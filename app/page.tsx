@@ -1,4 +1,4 @@
-"use client";
+facebook"use client";
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -33,17 +33,25 @@ function buildMapEmbedUrl(value: string | null, fallbackAddress: string) {
   const raw = clean(value);
   const build = (query: string) =>
     `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=k&z=17&ie=UTF8&iwloc=B&output=embed`;
+
   if (!raw) return build(fallbackAddress);
+
+  // Keep an Admin Settings supplied Google Maps embed URL untouched.
+  // This lets Google retain its interactive controls and saved view state.
   if (/google\.com\/maps\/embed/i.test(raw) || /[?&]output=embed(?:&|$)/i.test(raw)) return raw;
+
   try {
     const url = new URL(raw);
     const query = url.searchParams.get("q") || url.searchParams.get("query");
     if (query) return build(query);
+
     const coords = raw.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
     if (coords) return build(`${coords[1]},${coords[2]}`);
+
     const placeMatch = url.pathname.match(/\/maps\/place\/([^/]+)/i);
     if (placeMatch?.[1]) return build(decodeURIComponent(placeMatch[1].replace(/\+/g, " ")));
   } catch {}
+
   return build(raw);
 }
 
@@ -79,7 +87,7 @@ export default function Home() {
     <section id="contact" className="scroll-mt-24 px-5 py-20 lg:px-8"><div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1.1fr_.9fr]"><div className="rounded-3xl theme-primary-bg p-8 sm:p-10"><p className="text-xs font-extrabold uppercase tracking-[0.16em] text-white/75">Contact</p><h2 className="mt-3 text-3xl font-black text-white sm:text-4xl">Get in touch with {schoolName}</h2><p className="mt-4 max-w-xl leading-7 text-white/75">For school information, admission enquiries or other official communication, use the contact details below.</p><div className="mt-8 space-y-3 text-sm font-semibold text-white">{settings.address ? <p>{settings.address}</p> : null}{phone ? <p><a href={`tel:${phone.replace(/\s+/g, "")}`}>{phone}</a></p> : null}{whatsapp ? <p><a href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`}>WhatsApp: {whatsapp}</a></p> : null}{email ? <p><a href={`mailto:${email}`}>{email}</a></p> : null}{settings.office_time ? <p>{settings.office_time}</p> : null}</div></div><div className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-8 sm:p-10"><p className="text-xs font-extrabold uppercase tracking-[0.16em] theme-primary">Official Links</p><div className="mt-6 grid grid-cols-2 gap-3">{[["Facebook",settings.facebook],["Messenger",settings.messenger],["Instagram",settings.instagram],["YouTube",settings.youtube],["LinkedIn",settings.linkedin],["Website",settings.website]].filter(([,url]) => url).map(([label,url]) => <a key={label} href={url as string} target="_blank" rel="noreferrer" className="flex min-w-0 items-center justify-between gap-2 rounded-xl border border-[var(--school-border)] px-3 py-3 text-sm font-bold sm:px-4"><span className="truncate">{label}</span><span className="theme-primary shrink-0">↗</span></a>)}{!settings.facebook && !settings.messenger && !settings.instagram && !settings.youtube && !settings.linkedin && !settings.website ? <p className="col-span-2 text-sm leading-6 text-[var(--school-muted)]">Official links will appear here when configured from Admin Settings.</p> : null}</div></div></div>
       <div className="mx-auto mt-8 max-w-7xl overflow-hidden rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] shadow-sm"><div className="flex items-center justify-between gap-4 border-b border-[var(--school-border)] px-5 py-4 sm:px-7"><div><p className="text-xs font-extrabold uppercase tracking-[0.16em] theme-primary">Our Location</p><h3 className="mt-1 text-lg font-black sm:text-xl">{schoolName}</h3><p className="mt-1 text-xs text-[var(--school-muted)]">{settings.address || DEFAULT_SETTINGS.address}</p></div>{mapLink ? <a href={mapLink} target="_blank" rel="noreferrer" className="hidden rounded-xl border border-[var(--school-primary-border)] px-4 py-2 text-xs font-extrabold theme-primary sm:inline-flex">Open in Maps ↗</a> : null}</div><div className="relative h-[320px] w-full sm:h-[380px] lg:h-[410px]"><iframe title={`${schoolName} location map`} src={mapSrc} className="absolute inset-0 h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen /></div><div className="flex items-center justify-end px-5 py-3 sm:px-7 sm:hidden">{mapLink ? <a href={mapLink} target="_blank" rel="noreferrer" className="text-xs font-extrabold theme-primary">Open in Google Maps ↗</a> : null}</div></div>
     </section>
-    {people.length > 0 ? <section className="px-4 py-14 sm:px-6 lg:px-8"><div className="mx-auto max-w-7xl rounded-[2rem] border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-7"><div className="mb-7"><p className="text-xs font-extrabold uppercase tracking-[0.18em] theme-primary">PEOPLE & ACHIEVEMENTS</p><h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Our School Community</h2><p className="mt-3 text-sm leading-6 text-[var(--school-muted)] sm:text-base">Meet the teachers, committee members, staff and students who make C.T. Model School special.</p></div><div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-5">{people.map((person) => { const description = clean(person.short_description); const expanded = expandedPerson === person.id; const primary = person.category === "gpa5" || person.category === "scholarship" ? "Student" : person.designation || person.committee_position || person.subject || "School Community"; return <article key={person.id} className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] transition hover:-translate-y-1 hover:shadow-lg"><div className="aspect-square overflow-hidden bg-[var(--school-primary-soft)]">{person.photo_url ? <img src={person.photo_url} alt={person.full_name} className="h-full w-full object-cover object-top transition duration-300 group-hover:scale-[1.02]" /> : <div className="flex h-full items-center justify-center text-xs font-bold theme-primary">PHOTO</div>}</div><div className="flex min-h-[220px] flex-1 flex-col p-3 sm:p-4"><h3 className="line-clamp-2 text-xs font-extrabold leading-5 sm:text-sm">{person.full_name}</h3><p className="mt-1 line-clamp-2 text-[10px] font-bold leading-4 theme-primary sm:text-[11px]">{primary}</p><div className="mt-2 min-h-[48px] text-[10px] leading-4 text-[var(--school-muted)] sm:text-[11px] sm:leading-5">{description ? <p className={expanded ? "" : "line-clamp-3"}>{description}</p> : <p>Meet our school community and learn more about this profile.</p>}</div><button type="button" onClick={() => setExpandedPerson(expanded ? null : person.id)} className="mt-2 self-start text-[10px] font-extrabold theme-primary hover:underline sm:text-xs">{expanded ? "Show less" : "Read more"}</button><div className="mt-auto flex items-center justify-center gap-3 border-t border-[var(--school-border)] pt-4">{person.email ? <a href={`mailto:${person.email}`} aria-label={`Email ${person.full_name}`} title="Email" className="theme-primary flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--school-primary-soft)] transition hover:scale-105"><ContactIcon type="email" /></a> : null}{person.phone ? <a href={`tel:${person.phone.replace(/\s+/g, "")}`} aria-label={`Call ${person.full_name}`} title="Phone" className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-orange-500 transition hover:scale-105"><ContactIcon type="phone" /></a> : null}{person.whatsapp ? <a href={`https://wa.me/${person.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" aria-label={`WhatsApp ${person.full_name}`} title="WhatsApp" className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-green-600 transition hover:scale-105"><ContactIcon type="whatsapp" /></a> : null}</div></div></article>; })}</div><div className="mt-6 text-center"><a href="/people" className="text-sm font-bold theme-primary hover:underline">View all people & achievements</a></div></div></section> : null}
+    {people.length > 0 ? <section className="px-4 py-14 sm:px-6 lg:px-8"><div className="mx-auto max-w-7xl rounded-[2rem] border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-7"><div className="mb-7"><p className="text-xs font-extrabold uppercase tracking-[0.18em] theme-primary">PEOPLE & ACHIEVEMENTS</p><h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Our School Community</h2><p className="mt-3 text-sm leading-6 text-[var(--school-muted)] sm:text-base">Meet the teachers, committee members, staff and students who make C.T. Model School special.</p></div><div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-5">{people.map((person) => { const description = clean(person.short_description); const expanded = expandedPerson === person.id; const primary = person.designation || person.committee_position || person.subject || "School Community"; return <article key={person.id} className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] transition hover:-translate-y-1 hover:shadow-lg"><div className="aspect-square overflow-hidden bg-[var(--school-primary-soft)]">{person.photo_url ? <img src={person.photo_url} alt={person.full_name} className="h-full w-full object-cover object-top transition duration-300 group-hover:scale-[1.02]" /> : <div className="flex h-full items-center justify-center text-xs font-bold theme-primary">PHOTO</div>}</div><div className="flex min-h-[220px] flex-1 flex-col p-3 sm:p-4"><h3 className="line-clamp-2 text-xs font-extrabold leading-5 sm:text-sm">{person.full_name}</h3><p className="mt-1 line-clamp-2 text-[10px] font-bold leading-4 theme-primary sm:text-[11px]">{primary}</p><div className="mt-2 min-h-[48px] text-[10px] leading-4 text-[var(--school-muted)] sm:text-[11px] sm:leading-5">{description ? <p className={expanded ? "" : "line-clamp-3"}>{description}</p> : <p>Meet our school community and learn more about this profile.</p>}</div><button type="button" onClick={() => setExpandedPerson(expanded ? null : person.id)} className="mt-2 self-start text-[10px] font-extrabold theme-primary hover:underline sm:text-xs">{expanded ? "Show less" : "Read more"}</button><div className="mt-auto flex items-center justify-center gap-3 border-t border-[var(--school-border)] pt-4">{person.email ? <a href={`mailto:${person.email}`} aria-label={`Email ${person.full_name}`} title="Email" className="theme-primary flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--school-primary-soft)] transition hover:scale-105"><ContactIcon type="email" /></a> : null}{person.phone ? <a href={`tel:${person.phone.replace(/\s+/g, "")}`} aria-label={`Call ${person.full_name}`} title="Phone" className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-orange-500 transition hover:scale-105"><ContactIcon type="phone" /></a> : null}{person.whatsapp ? <a href={`https://wa.me/${person.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" aria-label={`WhatsApp ${person.full_name}`} title="WhatsApp" className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-green-600 transition hover:scale-105"><ContactIcon type="whatsapp" /></a> : null}</div></div></article>; })}</div><div className="mt-6 text-center"><a href="/people" className="text-sm font-bold theme-primary hover:underline">View all Community & achievements</a></div></div></section> : null}
     <footer className="theme-primary-bg border-t border-white/15 px-5 py-8 text-white" style={{ backgroundColor: "var(--school-primary)" }}>
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
@@ -89,14 +97,45 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-xs text-white/75">© {new Date().getFullYear()} {schoolName}. All rights reserved.</p>
-            <a href="/admin/login" className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[10px] font-semibold text-white/75 opacity-70 blur-[0.15px] transition hover:bg-white/15 hover:text-white hover:opacity-100 hover:blur-0">Admin Login</a>
+            <a href="/admin/login" className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[10px] font-semibold text-white/75 opacity-70 blur-[0.15px] transition hover:bg-white/15 hover:text-white hover:opacity-100 hover:blur-0">
+              Admin Login
+            </a>
           </div>
         </div>
+
         <div className="mt-5 flex flex-col gap-3 border-t border-white/15 pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[11px] text-white/75">Developed by <span className="font-semibold text-white">Shafa Abid Automation BD</span></p>
+          <p className="text-[11px] text-white/75">
+            Developed by <span className="font-semibold text-white">Shafa Abid Automation BD</span>
+          </p>
+
           <div className="flex items-center gap-3">
-            {clean(settings.facebook) ? <a href={clean(settings.facebook)} target="_blank" rel="noreferrer" aria-label="Facebook" title="Facebook" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 transition hover:bg-white/20 hover:scale-105"><svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor"><path d="M13.5 21v-7h2.4l.4-2.8h-2.8V9.4c0-.8.2-1.4 1.4-1.4h1.5V5.5c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2H8v2.8h2.5v7h3Z" /></svg></a> : null}
-            {whatsapp ? <a href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" aria-label="WhatsApp" title="WhatsApp" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 transition hover:bg-white/20 hover:scale-105"><ContactIcon type="whatsapp" /></a> : null}
+            {clean(settings.facebook) ? (
+              <a
+                href={clean(settings.facebook)}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Facebook"
+                title="Facebook"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 transition hover:bg-white/20 hover:scale-105"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor">
+                  <path d="M13.5 21v-7h2.4l.4-2.8h-2.8V9.4c0-.8.2-1.4 1.4-1.4h1.5V5.5c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2H8v2.8h2.5v7h3Z" />
+                </svg>
+              </a>
+            ) : null}
+
+            {whatsapp ? (
+              <a
+                href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="WhatsApp"
+                title="WhatsApp"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 transition hover:bg-white/20 hover:scale-105"
+              >
+                <ContactIcon type="whatsapp" />
+              </a>
+            ) : null}
           </div>
         </div>
       </div>
