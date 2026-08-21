@@ -27,16 +27,29 @@ Work in small, verified sections. Do not try to implement the entire school-mana
 - Remove baseline build blockers without inventing feature behavior.
 
 ### Phase 1: Administration foundation
-- Admin login and authenticated admin access.
-- Protected admin layout/shell.
-- Admin dashboard foundation.
-- Role and permission model using the existing `roles`, `permissions`, and `role_permissions` structure.
-- Profile linkage for authenticated users.
-- Central school settings and theme configuration.
-- Admin-controlled primary/theme color and related visual tokens.
+- Admin login and authenticated admin access. **Complete.**
+- Protected admin layout/shell. **Complete.**
+- Admin dashboard foundation. **Complete.**
+- Role and permission model using the existing `roles`, `permissions`, and `role_permissions` structure. **Foundation verified; deeper permission audit remains.**
+- Profile linkage for authenticated users. **Complete.**
+- Central school settings and theme configuration. **Complete.**
+- Admin-controlled primary/theme color and related visual tokens. **Complete.**
 
 ### Phase 2: Admin experience
-Build the real administration UI around the established foundation, including navigation, reusable UI primitives, responsive layouts, loading/error/empty states, and consistent access checks.
+**In progress.** Build the real administration UI around the established foundation, including navigation, reusable UI primitives, responsive layouts, loading/error/empty states, and consistent access checks.
+
+Completed in this section so far:
+- Responsive admin shell with desktop sidebar and mobile header.
+- Central administration navigation.
+- Theme-aware dashboard and settings presentation.
+- Dashboard module status cards and central settings entry point.
+- Shared visual tokens used instead of page-level primary colors.
+
+Next bounded work:
+- Reusable admin UI primitives.
+- Loading/error/empty states.
+- Consistent module route access checks.
+- Module shells before database-backed feature implementation.
 
 ### Phase 3: Core school configuration
 Implement the school-wide configuration needed by later modules. Keep configuration centralized and avoid duplicating settings in individual pages.
@@ -66,10 +79,12 @@ Build the public-facing school website separately from the admin application. It
 ## Current state
 - Admin authentication is working locally.
 - `/admin` dashboard foundation is working locally.
-- Central theme foundation has been started and the login/dashboard are using the theme system.
-- Baseline lint and production build pass.
+- Protected admin shell/navigation is now implemented.
+- Central theme foundation is active and login/dashboard/settings use the theme system.
+- Admin Settings can persist the central school primary color through `school_settings`.
+- Baseline lint and production build were previously verified for the foundation.
 - The first verified foundation changes have been committed and pushed.
-- `supabase/001_school_settings.sql` exists for the school settings/RLS foundation and must be applied manually in Supabase when the task reaches that dependency.
+- `supabase/manual/001_school_settings.sql` exists for the school settings/RLS foundation and must be applied manually in Supabase when the task reaches that dependency.
 
 ## How to work from this roadmap
 1. Read this file before starting a new feature.
