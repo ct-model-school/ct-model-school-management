@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const categories = [
@@ -40,12 +39,12 @@ export default async function PeoplePage() {
             if (items.length === 0) return null;
             return (
               <section key={category.value} id={category.value}>
-                <div className="mb-5 flex items-end justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.14em] theme-primary">{category.label}</p><h2 className="mt-1 text-2xl font-bold">{items.length} Profile{items.length === 1 ? "" : "s"}</h2></div></div>
+                <div className="mb-5"><p className="text-xs font-bold uppercase tracking-[0.14em] theme-primary">{category.label}</p><h2 className="mt-1 text-2xl font-bold">{items.length} Profile{items.length === 1 ? "" : "s"}</h2></div>
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                   {items.map((item) => (
                     <article key={item.id} className="overflow-hidden rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                       <div className="relative aspect-[4/5] bg-[var(--school-primary-soft)]">
-                        {item.photo_url ? <Image src={item.photo_url} alt={item.full_name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw" className="object-cover" unoptimized /> : <div className="flex h-full items-center justify-center text-xs font-bold theme-primary">PHOTO</div>}
+                        {item.photo_url ? <img src={item.photo_url} alt={item.full_name} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-xs font-bold theme-primary">PHOTO</div>}
                       </div>
                       <div className="p-4">
                         <h3 className="line-clamp-2 font-bold text-[var(--school-text)]">{item.full_name}</h3>
