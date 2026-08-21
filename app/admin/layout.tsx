@@ -9,6 +9,7 @@ const primaryNavigation = [
 const upcomingModules = [
   { href: "/admin/students", label: "Students" },
   { href: "/admin/parents", label: "Parents & Guardians" },
+  { href: "/admin/people", label: "People & Achievements" },
   { href: "/admin/teachers", label: "Teachers & Staff" },
   { href: "/admin/accounts", label: "Accounts & Finance" },
   { href: "/admin/inventory", label: "Inventory" },
@@ -21,9 +22,6 @@ export default async function AdminLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const profile = await getCurrentProfile();
 
-  // The login page and its route-level authentication remain independent.
-  // Nested admin pages retain their own access checks until the shared
-  // middleware boundary is introduced during authentication hardening.
   if (!profile) return children;
 
   const roleLabel = profile.role.name.replace(/_/g, " ");
@@ -42,13 +40,7 @@ export default async function AdminLayout({
               <p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--school-muted)]">Administration</p>
               <div className="mt-2 space-y-1">
                 {primaryNavigation.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="block rounded-xl px-3 py-2.5 text-sm font-semibold text-[var(--school-text)] transition hover:bg-[var(--school-primary-soft)] hover:text-[var(--school-primary)]"
-                  >
-                    {item.label}
-                  </Link>
+                  <Link key={item.href} href={item.href} className="block rounded-xl px-3 py-2.5 text-sm font-semibold text-[var(--school-text)] transition hover:bg-[var(--school-primary-soft)] hover:text-[var(--school-primary)]">{item.label}</Link>
                 ))}
               </div>
             </div>
@@ -57,15 +49,9 @@ export default async function AdminLayout({
               <p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--school-muted)]">Modules</p>
               <div className="mt-2 space-y-1">
                 {upcomingModules.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-[var(--school-muted)] transition hover:bg-[var(--school-primary-soft)] hover:text-[var(--school-primary)]"
-                  >
+                  <Link key={item.href} href={item.href} className="group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-[var(--school-muted)] transition hover:bg-[var(--school-primary-soft)] hover:text-[var(--school-primary)]">
                     {item.label}
-                    <span className="rounded-full border border-[var(--school-border)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide group-hover:border-[var(--school-primary-border)]">
-                      Open
-                    </span>
+                    <span className="rounded-full border border-[var(--school-border)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide group-hover:border-[var(--school-primary-border)]">Open</span>
                   </Link>
                 ))}
               </div>
@@ -87,7 +73,7 @@ export default async function AdminLayout({
                 <p className="text-sm font-bold text-[var(--school-text)]">C.T. Model School</p>
                 <p className="mt-0.5 text-xs theme-primary">Administration</p>
               </div>
-              <Link href="/admin/settings" className="rounded-xl border border-[var(--school-primary-border)] px-3 py-2 text-xs font-bold theme-primary">Settings</Link>
+              <Link href="/admin/people" className="rounded-xl border border-[var(--school-primary-border)] px-3 py-2 text-xs font-bold theme-primary">People</Link>
             </div>
           </header>
 
