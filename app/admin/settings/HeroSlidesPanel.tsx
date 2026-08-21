@@ -131,6 +131,15 @@ export default function HeroSlidesPanel() {
     setSlides((current) => current.filter((item) => item.id !== slide.id));
   }
 
+  async function copyUrl(url: string) {
+    try {
+      await navigator.clipboard.writeText(url);
+      setMessage("Hero image URL copied.");
+    } catch {
+      setError("Could not copy the hero image URL. You can select it manually.");
+    }
+  }
+
   return (
     <section className="mx-auto mt-6 max-w-6xl rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-6 shadow-sm md:p-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -163,6 +172,23 @@ export default function HeroSlidesPanel() {
                   <span className="text-xs text-[var(--school-muted)]">{slide.is_active ? "Active" : "Hidden"}</span>
                 </div>
                 <p className="truncate text-xs text-[var(--school-muted)]" title={slide.storage_path}>{slide.storage_path}</p>
+                <div className="rounded-xl border border-[var(--school-border)] bg-[var(--school-surface)] p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--school-muted)]">Public Image URL</p>
+                  <input
+                    readOnly
+                    value={slide.image_url}
+                    onFocus={(event) => event.currentTarget.select()}
+                    className="mt-1 w-full bg-transparent text-xs text-[var(--school-text)] outline-none"
+                    aria-label={`Public URL for hero slide ${index + 1}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void copyUrl(slide.image_url)}
+                    className="mt-2 rounded-lg border border-[var(--school-primary-border)] px-3 py-1.5 text-xs font-bold theme-primary"
+                  >
+                    Copy URL
+                  </button>
+                </div>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => void toggleSlide(slide)} className="flex-1 rounded-xl border border-[var(--school-primary-border)] px-3 py-2 text-xs font-bold theme-primary">
                     {slide.is_active ? "Hide" : "Show"}
