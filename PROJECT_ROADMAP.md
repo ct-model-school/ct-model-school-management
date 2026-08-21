@@ -32,7 +32,7 @@ Work in small, verified sections. Do not try to implement the entire school-mana
 - Admin dashboard foundation. **Complete.**
 - Role and permission model using the existing `roles`, `permissions`, and `role_permissions` structure. **Foundation verified; deeper permission audit remains.**
 - Profile linkage for authenticated users. **Complete.**
-- Central school settings and theme configuration. **Complete.**
+- Central school settings and theme configuration. **Foundation complete; content/settings expansion in progress.**
 - Admin-controlled primary/theme color and related visual tokens. **Complete.**
 
 ### Phase 2: Admin experience
@@ -49,8 +49,11 @@ Completed in this section so far:
 - Sidebar and module navigation now expose the implemented module shells.
 - Admin-level loading skeleton and error recovery boundary added.
 - Module shells deliberately avoid inventing database fields, calculations or workflows.
+- Expanded School Settings UI prepared for school identity, branding, contact, social, hero/headline, SEO and regional/system configuration.
+- `supabase/manual/002_school_settings_content.sql` added to extend the central settings record for those sections.
 
 Next bounded work:
+- Apply and verify the new school settings SQL in Supabase.
 - Route-level access consistency.
 - Inspect existing database relationships and permissions before implementing real module forms/tables.
 - Continue Phase 2 with verified reusable interactions.
@@ -90,7 +93,8 @@ Build the public-facing school website separately from the admin application. It
 - Admin loading and error boundaries are present.
 - Baseline lint and production build were previously verified for the foundation.
 - The first verified foundation changes have been committed and pushed.
-- `supabase/manual/001_school_settings.sql` exists for the school settings/RLS foundation and must be applied manually in Supabase when the task reaches that dependency.
+- `supabase/manual/001_school_settings.sql` exists for the school settings/RLS foundation.
+- `supabase/manual/002_school_settings_content.sql` now defines the additional centralized school content/settings fields for the expanded Admin Settings UI and must be applied manually in Supabase before testing the new fields.
 
 ## How to work from this roadmap
 1. Read this file before starting a new feature.
