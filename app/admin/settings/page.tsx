@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 import SettingsForm from "./SettingsForm";
 import AssetUploadPanel from "./AssetUploadPanel";
+import HeroSlidesPanel from "./HeroSlidesPanel";
 
 export default async function AdminSettingsPage() {
   const profile = await getCurrentProfile();
@@ -20,6 +21,7 @@ export default async function AdminSettingsPage() {
     <>
       <SettingsForm />
       <AssetUploadPanel />
+      <HeroSlidesPanel />
     </>
   );
 }
