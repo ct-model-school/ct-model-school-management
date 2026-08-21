@@ -9,7 +9,7 @@ function addPeopleLink(nav: Element, mobile = false) {
 
   const link = document.createElement("a");
   link.href = "/people";
-  link.textContent = "Community";
+  link.textContent = "People";
   link.setAttribute(`data-${PEOPLE_LINK}`, "true");
   link.className = mobile
     ? "rounded-lg px-3 py-2 text-sm font-semibold"
@@ -22,12 +22,12 @@ function addPeopleLink(nav: Element, mobile = false) {
   }
 }
 
-function NavIcon({ type }: { type: "home" | "about" | "Community" | "principal" | "contact" }) {
+function NavIcon({ type }: { type: "home" | "about" | "people" | "principal" | "contact" }) {
   const common = "h-6 w-6";
 
   if (type === "home") return <svg viewBox="0 0 24 24" className={common} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8" /><path d="M5.5 9.8V21h13V9.8" /><path d="M9 21v-6h6v6" /></svg>;
   if (type === "about") return <svg viewBox="0 0 24 24" className={common} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 20h16" /><path d="M6 18V9h4v9" /><path d="M14 18V4h4v14" /><path d="M7.5 12h1M15.5 7h1M15.5 10h1M15.5 13h1" /></svg>;
-  if (type === "Community") return <svg viewBox="0 0 24 24" className={common} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3" /><path d="M3.5 20c.5-3.3 2.4-5 5.5-5s5 1.7 5.5 5" /><circle cx="17" cy="9" r="2.2" /><path d="M15.2 15.5c2.5.2 4.2 1.7 4.8 4.5" /></svg>;
+  if (type === "people") return <svg viewBox="0 0 24 24" className={common} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3" /><path d="M3.5 20c.5-3.3 2.4-5 5.5-5s5 1.7 5.5 5" /><circle cx="17" cy="9" r="2.2" /><path d="M15.2 15.5c2.5.2 4.2 1.7 4.8 4.5" /></svg>;
   if (type === "principal") return <svg viewBox="0 0 24 24" className={common} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="3.2" /><path d="M5 21c.7-4.1 3-6.2 7-6.2s6.3 2.1 7 6.2" /><path d="M18.5 4.5v4M16.5 6.5h4" /></svg>;
   return <svg viewBox="0 0 24 24" className={common} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 5h16v14H4z" /><path d="m4 6 8 6 8-6" /></svg>;
 }
@@ -65,7 +65,7 @@ export default function PublicPeopleNav() {
   const items = [
     { label: "Home", href: "/", type: "home" as const, active: pathname === "/" },
     { label: "About", href: "/#about", type: "about" as const, active: false },
-    { label: "Community", href: "/people", type: "Community" as const, active: pathname === "/people" },
+    { label: "People", href: "/people", type: "people" as const, active: pathname === "/people" },
     { label: "Principal", href: "/#principal", type: "principal" as const, active: false },
     { label: "Contact", href: "/#contact", type: "contact" as const, active: false },
   ];
