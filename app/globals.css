@@ -67,11 +67,11 @@ main:has(> header + #top) {
   }
 }
 
-/* Public hero: fixed 1660:600 visual ratio.
+/* Public hero: 1600:400 visual ratio (4:1 wide cover).
    The image is cropped with object-cover so the next headline section
    appears immediately below the banner instead of pushing content down. */
 main:has(> header + #top) > #top + section:first-of-type > div {
-  aspect-ratio: 1660 / 600;
+  aspect-ratio: 1600 / 400;
   position: relative;
 }
 
