@@ -67,6 +67,22 @@ main:has(> header + #top) {
   }
 }
 
+/* Public hero: fixed 1660:600 visual ratio.
+   The image is cropped with object-cover so the next headline section
+   appears immediately below the banner instead of pushing content down. */
+main:has(> header + #top) > #top + section:first-of-type > div {
+  aspect-ratio: 1660 / 600;
+  position: relative;
+}
+
+main:has(> header + #top) > #top + section:first-of-type > div > img:first-child {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* =========================================================
    C.T. MODEL SCHOOL
    ADMIN LOGIN
