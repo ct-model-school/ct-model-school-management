@@ -1,0 +1,35 @@
+name: One-time footer cleanup
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Finalize footer
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('app/page.tsx')
+          t = p.read_text(encoding='utf-8')
+          t = t.replace('theme-primary-bg text-white border-t border-[var(--school-border)] bg-[var(--school-surface)] px-5 py-8', 'theme-primary-bg text-white border-t border-white/15 px-5 py-8', 1)
+          t = re.sub(r'\{whatsapp \? <a href=\{`https://wa\.me/\$\{whatsapp\.replace\(/\\D/g, ""\)\}`\}[^>]*>WhatsApp</a> : null\}', '', t, count=1)
+          p.write_text(t, encoding='utf-8')
+          PY
+      - name: Commit and remove workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/page.tsx
+          git diff --cached --quiet || git commit -m "fix: finalize blue footer with social icons"
+          git rm .github/workflows/one-time-footer-cleanup.yml
+          git commit -m "chore: remove one-time footer cleanup workflow"
+          git push
