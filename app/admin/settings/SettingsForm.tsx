@@ -36,6 +36,43 @@ const emptySettings: SchoolSettings = {
 const inputClass = "h-11 w-full rounded-xl border border-[var(--school-border)] bg-[var(--school-surface)] px-3 text-sm text-[var(--school-text)] outline-none focus:border-[var(--school-primary)]";
 const textareaClass = "w-full rounded-xl border border-[var(--school-border)] bg-[var(--school-surface)] px-3 py-3 text-sm text-[var(--school-text)] outline-none focus:border-[var(--school-primary)]";
 
+const stringFields = [
+  "school_name", "school_short_name", "school_motto", "school_headline", "school_description",
+  "eiin", "board", "principal_name", "principal_message", "logo_url", "favicon_url", "hero_image",
+  "address", "phone", "whatsapp", "telephone", "email", "website", "google_map", "office_time",
+  "facebook", "messenger", "instagram", "youtube", "linkedin", "tiktok", "theme_color",
+  "hero_badge", "hero_subtitle", "hero_title", "hero_description", "hero_button_1_text", "hero_button_1_link",
+  "hero_button_2_text", "hero_button_2_link", "meta_title", "meta_description", "meta_keywords", "og_image",
+  "currency", "currency_symbol", "timezone",
+] as const;
+
+function normalizeSettings(data: Partial<SchoolSettings> | null): SchoolSettings {
+  const merged = { ...emptySettings, ...(data ?? {}) } as SchoolSettings;
+
+  for (const field of stringFields) {
+    if (merged[field] == null) {
+      (merged as Record<string, unknown>)[field] = "";
+    }
+  }
+
+  if (!/^#[0-9a-fA-F]{6}$/.test(merged.theme_color)) {
+    merged.theme_color = DEFAULT_COLOR;
+  }
+
+  if (merged.established_year == null || Number.isNaN(Number(merged.established_year))) {
+    merged.established_year = null;
+  }
+
+  merged.show_hero = merged.show_hero ?? true;
+  merged.hero_auto_slide = merged.hero_auto_slide ?? true;
+  merged.hero_slide_interval = Number(merged.hero_slide_interval) || 5;
+  merged.hero_transition_speed = Number(merged.hero_transition_speed) || 600;
+  merged.hero_max_items = Number(merged.hero_max_items) || 5;
+  merged.maintenance_mode = merged.maintenance_mode ?? false;
+
+  return merged;
+}
+
 export default function SettingsForm() {
   const router = useRouter();
   const supabase = createClient();
@@ -50,7 +87,7 @@ export default function SettingsForm() {
     setLoading(true);
     const { data, error: loadError } = await supabase.from("school_settings").select("*").eq("id", 1).maybeSingle();
     if (loadError) setError(loadError.message);
-    else setSettings({ ...emptySettings, ...(data ?? {}) });
+    else setSettings(normalizeSettings(data));
     setLoading(false);
   }
 
@@ -79,7 +116,7 @@ export default function SettingsForm() {
     };
     const { error: updateError } = await supabase.from("school_settings").update(payload).eq("id", 1);
     if (updateError) { setError(updateError.message); setSaving(false); return; }
-    setSettings(payload); setPrimaryColor(normalizedColor); await refreshTheme();
+    setSettings(normalizeSettings(payload)); setPrimaryColor(normalizedColor); await refreshTheme();
     setMessage("School settings saved successfully."); setSaving(false); router.refresh();
   }
 
