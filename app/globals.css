@@ -340,3 +340,45 @@ main:has(> header + #top) > header > div > a > span > span:first-child {
   .admin-login-card { padding: 26px 22px; border-radius: 20px; }
   .admin-login-heading h1 { font-size: 28px; }
 }
+
+/* Official links: use clean platform icons instead of the generic arrow. */
+main:has(> header + #top) #contact > div > div:last-child a {
+  min-height: 46px;
+}
+
+main:has(> header + #top) #contact > div > div:last-child a > span:last-child {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--school-primary-border);
+  border-radius: 9px;
+  background: var(--school-primary-soft);
+  color: var(--school-primary);
+  font-size: 0;
+  line-height: 1;
+}
+
+main:has(> header + #top) #contact > div > div:last-child a > span:last-child::before {
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+main:has(> header + #top) #contact > div > div:last-child a[href*="facebook"] > span:last-child::before { content: "f"; font-family: Arial, sans-serif; }
+main:has(> header + #top) #contact > div > div:last-child a[href*="messenger"],
+main:has(> header + #top) #contact > div > div:last-child a[href*="m.me"] { }
+main:has(> header + #top) #contact > div > div:last-child a[href*="messenger"] > span:last-child::before,
+main:has(> header + #top) #contact > div > div:last-child a[href*="m.me"] > span:last-child::before { content: "⌁"; font-size: 19px; }
+main:has(> header + #top) #contact > div > div:last-child a[href*="instagram"] > span:last-child::before { content: "◎"; font-size: 20px; }
+main:has(> header + #top) #contact > div > div:last-child a[href*="youtube"] > span:last-child::before { content: "▶"; font-size: 13px; }
+main:has(> header + #top) #contact > div > div:last-child a[href*="linkedin"] > span:last-child::before { content: "in"; font-size: 12px; font-family: Arial, sans-serif; }
+main:has(> header + #top) #contact > div > div:last-child a[href^="http"]:not([href*="facebook"]):not([href*="messenger"]):not([href*="m.me"]):not([href*="instagram"]):not([href*="youtube"]):not([href*="linkedin"]) > span:last-child::before { content: "⌂"; font-size: 17px; }
+
+main:has(> header + #top) #contact > div > div:last-child a:hover > span:last-child {
+  background: var(--school-primary);
+  color: var(--school-on-primary);
+  border-color: var(--school-primary);
+}
