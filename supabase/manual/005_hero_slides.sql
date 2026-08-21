@@ -73,6 +73,36 @@ create trigger hero_slides_set_updated_at
 before update on public.hero_slides
 for each row execute function public.set_hero_slides_updated_at();
 
+-- Keep school_settings.hero_image populated with the first active slide for
+-- backward compatibility. The public website should use hero_slides for the
+-- complete multi-image gallery.
+create or replace function public.sync_primary_hero_image()
+returns trigger
+language plpgsql
+as $$
+declare
+  primary_url text;
+begin
+  select image_url
+    into primary_url
+    from public.hero_slides
+   where is_active = true
+   order by sort_order asc, created_at asc
+   limit 1;
+
+  update public.school_settings
+     set hero_image = primary_url
+   where id = 1;
+
+  return null;
+end;
+$$;
+
+drop trigger if exists hero_slides_sync_primary_hero on public.hero_slides;
+create trigger hero_slides_sync_primary_hero
+after insert or update or delete on public.hero_slides
+for each statement execute function public.sync_primary_hero_image();
+
 -- AssetUploadPanel owns these four URLs. The main Settings form currently submits the
 -- complete settings object, so preserve an existing uploaded URL when that form sends
 -- an empty value. This prevents a later Save All Settings from erasing an uploaded link.
