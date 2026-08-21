@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 import SettingsForm from "./SettingsForm";
+import AssetUploadPanel from "./AssetUploadPanel";
 
 export default async function AdminSettingsPage() {
   const profile = await getCurrentProfile();
@@ -15,5 +16,10 @@ export default async function AdminSettingsPage() {
     redirect("/admin");
   }
 
-  return <SettingsForm />;
+  return (
+    <>
+      <SettingsForm />
+      <AssetUploadPanel />
+    </>
+  );
 }
