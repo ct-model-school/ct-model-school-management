@@ -26,7 +26,7 @@ export default async function PeoplePage() {
         <header className="text-center">
           <p className="text-xs font-bold uppercase tracking-[0.18em] theme-primary">People & Achievements</p>
           <h1 className="mt-2 text-3xl font-bold md:text-4xl">Our School Community</h1>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-[var(--school-muted)]">Meet the people who teach, lead, support and represent C.T. Model School.</p>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-[var(--school-muted)]">Meet the teachers, committee members, staff and students who make C.T. Model School special.</p>
         </header>
 
         <nav className="mt-8 flex gap-2 overflow-x-auto pb-2" aria-label="Profile categories">
@@ -40,7 +40,7 @@ export default async function PeoplePage() {
             return (
               <section key={category.value} id={category.value}>
                 <div className="mb-5"><p className="text-xs font-bold uppercase tracking-[0.14em] theme-primary">{category.label}</p><h2 className="mt-1 text-2xl font-bold">{items.length} Profile{items.length === 1 ? "" : "s"}</h2></div>
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                   {items.map((item) => (
                     <article key={item.id} className="overflow-hidden rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                       <div className="relative aspect-[4/5] bg-[var(--school-primary-soft)]">

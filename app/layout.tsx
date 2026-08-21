@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
+import PublicPeopleSection from "@/app/components/PublicPeopleSection";
 
 export const metadata: Metadata = {
   title: "C.T. Model School",
@@ -15,7 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <PublicPeopleSection />
+        </ThemeProvider>
       </body>
     </html>
   );
