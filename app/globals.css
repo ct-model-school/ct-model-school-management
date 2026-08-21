@@ -5,6 +5,7 @@
   --school-primary-hover: #475569;
   --school-primary-soft: #f1f5f9;
   --school-primary-border: #cbd5e1;
+  --school-on-primary: #ffffff;
 
   --school-background: #f5f7fa;
   --school-surface: #ffffff;
@@ -22,6 +23,24 @@
 html,
 body {
   min-height: 100%;
+}
+
+/* Shared theme utilities. Use these instead of page-level brand colors. */
+.theme-primary {
+  color: var(--school-primary);
+}
+
+.theme-primary-bg {
+  background-color: var(--school-primary);
+  color: var(--school-on-primary);
+}
+
+.theme-primary-soft-bg {
+  background-color: var(--school-primary-soft);
+}
+
+.theme-primary-border {
+  border-color: var(--school-primary-border);
 }
 
 body {
@@ -84,7 +103,7 @@ body {
   justify-content: center;
   border-radius: 14px;
   background: var(--school-primary);
-  color: #fff;
+  color: var(--school-on-primary);
   font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -179,7 +198,7 @@ body {
   border: 0;
   border-radius: 12px;
   background: var(--school-primary);
-  color: #fff;
+  color: var(--school-on-primary);
   cursor: pointer;
   font-size: 14px;
   font-weight: 750;

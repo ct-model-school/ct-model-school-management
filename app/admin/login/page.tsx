@@ -8,7 +8,7 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  const [email, setEmail] = useState("shafa.ctmodel@gmail.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,7 +29,13 @@ export default function AdminLoginPage() {
       return;
     }
 
-    router.replace("/admin");
+    const nextPath = new URLSearchParams(window.location.search).get("next");
+    const destination =
+      nextPath?.startsWith("/admin") && nextPath !== "/admin/login"
+        ? nextPath
+        : "/admin";
+
+    router.replace(destination);
     router.refresh();
   }
 

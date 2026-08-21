@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { cache } from "react";
 
-export async function getCurrentProfile() {
+export const getCurrentProfile = cache(async () => {
   const supabase = await createServerSupabaseClient();
 
   const {
@@ -37,4 +38,4 @@ export async function getCurrentProfile() {
     ...data,
     role,
   };
-}
+});

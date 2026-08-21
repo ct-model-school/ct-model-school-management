@@ -75,9 +75,8 @@ function applyTheme(color: string) {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [primaryColor, setPrimaryColorState] = useState("#64748b");
-  const supabase = createClient();
-
   async function refreshTheme() {
+    const supabase = createClient();
     const { data } = await supabase
       .from("school_settings")
       .select("theme_color")
