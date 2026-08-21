@@ -89,7 +89,7 @@ export default function Home() {
 
       {settings.show_hero ? <>
         <section className="relative w-full overflow-hidden bg-[var(--school-text)]">
-          <div className="relative isolate w-full overflow-hidden" style={{ height: "min(56.25vw, 600px)" }}>
+          <div className="relative isolate w-full overflow-hidden" style={{ aspectRatio: "16 / 9" }}>
             {heroImages.map((slide, index) => <div key={slide.id} className={`absolute inset-0 h-full w-full overflow-hidden transition-opacity ${index === activeSlide ? "opacity-100" : "pointer-events-none opacity-0"}`} style={{ transitionDuration: `${Math.max(200, settings.hero_transition_speed || 600)}ms` }}>
               <img src={slide.image_url} alt={slide.alt_text || schoolName} className="absolute inset-0 block h-full w-full object-cover object-center" />
             </div>)}
