@@ -32,12 +32,12 @@ body {
 /* Public home uses one fixed desktop canvas so browser zoom scales
    header, hero and all following sections together. Admin is unaffected. */
 main:has(> header + #top) {
-  width: 1366px;
-  min-width: 1366px;
+  width: 1320px;
+  min-width: 1320px;
   margin-inline: auto;
 }
 
-@media (max-width: 1365px) {
+@media (max-width: 1300px) {
   main:has(> header + #top) { margin-inline: 0; }
 }
 
