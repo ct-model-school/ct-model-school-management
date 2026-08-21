@@ -180,13 +180,10 @@ main:has(> header + #top) > footer {
   box-shadow: 0 -4px 14px rgba(15, 23, 42, 0.025);
 }
 
-/* Keep the public content readable while the browser zooms the whole
-   fixed canvas, including the hero image. */
 main:has(> header + #top) img {
   max-width: 100%;
 }
 
-/* Mobile public-home layout. Desktop remains unchanged above 768px. */
 @media (max-width: 767px) {
   main:has(> header + #top) {
     width: 100%;
@@ -210,17 +207,15 @@ main:has(> header + #top) img {
     font-size: 13px;
   }
 
-  /* Mobile must preserve the complete 1600:400 hero artwork.
-     The previous 16:6 box forced horizontal cropping on narrow screens. */
   main:has(> header + #top) > #top + section:first-of-type > div {
-    aspect-ratio: 1600 / 400;
+    aspect-ratio: 16 / 6;
     min-height: 0;
   }
 
   main:has(> header + #top) > #top + section:first-of-type > div > div img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     object-position: center;
   }
 
@@ -292,6 +287,17 @@ main:has(> header + #top) img {
     font-size: 16px;
     line-height: 1.7;
   }
+}
+
+/* Public header: one-line school name, no CTMS subtitle. */
+main:has(> header + #top) > header > div > a > span > span:last-child {
+  display: none;
+}
+
+main:has(> header + #top) > header > div > a > span > span:first-child {
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .admin-login-page {
