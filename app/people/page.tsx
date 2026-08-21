@@ -65,7 +65,9 @@ export default async function PeoplePage() {
 
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                   {items.map((item) => {
-                    const primaryInfo = item.designation || item.committee_position || item.subject || item.achievement_type || item.result_value || item.scholarship_type || "School Community";
+                    const primaryInfo = item.category === "gpa5" || item.category === "scholarship"
+                      ? "Student"
+                      : item.designation || item.committee_position || item.subject || item.achievement_type || item.result_value || item.scholarship_type || "School Community";
                     const metaInfo = [item.department, item.class_name, item.section, item.academic_year].filter(Boolean).join(" • ");
                     const hasDetails = Boolean(item.short_description || metaInfo || item.exam_name || item.result_value || item.scholarship_type);
 
