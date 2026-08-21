@@ -8,6 +8,17 @@ type AdminPageShellProps = {
   action?: { href: string; label: string };
 };
 
+const moduleLinks = [
+  { href: "/admin", label: "Dashboard" },
+  { href: "/admin/students", label: "Students" },
+  { href: "/admin/parents", label: "Parents" },
+  { href: "/admin/teachers", label: "Teachers & Staff" },
+  { href: "/admin/accounts", label: "Accounts" },
+  { href: "/admin/inventory", label: "Inventory" },
+  { href: "/admin/notices", label: "Notices" },
+  { href: "/admin/results", label: "Results" },
+];
+
 export function AdminPageShell({
   eyebrow,
   title,
@@ -34,6 +45,24 @@ export function AdminPageShell({
           ) : null}
         </div>
       </header>
+
+      <nav
+        aria-label="Administration modules"
+        className="mt-4 overflow-x-auto rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] p-2 shadow-sm"
+      >
+        <div className="flex min-w-max gap-1">
+          {moduleLinks.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-xl px-3 py-2 text-xs font-semibold text-[var(--school-muted)] transition hover:bg-[var(--school-primary-soft)] hover:text-[var(--school-primary)]"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </nav>
+
       <section className="mt-6">{children}</section>
     </div>
   );
