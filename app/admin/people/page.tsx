@@ -23,6 +23,9 @@ type Profile = {
   achievement_type: string | null;
   scholarship_type: string | null;
   short_description: string | null;
+  email: string | null;
+  phone: string | null;
+  whatsapp: string | null;
   is_active: boolean;
   display_order: number;
 };
@@ -76,7 +79,7 @@ export default function PeopleAdminPage() {
     setLoading(true);
     const query = supabase
       .from("people_profiles")
-      .select("id,category,full_name,photo_url,designation,department,subject,committee_position,class_name,section,academic_year,exam_name,result_value,achievement_type,scholarship_type,short_description,is_active,display_order")
+      .select("id,category,full_name,photo_url,designation,department,subject,committee_position,class_name,section,academic_year,exam_name,result_value,achievement_type,scholarship_type,short_description,email,phone,whatsapp,is_active,display_order")
       .order("display_order", { ascending: true })
       .order("full_name", { ascending: true });
     const { data, error } = await query;
@@ -182,9 +185,9 @@ export default function PeopleAdminPage() {
       achievement_type: item.achievement_type || "",
       scholarship_type: item.scholarship_type || "",
       short_description: item.short_description || "",
-      email: "",
-      phone: "",
-      whatsapp: "",
+      email: item.email || "",
+      phone: item.phone || "",
+      whatsapp: item.whatsapp || "",
       display_order: String(item.display_order),
     });
     setPhoto(null);
@@ -251,6 +254,16 @@ export default function PeopleAdminPage() {
             {showAchievementFields && <label><span className="label">Achievement Type</span><select className="field" value={form.achievement_type} onChange={(e) => updateField("achievement_type", e.target.value)}><option value="">Select type</option>{achievementTypes.map((item) => <option key={item}>{item}</option>)}</select></label>}
 
             <label className="md:col-span-2"><span className="label">Short Description</span><textarea className="field min-h-24 py-3" value={form.short_description} onChange={(e) => updateField("short_description", e.target.value)} placeholder="Short profile / achievement description" /></label>
+
+            <div className="md:col-span-2">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] theme-primary">Contact Information</p>
+              <div className="grid gap-4 md:grid-cols-3">
+                <label><span className="label">Email</span><input className="field" type="email" value={form.email} onChange={(e) => updateField("email", e.target.value)} placeholder="name@example.com" /></label>
+                <label><span className="label">Phone</span><input className="field" type="tel" value={form.phone} onChange={(e) => updateField("phone", e.target.value)} placeholder="01XXXXXXXXX" /></label>
+                <label><span className="label">WhatsApp</span><input className="field" type="tel" value={form.whatsapp} onChange={(e) => updateField("whatsapp", e.target.value)} placeholder="01XXXXXXXXX" /></label>
+              </div>
+            </div>
+
             <label><span className="label">Display Order</span><input className="field" type="number" min="0" value={form.display_order} onChange={(e) => updateField("display_order", e.target.value)} /></label>
           </div>
 
