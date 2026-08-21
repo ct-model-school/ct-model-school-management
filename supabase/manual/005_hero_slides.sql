@@ -29,6 +29,13 @@ create policy "Public can read active hero slides"
   to anon, authenticated
   using (is_active = true);
 
+drop policy if exists "Administrators can read all hero slides" on public.hero_slides;
+create policy "Administrators can read all hero slides"
+  on public.hero_slides
+  for select
+  to authenticated
+  using (public.is_school_administrator());
+
 drop policy if exists "Administrators can insert hero slides" on public.hero_slides;
 create policy "Administrators can insert hero slides"
   on public.hero_slides
