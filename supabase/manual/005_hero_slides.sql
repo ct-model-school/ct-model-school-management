@@ -66,5 +66,34 @@ create trigger hero_slides_set_updated_at
 before update on public.hero_slides
 for each row execute function public.set_hero_slides_updated_at();
 
+-- AssetUploadPanel owns these four URLs. The main Settings form currently submits the
+-- complete settings object, so preserve an existing uploaded URL when that form sends
+-- an empty value. This prevents a later Save All Settings from erasing an uploaded link.
+create or replace function public.preserve_school_asset_urls()
+returns trigger
+language plpgsql
+as $$
+begin
+  if nullif(trim(coalesce(new.logo_url, '')), '') is null then
+    new.logo_url = old.logo_url;
+  end if;
+  if nullif(trim(coalesce(new.favicon_url, '')), '') is null then
+    new.favicon_url = old.favicon_url;
+  end if;
+  if nullif(trim(coalesce(new.hero_image, '')), '') is null then
+    new.hero_image = old.hero_image;
+  end if;
+  if nullif(trim(coalesce(new.og_image, '')), '') is null then
+    new.og_image = old.og_image;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists school_settings_preserve_asset_urls on public.school_settings;
+create trigger school_settings_preserve_asset_urls
+before update on public.school_settings
+for each row execute function public.preserve_school_asset_urls();
+
 -- Storage files remain in the existing public school-assets bucket under hero/.
 -- Supabase Storage creates the logical folder automatically when the first file is uploaded.
