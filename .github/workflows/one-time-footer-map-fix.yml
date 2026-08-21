@@ -1,0 +1,68 @@
+name: One-time footer and map fix
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Patch page
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('app/page.tsx')
+          text = path.read_text(encoding='utf-8')
+
+          old_map = '''  const mapQuery = "Shafa Abid Automation BD, Shop No 01, Porir Rasta, Royal Gate, Kumira 4314, Bangladesh";\n  const mapSrc = settings.google_map ? settings.google_map : `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`;'''
+          new_map = '''  const mapSrc = clean(settings.google_map);'''
+          if old_map in text:
+              text = text.replace(old_map, new_map, 1)
+          elif 'const mapSrc = settings.google_map ? settings.google_map' in text:
+              text = re.sub(r'  const mapQuery = .*?;\\n  const mapSrc = settings\\.google_map \? settings\\.google_map : .*?;', new_map, text, count=1)
+
+          # Add Facebook + WhatsApp icon buttons to the main footer, using Admin Settings links.
+          footer_icon_block = '''{(clean(settings.facebook) || whatsapp) ? <div className="mt-6 flex items-center gap-3">{clean(settings.facebook) ? <a href={clean(settings.facebook)} target="_blank" rel="noreferrer" aria-label="Facebook" className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 transition hover:bg-white/20"><svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor"><path d="M13.5 21v-7h2.4l.4-2.8h-2.8V9.4c0-.8.2-1.4 1.4-1.4h1.5V5.5c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2H8v2.8h2.5v7h3Z" /></svg></a> : null}{whatsapp ? <a href={`https://wa.me/${whatsapp.replace(/\\D/g, "")}`} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 transition hover:bg-white/20"><ContactIcon type="whatsapp" /></a> : null}</div> : null}'''
+
+          if 'aria-label="Facebook" className="flex h-10 w-10' not in text:
+              marker = '</footer>'
+              if marker in text:
+                  text = text.replace(marker, footer_icon_block + marker, 1)
+              else:
+                  raise SystemExit('footer closing tag not found')
+
+          # Make the existing footer theme-primary blue without disturbing its layout.
+          m = re.search(r'<footer(?P<attrs>[^>]*)>', text)
+          if not m:
+              raise SystemExit('footer opening tag not found')
+          attrs = m.group('attrs')
+          if 'theme-primary-bg' not in attrs:
+              if 'className=' in attrs:
+                  attrs = re.sub(r'className="([^"]*)"', lambda x: f'className="theme-primary-bg text-white {x.group(1)}"', attrs, count=1)
+              else:
+                  attrs += ' className="theme-primary-bg text-white"'
+              text = text[:m.start('attrs')] + attrs + text[m.end('attrs'):]
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit fix and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/page.tsx
+          git diff --cached --quiet && echo "No page changes needed" || git commit -m "fix: use school map and add themed footer social icons"
+          git rm .github/workflows/one-time-footer-map-fix.yml
+          git commit -m "chore: remove one-time footer map workflow"
+          git push
