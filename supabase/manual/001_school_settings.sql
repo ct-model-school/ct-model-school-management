@@ -31,6 +31,12 @@ $$;
 revoke all on function public.is_school_administrator() from public;
 grant execute on function public.is_school_administrator() to authenticated;
 
+-- Data API grants are required before RLS policies can take effect.
+revoke all on table public.school_settings from anon;
+revoke all on table public.school_settings from authenticated;
+grant select on table public.school_settings to anon;
+grant select, insert, update, delete on table public.school_settings to authenticated;
+
 drop policy if exists "Anyone can read the school theme" on public.school_settings;
 create policy "Anyone can read the school theme"
   on public.school_settings
@@ -43,8 +49,8 @@ create policy "Administrators can manage school settings"
   on public.school_settings
   for all
   to authenticated
-  using (public.is_school_administrator())
-  with check (public.is_school_administrator());
+  using ((select public.is_school_administrator()))
+  with check ((select public.is_school_administrator()));
 
 insert into public.school_settings (id, theme_color)
 values (1, '#64748b')
