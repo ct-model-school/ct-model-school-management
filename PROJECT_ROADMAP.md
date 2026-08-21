@@ -43,13 +43,15 @@ Completed in this section so far:
 - Central administration navigation.
 - Theme-aware dashboard and settings presentation.
 - Dashboard module status cards and central settings entry point.
-- Shared visual tokens used instead of page-level primary colors.
+- Reusable `AdminPageShell`, `AdminEmptyState` and `AdminInfoCard` primitives.
+- Theme-aware shells for Students, Parents & Guardians, Teachers & Staff, Accounts, Inventory, Notices, and Results.
+- Dashboard links now open the Students, Accounts and Inventory foundation shells.
+- Module shells deliberately avoid inventing database fields, calculations or workflows.
 
 Next bounded work:
-- Reusable admin UI primitives.
-- Loading/error/empty states.
-- Consistent module route access checks.
-- Module shells before database-backed feature implementation.
+- Loading/error states and route-level access consistency.
+- Inspect existing database relationships and permissions before implementing real module forms/tables.
+- Continue Phase 2 with verified reusable interactions.
 
 ### Phase 3: Core school configuration
 Implement the school-wide configuration needed by later modules. Keep configuration centralized and avoid duplicating settings in individual pages.
@@ -79,9 +81,10 @@ Build the public-facing school website separately from the admin application. It
 ## Current state
 - Admin authentication is working locally.
 - `/admin` dashboard foundation is working locally.
-- Protected admin shell/navigation is now implemented.
+- Protected admin shell/navigation is implemented.
 - Central theme foundation is active and login/dashboard/settings use the theme system.
 - Admin Settings can persist the central school primary color through `school_settings`.
+- Reusable admin presentation primitives and module shells are now present.
 - Baseline lint and production build were previously verified for the foundation.
 - The first verified foundation changes have been committed and pushed.
 - `supabase/manual/001_school_settings.sql` exists for the school settings/RLS foundation and must be applied manually in Supabase when the task reaches that dependency.
