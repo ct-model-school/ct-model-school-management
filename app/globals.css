@@ -254,3 +254,9 @@ body {
     font-size: 28px;
   }
 }
+
+/* Homepage hero: preserve the complete uploaded image without cropping or zooming. */
+main > section:first-of-type img {
+  object-fit: contain !important;
+  object-position: center center !important;
+}
