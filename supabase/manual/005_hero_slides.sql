@@ -103,6 +103,18 @@ create trigger hero_slides_sync_primary_hero
 after insert or update or delete on public.hero_slides
 for each statement execute function public.sync_primary_hero_image();
 
+-- Sync the existing gallery immediately when this SQL is run, without requiring
+-- another upload or edit action.
+update public.school_settings
+   set hero_image = (
+     select image_url
+       from public.hero_slides
+      where is_active = true
+      order by sort_order asc, created_at asc
+      limit 1
+   )
+ where id = 1;
+
 -- AssetUploadPanel owns these four URLs. The main Settings form currently submits the
 -- complete settings object, so preserve an existing uploaded URL when that form sends
 -- an empty value. This prevents a later Save All Settings from erasing an uploaded link.
