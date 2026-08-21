@@ -1,0 +1,44 @@
+name: One-time school map polish
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch school map
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('app/page.tsx')
+          text = path.read_text(encoding='utf-8')
+
+          text = text.replace('  const mapSrc = clean(settings.google_map);', '  const mapLink = clean(settings.google_map);\n  const mapSrc = mapLink;', 1)
+          text = text.replace('<h3 className="mt-1 text-lg font-black sm:text-xl">Shafa Abid Automation BD</h3><p className="mt-1 text-xs text-[var(--school-muted)]">Shop No: 01, Porir Rasta, Royal Gate, Kumira 4314</p>', '<h3 className="mt-1 text-lg font-black sm:text-xl">{schoolName}</h3><p className="mt-1 text-xs text-[var(--school-muted)]">{settings.address || DEFAULT_SETTINGS.address}</p>', 1)
+          text = text.replace('href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`}', 'href={mapLink || "#"}', 2)
+          text = text.replace('title="Shafa Abid Automation BD location map"', 'title={`${schoolName} location map`}', 1)
+          # Remove the old text WhatsApp footer button because icon buttons are now present.
+          text = re.sub(r'\{whatsapp \? <a href=\{`https://wa\.me/\$\{whatsapp\.replace\(/\\\\D/g, ""\)\}`\}[^>]*>WhatsApp</a> : null\}', '', text, count=1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit and remove workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/page.tsx
+          git diff --cached --quiet && echo "No changes needed" || git commit -m "fix: show school name and settings address on map"
+          git rm .github/workflows/one-time-school-map-polish.yml
+          git commit -m "chore: remove one-time map polish workflow"
+          git push
