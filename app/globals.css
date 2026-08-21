@@ -341,15 +341,15 @@ main:has(> header + #top) > header > div > a > span > span:first-child {
   .admin-login-heading h1 { font-size: 28px; }
 }
 
-/* Official links: use clean platform icons instead of the generic arrow. */
+/* Official links: real platform-style SVG icons, theme-aware. */
 main:has(> header + #top) #contact > div > div:last-child a {
   min-height: 46px;
 }
 
 main:has(> header + #top) #contact > div > div:last-child a > span:last-child {
-  width: 30px;
-  height: 30px;
-  flex: 0 0 30px;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -359,26 +359,63 @@ main:has(> header + #top) #contact > div > div:last-child a > span:last-child {
   color: var(--school-primary);
   font-size: 0;
   line-height: 1;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease, transform 150ms ease;
 }
 
 main:has(> header + #top) #contact > div > div:last-child a > span:last-child::before {
-  font-size: 16px;
-  font-weight: 900;
-  line-height: 1;
+  content: "";
+  display: block;
+  width: 19px;
+  height: 19px;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
 
-main:has(> header + #top) #contact > div > div:last-child a[href*="facebook"] > span:last-child::before { content: "f"; font-family: Arial, sans-serif; }
-main:has(> header + #top) #contact > div > div:last-child a[href*="messenger"],
-main:has(> header + #top) #contact > div > div:last-child a[href*="m.me"] { }
+/* Facebook */
+main:has(> header + #top) #contact > div > div:last-child a[href*="facebook"] > span:last-child::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12c0 5.99 4.39 10.95 10.13 11.85v-8.39H7.08v-3.39h3.05V9.41c0-3.03 1.79-4.7 4.53-4.7 1.31 0 2.68.24 2.68.24v2.96h-1.51c-1.49 0-1.96.93-1.96 1.88v2.26h3.33l-.53 3.39h-2.8v8.39C19.61 22.95 24 17.99 24 12.07z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12c0 5.99 4.39 10.95 10.13 11.85v-8.39H7.08v-3.39h3.05V9.41c0-3.03 1.79-4.7 4.53-4.7 1.31 0 2.68.24 2.68.24v2.96h-1.51c-1.49 0-1.96.93-1.96 1.88v2.26h3.33l-.53 3.39h-2.8v8.39C19.61 22.95 24 17.99 24 12.07z'/%3E%3C/svg%3E");
+}
+
+/* Messenger */
 main:has(> header + #top) #contact > div > div:last-child a[href*="messenger"] > span:last-child::before,
-main:has(> header + #top) #contact > div > div:last-child a[href*="m.me"] > span:last-child::before { content: "⌁"; font-size: 19px; }
-main:has(> header + #top) #contact > div > div:last-child a[href*="instagram"] > span:last-child::before { content: "◎"; font-size: 20px; }
-main:has(> header + #top) #contact > div > div:last-child a[href*="youtube"] > span:last-child::before { content: "▶"; font-size: 13px; }
-main:has(> header + #top) #contact > div > div:last-child a[href*="linkedin"] > span:last-child::before { content: "in"; font-size: 12px; font-family: Arial, sans-serif; }
-main:has(> header + #top) #contact > div > div:last-child a[href^="http"]:not([href*="facebook"]):not([href*="messenger"]):not([href*="m.me"]):not([href*="instagram"]):not([href*="youtube"]):not([href*="linkedin"]) > span:last-child::before { content: "⌂"; font-size: 17px; }
+main:has(> header + #top) #contact > div > div:last-child a[href*="m.me"] > span:last-child::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 5.98 2 10.9c0 2.82 1.47 5.32 3.82 6.97V22l3.49-1.92c.86.24 1.76.37 2.69.37 5.52 0 10-3.98 10-8.9S17.52 2 12 2Zm1.03 12.01-2.63-2.81-5.15 2.81 5.67-6.02 2.58 2.81 5.2-2.81-5.67 6.02Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 5.98 2 10.9c0 2.82 1.47 5.32 3.82 6.97V22l3.49-1.92c.86.24 1.76.37 2.69.37 5.52 0 10-3.98 10-8.9S17.52 2 12 2Zm1.03 12.01-2.63-2.81-5.15 2.81 5.67-6.02 2.58 2.81 5.2-2.81-5.67 6.02Z'/%3E%3C/svg%3E");
+}
+
+/* Instagram */
+main:has(> header + #top) #contact > div > div:last-child a[href*="instagram"] > span:last-child::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5Zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5ZM17.75 6.25a1 1 0 1 1-1 1 1 1 0 0 1 1-1Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5Zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5ZM17.75 6.25a1 1 0 1 1-1 1 1 1 0 0 1 17.75 6.25Z'/%3E%3C/svg%3E");
+}
+
+/* YouTube */
+main:has(> header + #top) #contact > div > div:last-child a[href*="youtube"] > span:last-child::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M23.5 6.19a3 3 0 0 0-2.11-2.12C19.52 3.5 12 3.5 12 3.5s-7.52 0-9.39.57A3 3 0 0 0 .5 6.19 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.81 3 3 0 0 0 2.11 2.12c1.87.57 9.39.57 9.39.57s7.52 0 9.39-.57a3 3 0 0 0 2.11-2.12A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.81ZM9.6 15.5v-7l6 3.5-6 3.5Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M23.5 6.19a3 3 0 0 0-2.11-2.12C19.52 3.5 12 3.5 12 3.5s-7.52 0-9.39.57A3 3 0 0 0 .5 6.19 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.81 3 3 0 0 0 2.11 2.12c1.87.57 9.39.57 9.39.57s7.52 0 9.39-.57a3 3 0 0 0 2.11-2.12A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.81ZM9.6 15.5v-7l6 3.5-6 3.5Z'/%3E%3C/svg%3E");
+}
+
+/* LinkedIn */
+main:has(> header + #top) #contact > div > div:last-child a[href*="linkedin"] > span:last-child::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1-.02-5ZM2.5 9.5h5V21h-5V9.5Zm8 0h4.8v1.57h.07c.67-1.2 2.3-2.47 4.73-2.47 5.06 0 5.9 3.33 5.9 7.66V21h-5v-4.2c0-1 0-2.29-.08-3.01-.09-.72-.53-1.43-1.72-1.43-1.19 0-1.91.85-1.91 2.8V21h-5V9.5Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1-.02-5ZM2.5 9.5h5V21h-5V9.5Zm8 0h4.8v1.57h.07c.67-1.2 2.3-2.47 4.73-2.47 5.06 0 5.9 3.33 5.9 7.66V21h-5v-4.2c0-1 0-2.29-.08-3.01-.09-.72-.53-1.43-1.72-1.43-1.19 0-1.91.85-1.91 2.8V21h-5V9.5Z'/%3E%3C/svg%3E");
+}
+
+/* Website */
+main:has(> header + #top) #contact > div > div:last-child a[href^="http"]:not([href*="facebook"]):not([href*="messenger"]):not([href*="m.me"]):not([href*="instagram"]):not([href*="youtube"]):not([href*="linkedin"]) > span:last-child::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm7.93 9h-3.01a15.7 15.7 0 0 0-1.12-5.08A8.05 8.05 0 0 1 19.93 11ZM12 4c.86 1.22 1.62 3.48 1.86 7h-3.72c.24-3.52 1-5.78 1.86-7ZM8.2 5.92A15.7 15.7 0 0 0 7.08 11H4.07a8.05 8.05 0 0 1 4.13-5.08ZM4.07 13h3.01a15.7 15.7 0 0 0 1.12 5.08A8.05 8.05 0 0 1 4.07 13ZM12 20c-.86-1.22-1.62-3.48-1.86-7h3.72c-.24 3.52-1 5.78-1.86 7Zm3.8-1.92A15.7 15.7 0 0 0 16.92 13h3.01a8.05 8.05 0 0 1-4.13 5.08Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm7.93 9h-3.01a15.7 15.7 0 0 0-1.12-5.08A8.05 8.05 0 0 1 19.93 11ZM12 4c.86 1.22 1.62 3.48 1.86 7h-3.72c.24-3.52 1-5.78 1.86-7ZM8.2 5.92A15.7 15.7 0 0 0 7.08 11H4.07a8.05 8.05 0 0 1 4.13-5.08ZM4.07 13h3.01a15.7 15.7 0 0 0 1.12 5.08A8.05 8.05 0 0 1 4.07 13ZM12 20c-.86-1.22-1.62-3.48-1.86-7h3.72c-.24 3.52-1 5.78-1.86 7Zm3.8-1.92A15.7 15.7 0 0 0 16.92 13h3.01a8.05 8.05 0 0 1-4.13 5.08Z'/%3E%3C/svg%3E");
+}
 
 main:has(> header + #top) #contact > div > div:last-child a:hover > span:last-child {
   background: var(--school-primary);
   color: var(--school-on-primary);
   border-color: var(--school-primary);
+  transform: translateY(-1px);
 }
