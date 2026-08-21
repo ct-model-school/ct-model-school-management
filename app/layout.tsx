@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
-import PublicPeopleSection from "@/app/components/PublicPeopleSection";
 import PublicPeopleNav from "@/app/components/PublicPeopleNav";
 
 export const metadata: Metadata = {
@@ -19,7 +18,6 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           {children}
-          <PublicPeopleSection />
           <PublicPeopleNav />
         </ThemeProvider>
       </body>
