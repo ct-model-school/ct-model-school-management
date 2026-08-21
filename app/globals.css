@@ -289,11 +289,7 @@ main:has(> header + #top) img {
   }
 }
 
-/* Public header: one-line school name, no CTMS subtitle. */
-main:has(> header + #top) > header > div > a > span > span:last-child {
-  display: none;
-}
-
+/* Public header: one-line school name. */
 main:has(> header + #top) > header > div > a > span > span:first-child {
   white-space: nowrap;
   overflow: visible;
