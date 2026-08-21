@@ -255,8 +255,27 @@ body {
   }
 }
 
-/* Homepage hero: preserve the complete uploaded image without cropping or zooming. */
+/* Homepage hero: full layout width, crop only vertically when aspect ratios differ. */
 main > section:first-of-type img {
-  object-fit: contain !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  display: block !important;
+  object-fit: cover !important;
   object-position: center center !important;
+}
+
+main > section:first-of-type,
+main > section:first-of-type > div {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
