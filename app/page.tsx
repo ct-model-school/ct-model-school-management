@@ -31,16 +31,28 @@ const clean = (value: string | null) => value?.trim() || "";
 function normalizeHomeLink(value: string | null | undefined, fallback: string) { const link = clean(value ?? null); if (!link) return fallback; if (link === "/about" || link === "/about/" || link.endsWith("/about") || link.endsWith("/about/")) return "#about"; if (link === "/contact" || link === "/contact/" || link.endsWith("/contact") || link.endsWith("/contact/")) return "#contact"; return link; }
 function buildMapEmbedUrl(value: string | null, fallbackAddress: string) {
   const raw = clean(value);
-  if (!raw) return `https://www.google.com/maps?q=${encodeURIComponent(fallbackAddress)}&z=17&output=embed`;
+  const build = (query: string) =>
+    `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=k&z=17&ie=UTF8&iwloc=B&output=embed`;
+
+  if (!raw) return build(fallbackAddress);
+
+  // Keep an Admin Settings supplied Google Maps embed URL untouched.
+  // This lets Google retain its interactive controls and saved view state.
   if (/google\.com\/maps\/embed/i.test(raw) || /[?&]output=embed(?:&|$)/i.test(raw)) return raw;
+
   try {
     const url = new URL(raw);
     const query = url.searchParams.get("q") || url.searchParams.get("query");
-    if (query) return `https://www.google.com/maps?q=${encodeURIComponent(query)}&z=17&output=embed`;
+    if (query) return build(query);
+
     const coords = raw.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
-    if (coords) return `https://www.google.com/maps?q=${coords[1]},${coords[2]}&z=17&output=embed`;
+    if (coords) return build(`${coords[1]},${coords[2]}`);
+
+    const placeMatch = url.pathname.match(/\/maps\/place\/([^/]+)/i);
+    if (placeMatch?.[1]) return build(decodeURIComponent(placeMatch[1].replace(/\+/g, " ")));
   } catch {}
-  return `https://www.google.com/maps?q=${encodeURIComponent(raw)}&z=17&output=embed`;
+
+  return build(raw);
 }
 
 function ContactIcon({ type }: { type: "email" | "phone" | "whatsapp" }) {
