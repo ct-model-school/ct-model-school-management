@@ -50,6 +50,24 @@ body {
 }
 
 /* =========================================================
+   PUBLIC HOME CANVAS
+   Keep the complete public page on one desktop canvas so
+   browser zoom scales header, hero image and all sections together.
+   Admin pages are intentionally not affected.
+   ========================================================= */
+main:has(> header + #top) {
+  width: 1366px;
+  min-width: 1366px;
+  margin-inline: auto;
+}
+
+@media (max-width: 1365px) {
+  main:has(> header + #top) {
+    margin-inline: 0;
+  }
+}
+
+/* =========================================================
    C.T. MODEL SCHOOL
    ADMIN LOGIN
    Theme-aware only
