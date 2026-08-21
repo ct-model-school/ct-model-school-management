@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type SchoolSettings = {
@@ -29,7 +29,6 @@ const DEFAULT_SETTINGS: SchoolSettings = {
 const clean = (value: string | null) => value?.trim() || "";
 
 export default function Home() {
-  const supabase = useMemo(() => createClient(), []);
   const [settings, setSettings] = useState<SchoolSettings>(DEFAULT_SETTINGS);
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [activeSlide, setActiveSlide] = useState(0);
@@ -38,6 +37,7 @@ export default function Home() {
 
   useEffect(() => {
     let mounted = true;
+    const supabase = createClient();
     async function loadHome() {
       const [settingsResult, slidesResult] = await Promise.all([
         supabase.from("school_settings").select("*").eq("id", 1).maybeSingle(),
@@ -50,7 +50,7 @@ export default function Home() {
     }
     void loadHome();
     return () => { mounted = false; };
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     if (slides.length < 2 || !settings.hero_auto_slide) return;
