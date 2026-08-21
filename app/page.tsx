@@ -75,7 +75,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 lg:px-8">
           <a href="#top" className="flex min-w-0 items-center gap-3">
             {logoUrl ? <img src={logoUrl} alt={`${schoolName} logo`} className="h-12 w-16 rounded-lg object-contain" /> : <span className="theme-primary-bg flex h-11 w-11 items-center justify-center rounded-xl text-sm font-extrabold">CT</span>}
-            <span className="min-w-0"><span className="block truncate text-sm font-extrabold sm:text-base">{schoolName}</span><span className="block truncate text-xs text-[var(--school-muted)]">{settings.school_short_name || "CTMS"}</span></span>
+            <span className="min-w-0"><span className="block whitespace-nowrap text-xl font-black leading-tight sm:text-2xl lg:text-3xl">{schoolName}</span></span>
           </a>
           <nav className="hidden items-center gap-7 text-sm font-semibold lg:flex">
             <a href="#top" className="theme-primary">Home</a><a href="#about">About</a><a href="#principal">Principal</a><a href="#contact">Contact</a>
