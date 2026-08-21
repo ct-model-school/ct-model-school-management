@@ -45,7 +45,7 @@ main:has(> header + #top) {
    below it. The image itself remains a 1600:400 (4:1) cover. */
 main:has(> header + #top) > #top + section:first-of-type {
   width: 100%;
-  max-width: 1240px;
+  max-width: 1600px;
   margin-inline: auto;
 }
 
