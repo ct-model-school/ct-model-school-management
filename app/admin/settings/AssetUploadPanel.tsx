@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-type AssetField = "logo_url" | "favicon_url" | "hero_image" | "og_image";
+type AssetField = "logo_url" | "favicon_url" | "og_image";
 
 type Asset = {
   field: AssetField;
   label: string;
-  folder: "branding" | "hero" | "seo";
+  folder: "branding" | "seo";
   hint: string;
   accept: string;
 };
@@ -16,7 +16,6 @@ type Asset = {
 const assets: Asset[] = [
   { field: "logo_url", label: "School Logo", folder: "branding", hint: "PNG, JPG, WEBP or SVG", accept: "image/png,image/jpeg,image/webp,image/svg+xml" },
   { field: "favicon_url", label: "Favicon", folder: "branding", hint: "ICO, PNG or SVG", accept: "image/x-icon,image/png,image/svg+xml" },
-  { field: "hero_image", label: "Hero Image", folder: "hero", hint: "PNG, JPG or WEBP", accept: "image/png,image/jpeg,image/webp" },
   { field: "og_image", label: "Open Graph Image", folder: "seo", hint: "PNG, JPG or WEBP", accept: "image/png,image/jpeg,image/webp" },
 ];
 
@@ -27,7 +26,6 @@ export default function AssetUploadPanel() {
   const [values, setValues] = useState<Record<AssetField, AssetValue>>({
     logo_url: { url: "", path: "" },
     favicon_url: { url: "", path: "" },
-    hero_image: { url: "", path: "" },
     og_image: { url: "", path: "" },
   });
   const [busy, setBusy] = useState<AssetField | null>(null);
@@ -37,9 +35,10 @@ export default function AssetUploadPanel() {
   async function loadAssets() {
     const { data, error: loadError } = await supabase
       .from("school_settings")
-      .select("logo_url,favicon_url,hero_image,og_image")
+      .select("logo_url,favicon_url,og_image")
       .eq("id", 1)
       .maybeSingle();
+
     if (loadError) {
       setError(loadError.message);
       return;
@@ -53,7 +52,6 @@ export default function AssetUploadPanel() {
     setValues({
       logo_url: toAssetValue(data?.logo_url),
       favicon_url: toAssetValue(data?.favicon_url),
-      hero_image: toAssetValue(data?.hero_image),
       og_image: toAssetValue(data?.og_image),
     });
   }
@@ -110,14 +108,14 @@ export default function AssetUploadPanel() {
         <p className="text-xs font-bold uppercase tracking-[0.14em] theme-primary">Media Library</p>
         <h2 className="mt-2 text-2xl font-bold text-[var(--school-text)]">School Assets</h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--school-muted)]">
-          Upload school branding and public website images directly to the central Supabase Storage bucket. Files are organized under branding, hero and seo folders automatically.
+          Upload the school logo, favicon and social sharing image to the central Supabase Storage bucket. Homepage hero images are managed separately in the Hero Image Gallery below.
         </p>
       </div>
 
       {error ? <p className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
       {message ? <p className="mt-5 rounded-2xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] px-4 py-3 text-sm theme-primary">{message}</p> : null}
 
-      <div className="mt-6 grid gap-5 md:grid-cols-2">
+      <div className="mt-6 grid gap-5 md:grid-cols-3">
         {assets.map((asset) => (
           <div key={asset.field} className="rounded-2xl border border-[var(--school-border)] p-5">
             <div className="flex items-start justify-between gap-4">
