@@ -20,21 +20,41 @@ const assets: Asset[] = [
   { field: "og_image", label: "Open Graph Image", folder: "seo", hint: "PNG, JPG or WEBP", accept: "image/png,image/jpeg,image/webp" },
 ];
 
+type AssetValue = { url: string; path: string };
+
 export default function AssetUploadPanel() {
   const supabase = createClient();
-  const [values, setValues] = useState<Record<AssetField, string>>({ logo_url: "", favicon_url: "", hero_image: "", og_image: "" });
+  const [values, setValues] = useState<Record<AssetField, AssetValue>>({
+    logo_url: { url: "", path: "" },
+    favicon_url: { url: "", path: "" },
+    hero_image: { url: "", path: "" },
+    og_image: { url: "", path: "" },
+  });
   const [busy, setBusy] = useState<AssetField | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   async function loadAssets() {
-    const { data, error: loadError } = await supabase.from("school_settings").select("logo_url,favicon_url,hero_image,og_image").eq("id", 1).maybeSingle();
-    if (loadError) setError(loadError.message);
-    else setValues({
-      logo_url: data?.logo_url ?? "",
-      favicon_url: data?.favicon_url ?? "",
-      hero_image: data?.hero_image ?? "",
-      og_image: data?.og_image ?? "",
+    const { data, error: loadError } = await supabase
+      .from("school_settings")
+      .select("logo_url,favicon_url,hero_image,og_image")
+      .eq("id", 1)
+      .maybeSingle();
+    if (loadError) {
+      setError(loadError.message);
+      return;
+    }
+
+    const toAssetValue = (url: string | null | undefined): AssetValue => ({
+      url: url ?? "",
+      path: "",
+    });
+
+    setValues({
+      logo_url: toAssetValue(data?.logo_url),
+      favicon_url: toAssetValue(data?.favicon_url),
+      hero_image: toAssetValue(data?.hero_image),
+      og_image: toAssetValue(data?.og_image),
     });
   }
 
@@ -67,16 +87,20 @@ export default function AssetUploadPanel() {
 
     const { data: publicData } = supabase.storage.from("school-assets").getPublicUrl(path);
     const publicUrl = publicData.publicUrl;
-    const { error: updateError } = await supabase.from("school_settings").update({ [asset.field]: publicUrl }).eq("id", 1);
+
+    const { error: updateError } = await supabase
+      .from("school_settings")
+      .update({ [asset.field]: publicUrl })
+      .eq("id", 1);
 
     if (updateError) {
-      setError(updateError.message);
+      setError(`File uploaded, but the school settings link could not be saved: ${updateError.message}`);
       setBusy(null);
       return;
     }
 
-    setValues((current) => ({ ...current, [asset.field]: publicUrl }));
-    setMessage(`${asset.label} uploaded successfully.`);
+    setValues((current) => ({ ...current, [asset.field]: { url: publicUrl, path } }));
+    setMessage(`${asset.label} uploaded and linked successfully.`);
     setBusy(null);
   }
 
@@ -102,9 +126,9 @@ export default function AssetUploadPanel() {
                 <p className="mt-1 text-xs text-[var(--school-muted)]">Storage: school-assets/{asset.folder}/</p>
                 <p className="mt-1 text-xs text-[var(--school-muted)]">{asset.hint}, max 5 MB</p>
               </div>
-              {values[asset.field] ? (
+              {values[asset.field].url ? (
                 <div className="h-16 w-20 overflow-hidden rounded-xl border border-[var(--school-border)] bg-[var(--school-background)] p-1">
-                  <img src={values[asset.field]} alt={`${asset.label} preview`} className="h-full w-full object-contain" />
+                  <img src={values[asset.field].url} alt={`${asset.label} preview`} className="h-full w-full object-contain" />
                 </div>
               ) : null}
             </div>
@@ -114,7 +138,7 @@ export default function AssetUploadPanel() {
                 if (file) void uploadAsset(asset, file);
                 event.currentTarget.value = "";
               }} />
-              {busy === asset.field ? "Uploading..." : values[asset.field] ? "Replace File" : "Choose File"}
+              {busy === asset.field ? "Uploading..." : values[asset.field].url ? "Replace File" : "Choose File"}
             </label>
           </div>
         ))}
