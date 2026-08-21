@@ -89,9 +89,9 @@ export default function Home() {
 
       {settings.show_hero ? <>
         <section className="relative overflow-hidden bg-[var(--school-text)]">
-          <div className="relative h-[460px] sm:h-[560px] lg:h-[620px]">
-            {heroImages.map((slide, index) => <div key={slide.id} className={`absolute inset-0 transition-opacity ${index === activeSlide ? "opacity-100" : "pointer-events-none opacity-0"}`} style={{ transitionDuration: `${Math.max(200, settings.hero_transition_speed || 600)}ms` }}>
-              <img src={slide.image_url} alt={slide.alt_text || schoolName} className="h-full w-full object-cover" />
+          <div className="relative isolate h-[460px] w-full overflow-hidden sm:h-[560px] lg:h-[620px]">
+            {heroImages.map((slide, index) => <div key={slide.id} className={`absolute inset-0 h-full w-full overflow-hidden transition-opacity ${index === activeSlide ? "opacity-100" : "pointer-events-none opacity-0"}`} style={{ transitionDuration: `${Math.max(200, settings.hero_transition_speed || 600)}ms` }}>
+              <img src={slide.image_url} alt={slide.alt_text || schoolName} className="absolute inset-0 block h-full w-full min-h-0 min-w-0 object-cover object-center" />
             </div>)}
             {!heroImages.length ? <div className="absolute inset-0 theme-primary-bg" /> : null}
             {heroImages.length > 1 ? <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2">{heroImages.map((slide, index) => <button key={slide.id} type="button" onClick={() => setActiveSlide(index)} className={`h-2.5 rounded-full transition-all ${index === activeSlide ? "theme-primary-bg w-9" : "w-2.5 bg-white/70"}`} aria-label={`Show hero slide ${index + 1}`} />)}</div> : null}
@@ -99,26 +99,11 @@ export default function Home() {
         </section>
 
         <section className="border-b border-[var(--school-border)] bg-[var(--school-surface)]">
-          <div className="mx-auto max-w-7xl px-5 py-12 lg:px-8 lg:py-14">
-            <div className="max-w-4xl">
-              <p className="text-xs font-extrabold uppercase tracking-[0.18em] theme-primary">{settings.hero_badge || DEFAULT_SETTINGS.hero_badge}</p>
-              <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">{heroTitle}</h1>
-              {settings.hero_subtitle ? <p className="mt-4 text-xl font-semibold text-[var(--school-muted)] sm:text-2xl">{settings.hero_subtitle}</p> : null}
-              <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--school-muted)] sm:text-lg">{heroDescription}</p>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <a href={settings.hero_button_1_link || "#about"} className="theme-primary-bg rounded-xl px-5 py-3 text-sm font-extrabold text-white">{settings.hero_button_1_text || "Explore the School"}</a>
-                <a href={settings.hero_button_2_link || "#contact"} className="rounded-xl border border-[var(--school-primary-border)] px-5 py-3 text-sm font-extrabold">{settings.hero_button_2_text || "Contact Us"}</a>
-              </div>
-            </div>
-          </div>
+          <div className="mx-auto max-w-7xl px-5 py-12 lg:px-8 lg:py-14"><div className="max-w-4xl"><p className="text-xs font-extrabold uppercase tracking-[0.18em] theme-primary">{settings.hero_badge || DEFAULT_SETTINGS.hero_badge}</p><h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">{heroTitle}</h1>{settings.hero_subtitle ? <p className="mt-4 text-xl font-semibold text-[var(--school-muted)] sm:text-2xl">{settings.hero_subtitle}</p> : null}<p className="mt-5 max-w-3xl text-base leading-8 text-[var(--school-muted)] sm:text-lg">{heroDescription}</p><div className="mt-7 flex flex-wrap gap-3"><a href={settings.hero_button_1_link || "#about"} className="theme-primary-bg rounded-xl px-5 py-3 text-sm font-extrabold text-white">{settings.hero_button_1_text || "Explore the School"}</a><a href={settings.hero_button_2_link || "#contact"} className="rounded-xl border border-[var(--school-primary-border)] px-5 py-3 text-sm font-extrabold">{settings.hero_button_2_text || "Contact Us"}</a></div></div></div>
         </section>
       </> : null}
 
-      <section className="border-b border-[var(--school-border)] bg-[var(--school-surface)]">
-        <div className="mx-auto grid max-w-7xl gap-px bg-[var(--school-border)] sm:grid-cols-2 lg:grid-cols-4">
-          {[["Established", settings.established_year ? String(settings.established_year) : "2010"],["Board", settings.board || "Bangladesh"],["School", settings.school_short_name || "CTMS"],["Location", settings.address || DEFAULT_SETTINGS.address]].map(([label,value]) => <div key={label} className="bg-[var(--school-surface)] px-6 py-7"><p className="text-xs font-extrabold uppercase tracking-[0.14em] theme-primary">{label}</p><p className="mt-2 text-xl font-black leading-7">{value}</p></div>)}
-        </div>
-      </section>
+      <section className="border-b border-[var(--school-border)] bg-[var(--school-surface)]"><div className="mx-auto grid max-w-7xl gap-px bg-[var(--school-border)] sm:grid-cols-2 lg:grid-cols-4">{[["Established", settings.established_year ? String(settings.established_year) : "2010"],["Board", settings.board || "Bangladesh"],["School", settings.school_short_name || "CTMS"],["Location", settings.address || DEFAULT_SETTINGS.address]].map(([label,value]) => <div key={label} className="bg-[var(--school-surface)] px-6 py-7"><p className="text-xs font-extrabold uppercase tracking-[0.14em] theme-primary">{label}</p><p className="mt-2 text-xl font-black leading-7">{value}</p></div>)}</div></section>
 
       <section id="about" className="scroll-mt-24 px-5 py-20 lg:px-8"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.05fr_.95fr] lg:items-center"><div><p className="text-xs font-extrabold uppercase tracking-[0.16em] theme-primary">About the School</p><h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">{settings.school_headline || `Welcome to ${schoolName}`}</h2><p className="mt-6 text-base leading-8 text-[var(--school-muted)]">{settings.school_description || `Learn more about ${schoolName}, its educational journey, school community and the people who make it a place for learning and growth.`}</p>{settings.school_motto ? <div className="mt-7 rounded-2xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] p-5"><p className="text-xs font-extrabold uppercase tracking-[0.14em] theme-primary">School Motto</p><p className="mt-2 text-lg font-bold">{settings.school_motto}</p></div> : null}</div><div className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-7 shadow-sm sm:p-9"><p className="text-xs font-extrabold uppercase tracking-[0.14em] theme-primary">School Information</p><div className="mt-6 divide-y divide-[var(--school-border)]">{[["Established",settings.established_year ? String(settings.established_year) : ""],["EIIN",settings.eiin || ""],["Board",settings.board || ""],["Address",settings.address || ""]].filter(([,v]) => v).map(([label,value]) => <div key={label} className="grid grid-cols-[120px_1fr] gap-4 py-4"><span className="text-sm font-bold text-[var(--school-muted)]">{label}</span><span className="text-sm font-semibold">{value}</span></div>)}</div></div></div></section>
 
