@@ -92,7 +92,7 @@ export default function Home() {
           <div className="relative w-full overflow-hidden">
             {heroImages.length ? <img src={heroImages[0].image_url} alt="" aria-hidden="true" className="block h-auto w-full select-none opacity-0" /> : <div className="aspect-video w-full theme-primary-bg" />}
             {heroImages.map((slide, index) => <div key={slide.id} className={`absolute inset-0 h-full w-full overflow-hidden transition-opacity ${index === activeSlide ? "opacity-100" : "pointer-events-none opacity-0"}`} style={{ transitionDuration: `${Math.max(200, settings.hero_transition_speed || 600)}ms` }}>
-              <img src={slide.image_url} alt={slide.alt_text || schoolName} className="block h-full w-full object-cover object-center" />
+              <img src={slide.image_url} alt={String(slide.alt_text || schoolName)} className="block h-full w-full object-cover object-center" />
             </div>)}
             {heroImages.length > 1 ? <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2">{heroImages.map((slide, index) => <button key={slide.id} type="button" onClick={() => setActiveSlide(index)} className={`h-2.5 rounded-full transition-all ${index === activeSlide ? "theme-primary-bg w-9" : "w-2.5 bg-white/70"}`} aria-label={`Show hero slide ${index + 1}`} />)}</div> : null}
           </div>
