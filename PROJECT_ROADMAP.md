@@ -46,10 +46,12 @@ Completed in this section so far:
 - Reusable `AdminPageShell`, `AdminEmptyState` and `AdminInfoCard` primitives.
 - Theme-aware shells for Students, Parents & Guardians, Teachers & Staff, Accounts, Inventory, Notices, and Results.
 - Dashboard links now open the Students, Accounts and Inventory foundation shells.
+- Sidebar and module navigation now expose the implemented module shells.
+- Admin-level loading skeleton and error recovery boundary added.
 - Module shells deliberately avoid inventing database fields, calculations or workflows.
 
 Next bounded work:
-- Loading/error states and route-level access consistency.
+- Route-level access consistency.
 - Inspect existing database relationships and permissions before implementing real module forms/tables.
 - Continue Phase 2 with verified reusable interactions.
 
@@ -85,6 +87,7 @@ Build the public-facing school website separately from the admin application. It
 - Central theme foundation is active and login/dashboard/settings use the theme system.
 - Admin Settings can persist the central school primary color through `school_settings`.
 - Reusable admin presentation primitives and module shells are now present.
+- Admin loading and error boundaries are present.
 - Baseline lint and production build were previously verified for the foundation.
 - The first verified foundation changes have been committed and pushed.
 - `supabase/manual/001_school_settings.sql` exists for the school settings/RLS foundation and must be applied manually in Supabase when the task reaches that dependency.
