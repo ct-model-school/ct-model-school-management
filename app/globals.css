@@ -62,6 +62,130 @@ main:has(> header + #top) > #top + section:first-of-type > div > img:first-child
   object-fit: cover;
 }
 
+/* Public website polish only. These rules are scoped to the public
+   homepage so the existing Admin UI remains unchanged. */
+main:has(> header + #top) {
+  background: #edf1f5;
+}
+
+main:has(> header + #top) > header {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.06), 0 5px 18px rgba(15, 23, 42, 0.05);
+}
+
+main:has(> header + #top) > header > div {
+  min-height: 78px;
+}
+
+main:has(> header + #top) > header nav a {
+  position: relative;
+  color: #344054;
+  transition: color 160ms ease;
+}
+
+main:has(> header + #top) > header nav a:hover,
+main:has(> header + #top) > header nav a.theme-primary {
+  color: var(--school-primary-hover);
+}
+
+main:has(> header + #top) > #top + section + section {
+  background: #f8fafc;
+  border-bottom: 1px solid #dfe4ea;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.035);
+}
+
+main:has(> header + #top) > #top + section + section > div {
+  max-width: 1180px;
+}
+
+main:has(> header + #top) > #top + section + section + section {
+  background: #ffffff;
+  border-bottom: 1px solid #dfe4ea;
+}
+
+main:has(> header + #top) > #top + section + section + section > div > div {
+  background: #ffffff;
+}
+
+main:has(> header + #top) #about {
+  background: #edf1f5;
+  border-bottom: 1px solid #dfe4ea;
+}
+
+main:has(> header + #top) #about > div > div:last-child {
+  background: #ffffff;
+  border-color: #d8dee7;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.055);
+}
+
+main:has(> header + #top) #about > div > div:first-child {
+  padding: 4px 0;
+}
+
+main:has(> header + #top) #about .rounded-2xl {
+  border-radius: 12px;
+  background: #f8fafc;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7);
+}
+
+main:has(> header + #top) #principal {
+  background: #ffffff;
+  border-color: #dfe4ea;
+}
+
+main:has(> header + #top) #principal blockquote {
+  border-left-width: 3px;
+  background: #f8fafc;
+  border-radius: 0 12px 12px 0;
+  padding: 18px 22px;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.035);
+}
+
+main:has(> header + #top) #contact {
+  background: #edf1f5;
+  border-top: 1px solid #dfe4ea;
+}
+
+main:has(> header + #top) #contact > div > div:first-child,
+main:has(> header + #top) #contact > div > div:last-child {
+  border-radius: 16px;
+}
+
+main:has(> header + #top) #contact > div > div:first-child {
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.10);
+}
+
+main:has(> header + #top) #contact > div > div:last-child {
+  background: #ffffff;
+  border-color: #d8dee7;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.055);
+}
+
+main:has(> header + #top) #contact > div > div:last-child a {
+  background: #fbfcfd;
+  border-color: #e0e5eb;
+  transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+
+main:has(> header + #top) #contact > div > div:last-child a:hover {
+  transform: translateY(-1px);
+  background: #ffffff;
+  border-color: var(--school-primary-border);
+}
+
+main:has(> header + #top) > footer {
+  background: #f8fafc;
+  border-top-color: #d8dee7;
+  box-shadow: 0 -4px 14px rgba(15, 23, 42, 0.025);
+}
+
+/* Keep the public content readable while the browser zooms the whole
+   fixed canvas, including the hero image. */
+main:has(> header + #top) img {
+  max-width: 100%;
+}
+
 .admin-login-page {
   min-height: 100vh;
   width: 100%;
