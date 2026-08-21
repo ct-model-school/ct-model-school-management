@@ -126,7 +126,7 @@ export default function PublicPeopleSection() {
 
                           <div className="mt-auto flex items-center justify-center gap-2 border-t border-[var(--school-border)] pt-3 sm:gap-3 sm:pt-4">
                             {item.email ? <a href={`mailto:${item.email}`} aria-label={`Email ${item.full_name}`} title="Email" className="theme-primary flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--school-primary-soft)] transition hover:scale-105"><ContactIcon type="email" /></a> : null}
-                            {item.phone ? <a href={`tel:${item.phone.replace(/\s+/g, "")}`} aria-label={`Call ${item.full_name}`} title="Phone" className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-orange-500 transition hover:scale-105"><ContactIcon type="phone" /></a> : null}
+                            {item.phone ? <a href={`tel:${item.phone.replace(/\s+/g, "")}`} aria-label={`Call ${item.full_name}`} title="Phone" className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--school-primary-soft)] transition hover:scale-105"><ContactIcon type="phone" /></a> : null}
                             {item.whatsapp ? <a href={`https://wa.me/${item.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" aria-label={`WhatsApp ${item.full_name}`} title="WhatsApp" className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-green-600 transition hover:scale-105"><ContactIcon type="whatsapp" /></a> : null}
                           </div>
                         </div>
