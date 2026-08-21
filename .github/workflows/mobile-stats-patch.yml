@@ -1,0 +1,58 @@
+name: temporary-mobile-stats-patch
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply mobile stats patch
+        shell: bash
+        run: |
+          cat >> app/globals.css <<'CSS'
+
+/* Mobile homepage stats: keep only Established + Board as compact badges. */
+@media (max-width: 767px) {
+  main:has(> header + #top) > #top + section + section + section > div > div:nth-child(1),
+  main:has(> header + #top) > #top + section + section + section > div > div:nth-child(2) {
+    background: var(--school-surface);
+    border: 1px solid var(--school-primary-border);
+    border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    padding: 10px 14px;
+  }
+
+  main:has(> header + #top) > #top + section + section + section > div > div:nth-child(3),
+  main:has(> header + #top) > #top + section + section + section > div > div:nth-child(4) {
+    display: none;
+  }
+
+  main:has(> header + #top) > #top + section + section + section > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--school-surface);
+  }
+
+  main:has(> header + #top) > #top + section + section + section > div > div p.text-[10px],
+  main:has(> header + #top) > #top + section + section + section > div > div p.text-xs {
+    margin: 0;
+  }
+
+  main:has(> header + #top) > #top + section + section + section > div > div p.mt-2 {
+    margin-top: 2px;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+}
+CSS
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/globals.css
+          git diff --cached --quiet && exit 0
+          git commit -m "fix mobile stats badges [skip ci]"
+          git push
