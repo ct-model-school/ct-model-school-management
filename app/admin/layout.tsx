@@ -7,12 +7,13 @@ const primaryNavigation = [
 ];
 
 const upcomingModules = [
-  "Students",
-  "Parents & Guardians",
-  "Teachers & Staff",
-  "Accounts & Finance",
-  "Inventory",
-  "Notices & Results",
+  { href: "/admin/students", label: "Students" },
+  { href: "/admin/parents", label: "Parents & Guardians" },
+  { href: "/admin/teachers", label: "Teachers & Staff" },
+  { href: "/admin/accounts", label: "Accounts & Finance" },
+  { href: "/admin/inventory", label: "Inventory" },
+  { href: "/admin/notices", label: "Notices" },
+  { href: "/admin/results", label: "Results & Reports" },
 ];
 
 export default async function AdminLayout({
@@ -55,11 +56,17 @@ export default async function AdminLayout({
             <div>
               <p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--school-muted)]">Modules</p>
               <div className="mt-2 space-y-1">
-                {upcomingModules.map((label) => (
-                  <span key={label} className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-[var(--school-muted)]">
-                    {label}
-                    <span className="rounded-full border border-[var(--school-border)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide">Soon</span>
-                  </span>
+                {upcomingModules.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-[var(--school-muted)] transition hover:bg-[var(--school-primary-soft)] hover:text-[var(--school-primary)]"
+                  >
+                    {item.label}
+                    <span className="rounded-full border border-[var(--school-border)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide group-hover:border-[var(--school-primary-border)]">
+                      Open
+                    </span>
+                  </Link>
                 ))}
               </div>
             </div>
