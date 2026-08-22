@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 
-const PEOPLE_LINK = "public-people-nav-link";
+const COMMUNITY_LINK = "public-community-nav-link";
 
-function addPeopleLink(nav: Element, mobile = false) {
-  if (nav.querySelector(`[data-${PEOPLE_LINK}]`)) return;
+function addCommunityLink(nav: Element, mobile = false) {
+  if (nav.querySelector(`[data-${COMMUNITY_LINK}]`)) return;
 
   const link = document.createElement("a");
   link.href = "/people";
-  link.textContent = "People";
-  link.setAttribute(`data-${PEOPLE_LINK}`, "true");
+  link.textContent = "Community";
+  link.setAttribute(`data-${COMMUNITY_LINK}`, "true");
   link.className = mobile
     ? "rounded-lg px-3 py-2 text-sm font-semibold"
     : "text-sm font-semibold";
@@ -46,10 +46,10 @@ export default function PublicPeopleNav() {
       if (!header) return;
 
       const desktopNav = header.querySelector("nav.hidden");
-      if (desktopNav) addPeopleLink(desktopNav, false);
+      if (desktopNav) addCommunityLink(desktopNav, false);
 
       const mobileNav = Array.from(header.querySelectorAll("nav")).find((nav) => !nav.classList.contains("hidden"));
-      if (mobileNav && mobileNav.querySelector("div")) addPeopleLink(mobileNav, true);
+      if (mobileNav && mobileNav.querySelector("div")) addCommunityLink(mobileNav, true);
     };
 
     ensureMenu();
@@ -65,7 +65,7 @@ export default function PublicPeopleNav() {
   const items = [
     { label: "Home", href: "/", type: "home" as const, active: pathname === "/" },
     { label: "About", href: "/#about", type: "about" as const, active: false },
-    { label: "People", href: "/people", type: "people" as const, active: pathname === "/people" },
+    { label: "Community", href: "/people", type: "people" as const, active: pathname === "/people" },
     { label: "Principal", href: "/#principal", type: "principal" as const, active: false },
     { label: "Contact", href: "/#contact", type: "contact" as const, active: false },
   ];
@@ -82,77 +82,31 @@ export default function PublicPeopleNav() {
       </nav>
 
       <style>{`
-        .ctms-mobile-bottom-nav {
-          display: none;
-        }
-
+        .ctms-mobile-bottom-nav { display: none; }
         @media (max-width: 767px) {
           .ctms-mobile-bottom-nav {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 9999;
-            display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
-            min-height: 70px;
-            padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
-            border-top: 1px solid var(--school-border);
-            background: var(--school-surface);
+            position: fixed; left: 0; right: 0; bottom: 0; z-index: 9999;
+            display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+            min-height: 70px; padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+            border-top: 1px solid var(--school-border); background: var(--school-surface);
             box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.10);
           }
-
           .ctms-mobile-bottom-nav-item {
-            position: relative;
-            display: flex;
-            min-width: 0;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-            padding: 5px 2px 4px;
-            color: var(--school-muted);
-            text-decoration: none;
-            font-size: 11px;
-            font-weight: 700;
-            line-height: 1.1;
-            transition: color 160ms ease, transform 160ms ease;
+            position: relative; display: flex; min-width: 0; flex-direction: column;
+            align-items: center; justify-content: center; gap: 3px; padding: 5px 2px 4px;
+            color: var(--school-muted); text-decoration: none; font-size: 11px; font-weight: 700;
+            line-height: 1.1; transition: color 160ms ease, transform 160ms ease;
           }
-
-          .ctms-mobile-bottom-nav-item svg {
-            flex: 0 0 auto;
-          }
-
-          .ctms-mobile-bottom-nav-item.active {
-            color: var(--school-primary);
-          }
-
+          .ctms-mobile-bottom-nav-item svg { flex: 0 0 auto; }
+          .ctms-mobile-bottom-nav-item.active { color: var(--school-primary); }
           .ctms-mobile-bottom-nav-item.active::before {
-            content: "";
-            position: absolute;
-            top: -6px;
-            left: 50%;
-            width: 32px;
-            height: 3px;
-            border-radius: 999px;
-            transform: translateX(-50%);
-            background: var(--school-primary);
+            content: ""; position: absolute; top: -6px; left: 50%; width: 32px; height: 3px;
+            border-radius: 999px; transform: translateX(-50%); background: var(--school-primary);
           }
-
-          body:has(.ctms-mobile-bottom-nav) main {
-            padding-bottom: 78px;
-          }
-
-          main:has(> header + #top) > #top + section:first-of-type > div {
-            aspect-ratio: 1600 / 400 !important;
-            min-height: 0 !important;
-          }
-
+          body:has(.ctms-mobile-bottom-nav) main { padding-bottom: 78px; }
+          main:has(> header + #top) > #top + section:first-of-type > div { aspect-ratio: 1600 / 400 !important; min-height: 0 !important; }
           main:has(> header + #top) > #top + section:first-of-type > div > div img {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: contain !important;
-            object-position: center !important;
+            width: 100% !important; height: 100% !important; object-fit: contain !important; object-position: center !important;
           }
         }
       `}</style>
