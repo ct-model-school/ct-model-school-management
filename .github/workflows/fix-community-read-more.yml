@@ -1,0 +1,65 @@
+name: Update community read more behavior
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update community cards
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('app/page.tsx')
+          text = path.read_text()
+
+          state_anchor = 'const [mobileMenuOpen, setMobileMenuOpen] = useState(false);'
+          state_new = state_anchor + '\n  const [communityDetailsOpen, setCommunityDetailsOpen] = useState(false);'
+          if 'communityDetailsOpen' not in text:
+              if state_anchor not in text:
+                  raise SystemExit('Community state anchor not found')
+              text = text.replace(state_anchor, state_new, 1)
+
+          pattern = re.compile(r'\{hasDetails \? <details className="mt-auto pt-3 text-left">.*?</details> : null\}', re.S)
+          replacement = '''{hasDetails ? <details open={communityDetailsOpen} className="mt-auto pt-3 text-left">
+                <summary
+                  onClick={(event) => { event.preventDefault(); setCommunityDetailsOpen((open) => !open); }}
+                  className="flex min-h-8 cursor-pointer list-none items-center justify-center text-center text-[10px] font-extrabold theme-primary hover:underline sm:text-xs"
+                >
+                  {communityDetailsOpen ? "Read less" : "Read more"}
+                </summary>
+                {communityDetailsOpen ? <div className="mt-2.5 space-y-1.5 rounded-xl border border-[var(--school-border)] bg-[var(--school-background)] p-2.5 text-left text-[9px] leading-4 sm:text-[10px] sm:leading-5">
+                  {description ? <p><strong className="font-extrabold text-[var(--school-text)]">About:</strong> {description}</p> : null}
+                  {metaInfo ? <p><strong className="font-extrabold text-[var(--school-text)]">Class/Dept:</strong> {metaInfo}</p> : null}
+                  {person.exam_name ? <p><strong className="font-extrabold text-[var(--school-text)]">Exam:</strong> {person.exam_name}</p> : null}
+                  {person.result_value ? <p><strong className="font-extrabold text-[var(--school-text)]">Result:</strong> {person.result_value}</p> : null}
+                  {person.scholarship_type ? <p><strong className="font-extrabold text-[var(--school-text)]">Scholarship:</strong> {person.scholarship_type}</p> : null}
+                </div> : null}
+              </details> : null}'''
+
+          text, count = pattern.subn(replacement, text, count=1)
+          if count != 1:
+              raise SystemExit('Community details block not found')
+
+          path.write_text(text)
+          PY
+
+      - name: Commit changes and remove workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/page.tsx .github/workflows/fix-community-read-more.yml
+          git rm .github/workflows/fix-community-read-more.yml
+          git commit -m "fix: make community read more expand all cards"
+          git push
