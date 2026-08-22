@@ -3,6 +3,7 @@ import { getCurrentProfile } from "@/lib/auth";
 import SettingsForm from "./SettingsForm";
 import AssetUploadPanel from "./AssetUploadPanel";
 import HeroSlidesPanel from "./HeroSlidesPanel";
+import PrincipalPhotoPanel from "./PrincipalPhotoPanel";
 
 export default async function AdminSettingsPage() {
   const profile = await getCurrentProfile();
@@ -20,6 +21,7 @@ export default async function AdminSettingsPage() {
   return (
     <>
       <SettingsForm />
+      <PrincipalPhotoPanel />
       <AssetUploadPanel />
       <HeroSlidesPanel />
     </>
