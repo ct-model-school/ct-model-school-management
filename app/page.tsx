@@ -46,6 +46,9 @@ function buildMapEmbedUrl(value: string | null, fallbackAddress: string) {
   return build(raw);
 }
 
+
+{/* VERCEL DEPLOY TEST */}
+
 function ContactIcon({ type }: { type: "email" | "phone" | "whatsapp" }) {
   if (type === "email") return <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4"><path d="M4 6h16v12H4zM4 7l8 6 8-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg>;
   if (type === "phone") return <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4"><path d="M7 4l3 2-1.5 3a14 14 0 0 0 6.5 6.5l3-1.5 2 3c.4.6.2 1.4-.4 1.7l-1.7.9C11.5 20 4 12.5 4.4 5.6l.9-1.7C5.6 3.3 6.4 3.1 7 4Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
