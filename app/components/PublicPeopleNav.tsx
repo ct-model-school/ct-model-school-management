@@ -73,6 +73,10 @@ export default function PublicPeopleNav() {
     </nav>
     <style>{`
       .ctms-mobile-bottom-nav { display:none; }
+      main > section:has(a[href="/people"]) article { border-radius:1rem; box-shadow:0 4px 14px rgba(0,0,0,.06); transition:transform 180ms ease,box-shadow 180ms ease; }
+      main > section:has(a[href="/people"]) article:hover { transform:translateY(-4px); box-shadow:0 14px 34px rgba(0,0,0,.12); }
+      main > section:has(a[href="/people"]) article > div:first-child { aspect-ratio:4 / 5; }
+      main > section:has(a[href="/people"]) article > div:first-child img { object-fit:cover; object-position:top; }
       @media (max-width:767px) {
         .ctms-mobile-bottom-nav { position:fixed; left:0; right:0; bottom:0; z-index:9999; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); min-height:70px; padding:6px 4px calc(6px + env(safe-area-inset-bottom)); border-top:1px solid var(--school-border); background:var(--school-surface); box-shadow:0 -8px 24px rgba(15,23,42,.10); }
         .ctms-mobile-bottom-nav-item { position:relative; display:flex; min-width:0; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:5px 2px 4px; color:var(--school-muted); text-decoration:none; font-size:11px; font-weight:700; line-height:1.1; }
