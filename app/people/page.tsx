@@ -45,12 +45,12 @@ export default async function PeoplePage() {
     <main className="min-h-screen bg-[var(--school-background)] px-4 py-10 text-[var(--school-text)] md:px-8 md:py-14">
       <div className="mx-auto max-w-7xl">
         <header className="text-center">
-          <p className="text-xs font-extrabold uppercase tracking-[0.2em] theme-primary">People & Achievements</p>
+          <p className="text-xs font-extrabold uppercase tracking-[0.2em] theme-primary">Community & Achievements</p>
           <h1 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">Our School Community</h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-[var(--school-muted)]">Meet the teachers, committee members, staff and students who make C.T. Model School special.</p>
         </header>
 
-        <nav className="mt-8 flex gap-2 overflow-x-auto pb-2" aria-label="Profile categories">
+        <nav className="mt-8 flex gap-2 overflow-x-auto pb-2" aria-label="Community categories">
           {categories.map((item) => (
             <a key={item.value} href={`#${item.value}`} className="shrink-0 rounded-full border bg-[var(--school-surface)] px-4 py-2.5 text-xs font-extrabold text-[var(--school-muted)] shadow-sm transition hover:-translate-y-0.5 hover:text-[var(--school-primary)]" style={categoryStyle}>
               <span className="mr-1.5">{item.icon}</span>{item.label}
@@ -123,7 +123,7 @@ export default async function PeoplePage() {
           })}
         </div>
 
-        {profiles.length === 0 ? <div className="mt-10 rounded-3xl border border-dashed border-[var(--school-primary-border)] bg-[var(--school-surface)] p-10 text-center text-sm text-[var(--school-muted)]">Profiles will appear here after they are added from the Admin People & Achievements module.</div> : null}
+        {profiles.length === 0 ? <div className="mt-10 rounded-3xl border border-dashed border-[var(--school-primary-border)] bg-[var(--school-surface)] p-10 text-center text-sm text-[var(--school-muted)]">Profiles will appear here after they are added from the Admin Community & Achievements module.</div> : null}
       </div>
     </main>
   );
