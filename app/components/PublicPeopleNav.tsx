@@ -23,6 +23,7 @@ function syncHomeCommunity() {
   if (eyebrow?.textContent?.trim() === "PEOPLE & ACHIEVEMENTS") eyebrow.textContent = "COMMUNITY & ACHIEVEMENTS";
   const viewAll = Array.from(section.querySelectorAll("a")).find((link) => link.getAttribute("href") === "/people");
   if (viewAll) viewAll.textContent = "View all Community & achievements";
+  section.remove();
 }
 
 function NavIcon({ type }: { type: "home" | "about" | "people" | "principal" | "contact" }) {
