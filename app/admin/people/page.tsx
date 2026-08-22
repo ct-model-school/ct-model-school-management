@@ -1,5 +1,7 @@
 "use client";
 
+// Vercel build trigger: keep the normalized People profile edit state on main.
+
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
