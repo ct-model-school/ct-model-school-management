@@ -1,4 +1,4 @@
-/* Home hero fix: make the hero image fill the viewport cleanly on desktop and mobile. */
+/* Responsive home hero. Source artwork ratio: 1600x500 (3.2:1). */
 main:has(> header + #top) > #top + section:first-of-type {
   width: 100%;
   overflow: hidden;
@@ -8,23 +8,12 @@ main:has(> header + #top) > #top + section:first-of-type {
 main:has(> header + #top) > #top + section:first-of-type > div {
   position: relative;
   width: 100%;
-  height: clamp(190px, 31vw, 430px);
+  aspect-ratio: 1600 / 500;
+  height: auto;
   overflow: hidden;
 }
 
-main:has(> header + #top) > #top + section:first-of-type > div > img:first-child {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-main:has(> header + #top) > #top + section:first-of-type > div > div {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
-
+main:has(> header + #top) > #top + section:first-of-type > div > img:first-child,
 main:has(> header + #top) > #top + section:first-of-type > div > div > img {
   display: block;
   width: 100% !important;
@@ -34,18 +23,30 @@ main:has(> header + #top) > #top + section:first-of-type > div > div > img {
   object-position: center center !important;
 }
 
+main:has(> header + #top) > #top + section:first-of-type > div > div {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Believers-style responsive behavior: preserve the wide banner character on mobile,
+   while keeping the image full-bleed and avoiding a tall hero tile. */
 @media (max-width: 767px) {
   main:has(> header + #top) > #top + section:first-of-type > div {
-    height: clamp(155px, 48vw, 300px);
+    aspect-ratio: 1600 / 500;
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
 
   main:has(> header + #top) > #top + section:first-of-type > div > div > img {
     object-position: center center !important;
+    transform: none !important;
   }
 }
 
 @media (min-width: 768px) {
-  /* The uploaded hero artwork contains side padding. Crop it proportionally so the artwork reaches both edges. */
+  /* Keep the existing desktop edge-to-edge crop for the wide artwork. */
   main:has(> header + #top) > #top + section:first-of-type > div > div > img {
     transform: scale(1.26);
   }
