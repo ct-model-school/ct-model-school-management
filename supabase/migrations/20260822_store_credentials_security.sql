@@ -39,6 +39,7 @@ declare
   v_password text := nullif(trim(p_password), '');
   v_role text := coalesce(nullif(trim(p_access_role), ''), v_type);
   v_is_new boolean := p_id is null;
+  v_hash text;
 begin
   if not public.store_is_admin() then raise exception 'Not authorized'; end if;
   if v_type not in ('staff','teacher','accounts','other') then raise exception 'Invalid member type'; end if;
@@ -88,9 +89,10 @@ begin
     end if;
   end if;
 
+  v_hash := case when v_password is not null then crypt(v_password,gen_salt('bf')) end;
   if v_is_new or v_password is not null then
     insert into public.store_users (login_id,password_hash,member_type,member_id,access_role,is_active)
-    values (v_member_id,crypt(v_password,gen_salt('bf')),v_type,v_member_id,v_role,true)
+    values (v_member_id,coalesce(v_hash,(select password_hash from public.staff_members where member_id=v_member_id limit 1)),v_type,v_member_id,v_role,true)
     on conflict (login_id) do update set password_hash=excluded.password_hash,member_type=excluded.member_type,member_id=excluded.member_id,access_role=excluded.access_role,is_active=true;
   else
     update public.store_users set member_type=v_type,member_id=v_member_id,access_role=v_role,is_active=true where lower(login_id)=lower(v_member_id);
@@ -100,7 +102,9 @@ begin
 end;
 $$;
 
-create or replace function public.store_admin_list_members()
+-- The return shape is intentionally changed to remove password_text, so drop the prior signature first.
+drop function if exists public.store_admin_list_members();
+create function public.store_admin_list_members()
 returns table(id uuid,member_id text,member_type text,full_name text,designation text,department text,subject text,qualification text,account_role text,role_title text,phone text,email text,details text,access_role text,is_active boolean,created_at timestamptz)
 language sql security definer set search_path=''
 as $$
@@ -134,7 +138,9 @@ begin
   elsif v_type='other' then update public.other_members set password_hash=v_hash,updated_at=now(),is_active=true where id=p_id returning member_id into v_member_id;
   else raise exception 'Invalid member type'; end if;
   if v_member_id is null then raise exception 'Member not found'; end if;
-  update public.store_users set password_hash=v_hash,is_active=true,member_type=v_type,member_id=v_member_id where lower(login_id)=lower(v_member_id);
+  insert into public.store_users(login_id,password_hash,member_type,member_id,access_role,is_active)
+  values(v_member_id,v_hash,v_type,v_member_id,v_type,true)
+  on conflict(login_id) do update set password_hash=excluded.password_hash,is_active=true,member_type=excluded.member_type,member_id=excluded.member_id,access_role=excluded.access_role;
   return jsonb_build_object('member_id',v_member_id,'password',v_password);
 end;
 $$;
@@ -172,7 +178,7 @@ begin
   if v_full_name is null then raise exception 'Store account is inactive or profile is unavailable'; end if;
   v_token := encode(gen_random_bytes(32),'hex');
   insert into public.store_sessions(store_user_id,token_hash,expires_at) values(v_user.id,encode(digest(v_token,'sha256'),'hex'),now()+interval '8 hours');
-  update public.store_sessions set last_seen_at=now() where id in (select id from public.store_sessions where store_user_id=v_user.id and expires_at>now());
+  update public.store_sessions set last_seen_at=now() where store_user_id=v_user.id and expires_at>now();
 
   return jsonb_build_object('token',v_token,'expires_at',now()+interval '8 hours','user_id',v_user.id,'profile_id',null,'full_name',v_full_name,'photo_url',null,'email',v_email,'phone',v_phone,'whatsapp',v_whatsapp,'designation',coalesce(v_designation,v_subject),'department',v_department,'class_name',null,'section',null,'member_type',v_user.member_type,'access_role',v_user.access_role);
 end;
