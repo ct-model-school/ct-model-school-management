@@ -31,7 +31,6 @@
     width: 100%;
   }
 
-  /* Admin: collapse desktop form grids into a clean single-column flow. */
   .admin-shell .grid.grid-cols-2,
   .admin-shell .grid.grid-cols-3,
   .admin-shell .grid.grid-cols-4,
@@ -65,7 +64,6 @@
     min-height: 40px;
   }
 
-  /* Prevent long labels, IDs and URLs from forcing horizontal overflow. */
   .admin-shell p,
   .admin-shell h1,
   .admin-shell h2,
@@ -76,7 +74,6 @@
     overflow-wrap: anywhere;
   }
 
-  /* Public website: keep header controls inside the viewport. */
   main:has(> header + #top) > header > div {
     width: 100%;
     max-width: 100%;
@@ -114,6 +111,140 @@
   main:has(> header + #top) #principal img {
     max-height: 220px;
     object-fit: cover;
+  }
+
+  /* Dynamic public hero: use the full viewport width without the contain bars. */
+  main:has(> header + #top) > #top + section:first-of-type > div {
+    aspect-ratio: 16 / 7;
+    min-height: clamp(150px, 38vw, 430px);
+    max-height: 520px;
+  }
+
+  main:has(> header + #top) > #top + section:first-of-type > div > img:first-child {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  main:has(> header + #top) > #top + section:first-of-type > div > div img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+
+  main:has(> header + #top) > #top + section:first-of-type > div > div {
+    height: 100%;
+  }
+
+  main:has(> header + #top) > #top + section:first-of-type .absolute.bottom-6 {
+    bottom: 10px;
+  }
+
+  main:has(> header + #top) > #top + section:first-of-type .absolute.bottom-6 button {
+    height: 8px;
+  }
+
+  /* Hero content scales smoothly instead of using fixed mobile jumps. */
+  main:has(> header + #top) > #top + section + section > div {
+    padding-top: clamp(32px, 8vw, 56px);
+    padding-bottom: clamp(32px, 8vw, 56px);
+  }
+
+  main:has(> header + #top) > #top + section + section h1 {
+    font-size: clamp(30px, 7vw, 52px);
+    line-height: 1.08;
+  }
+
+  main:has(> header + #top) > #top + section + section p.text-xl {
+    font-size: clamp(17px, 4.5vw, 24px);
+    line-height: 1.45;
+  }
+
+  main:has(> header + #top) > #top + section + section p.text-base {
+    font-size: clamp(15px, 3.8vw, 18px);
+    line-height: 1.75;
+  }
+
+  main:has(> header + #top) > #top + section + section .flex.flex-wrap {
+    width: 100%;
+  }
+
+  main:has(> header + #top) > #top + section + section .flex.flex-wrap a {
+    flex: 1 1 150px;
+    text-align: center;
+  }
+
+  /* School facts: show all available facts and let each value size itself. */
+  main:has(> header + #top) > #top + section + section + section > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  main:has(> header + #top) > #top + section + section + section > div > div {
+    display: block !important;
+    min-width: 0;
+    padding: clamp(12px, 3vw, 20px);
+    border-radius: 16px;
+    border: 1px solid var(--school-primary-border);
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.05);
+  }
+
+  main:has(> header + #top) > #top + section + section + section > div > div p:last-child {
+    font-size: clamp(14px, 3.8vw, 20px);
+    line-height: 1.4;
+  }
+
+  /* About/principal/contact sections scale their spacing and typography with the viewport. */
+  main:has(> header + #top) #about,
+  main:has(> header + #top) #principal,
+  main:has(> header + #top) #contact {
+    padding-left: clamp(12px, 4vw, 32px);
+    padding-right: clamp(12px, 4vw, 32px);
+    padding-top: clamp(42px, 9vw, 80px);
+    padding-bottom: clamp(42px, 9vw, 80px);
+  }
+
+  main:has(> header + #top) #about > div,
+  main:has(> header + #top) #principal > div,
+  main:has(> header + #top) #contact > div {
+    gap: clamp(20px, 5vw, 40px);
+  }
+
+  main:has(> header + #top) #about h2,
+  main:has(> header + #top) #principal h2,
+  main:has(> header + #top) #contact h2 {
+    font-size: clamp(26px, 7vw, 40px);
+    line-height: 1.18;
+  }
+
+  main:has(> header + #top) #about > div > div:last-child,
+  main:has(> header + #top) #contact > div > div:first-child,
+  main:has(> header + #top) #contact > div > div:last-child {
+    border-radius: clamp(14px, 4vw, 24px);
+    padding: clamp(18px, 5vw, 32px);
+  }
+
+  main:has(> header + #top) #principal blockquote {
+    padding: clamp(14px, 4vw, 22px);
+    font-size: clamp(15px, 4vw, 18px);
+    line-height: 1.7;
+  }
+
+  /* Community cards become one-column on very narrow phones and two-column when there is room. */
+  main:has(> header + #top) .grid.grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  main:has(> header + #top) article {
+    min-width: 0;
+  }
+}
+
+@media (min-width: 420px) and (max-width: 767px) {
+  main:has(> header + #top) .grid.grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
