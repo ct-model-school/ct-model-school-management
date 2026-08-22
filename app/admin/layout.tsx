@@ -1,28 +1,72 @@
 import Link from "next/link";
-import { getCurrentProfile } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { getCurrentAdminPermissions } from "@/lib/adminPermissions";
 
 const primaryNavigation = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/settings", label: "Settings" },
-  { href: "/store", label: "Store / SR" },
+  { href: "/admin", label: "Dashboard", permission: "dashboard" },
+  { href: "/admin/settings", label: "Settings", adminOnly: true },
+  { href: "/admin/roles", label: "Role Management", adminOnly: true },
+  { href: "/store", label: "Store / SR", external: true },
 ];
 
 const upcomingModules = [
-  { href: "/admin/students", label: "Students" },
-  { href: "/admin/parents", label: "Parents & Guardians" },
-  { href: "/admin/people", label: "People & Achievements" },
-  { href: "/admin/teachers", label: "Teachers & Staff" },
-  { href: "/admin/accounts", label: "Accounts & Finance" },
-  { href: "/admin/inventory", label: "Inventory" },
-  { href: "/admin/store-members", label: "Store Users" },
-  { href: "/admin/notices", label: "Notices" },
-  { href: "/admin/results", label: "Results & Reports" },
+  { href: "/admin/students", label: "Students", permission: "students" },
+  { href: "/admin/parents", label: "Parents & Guardians", permission: "parents" },
+  { href: "/admin/people", label: "People & Achievements", permission: "people" },
+  { href: "/admin/teachers", label: "Teachers & Staff", permission: "teachers" },
+  { href: "/admin/accounts", label: "Accounts & Finance", permission: "accounts" },
+  { href: "/admin/inventory", label: "Inventory", permission: "inventory" },
+  { href: "/admin/store-members", label: "Store Users", permission: "store_members" },
+  { href: "/admin/notices", label: "Notices", permission: "notices" },
+  { href: "/admin/results", label: "Results & Reports", permission: "results" },
 ];
 
+const isAdminOnlyRole = (roleName: string) => ["admin", "administrator", "super_admin", "super admin"].includes(roleName.toLowerCase().replace(/_/g, " "));
+
 export default async function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const profile = await getCurrentProfile();
-  if (!profile) return children;
-  const roleLabel = profile.role.name.replace(/_/g, " ");
+  const access = await getCurrentAdminPermissions();
+  if (!access) return children;
+
+  const roleName = access.profile.role.name;
+  const adminOnly = isAdminOnlyRole(roleName);
+  const permissions = access.permissions;
+  const requestHeaders = await headers();
+  const pathname = requestHeaders.get("x-admin-pathname") || "";
+
+  const routePermission: Array<[string, string | string[]]> = [
+    ["/admin/students", "students"],
+    ["/admin/parents", "parents"],
+    ["/admin/people", "people"],
+    ["/admin/teachers", "teachers"],
+    ["/admin/accounts", "accounts"],
+    ["/admin/inventory", "inventory"],
+    ["/admin/store-members", "store_members"],
+    ["/admin/notices", "notices"],
+    ["/admin/results", "results"],
+    ["/admin/members", ["teachers", "accounts", "store_members"]],
+  ];
+
+  const matchedRoute = routePermission.find(([prefix]) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+  if (matchedRoute) {
+    const required = Array.isArray(matchedRoute[1]) ? matchedRoute[1] : [matchedRoute[1]];
+    if (!required.some((key) => Boolean(permissions[key]))) redirect("/admin");
+  }
+
+  if (pathname === "/admin/settings" || pathname.startsWith("/admin/settings/")) {
+    if (!adminOnly) redirect("/admin");
+  }
+
+  if (pathname === "/admin/roles" || pathname.startsWith("/admin/roles/")) {
+    if (!adminOnly) redirect("/admin");
+  }
+
+  const roleLabel = roleName.replace(/_/g, " ");
+  const visiblePrimary = primaryNavigation.filter((item) => {
+    if (item.external || item.adminOnly) return item.external || adminOnly;
+    return Boolean(item.permission && permissions[item.permission]);
+  });
+  const visibleModules = upcomingModules.filter((item) => Boolean(permissions[item.permission]));
 
   return (
     <div className="min-h-screen bg-[var(--school-background)] text-[var(--school-text)]">
@@ -30,13 +74,13 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
         <aside className="hidden w-64 shrink-0 border-r border-[var(--school-border)] bg-[var(--school-surface)] lg:flex lg:flex-col">
           <div className="border-b border-[var(--school-border)] px-6 py-6"><p className="text-xs font-bold uppercase tracking-[0.16em] theme-primary">C.T. Model School</p><p className="mt-2 text-sm font-semibold text-[var(--school-text)]">Digital Management System</p></div>
           <nav className="flex-1 space-y-7 overflow-y-auto px-4 py-6" aria-label="Admin navigation">
-            <div><p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--school-muted)]">Administration</p><div className="mt-2 space-y-1">{primaryNavigation.map((item) => <Link key={item.href} href={item.href} className="block rounded-xl px-3 py-2.5 text-sm font-semibold text-[var(--school-text)] transition hover:bg-[var(--school-primary-soft)] hover:text-[var(--school-primary)]">{item.label}</Link>)}</div></div>
-            <div><p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--school-muted)]">Modules</p><div className="mt-2 space-y-1">{upcomingModules.map((item) => <Link key={item.href} href={item.href} className="group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-[var(--school-muted)] transition hover:bg-[var(--school-primary-soft)] hover:text-[var(--school-primary)]">{item.label}<span className="rounded-full border border-[var(--school-border)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide group-hover:border-[var(--school-primary-border)]">Open</span></Link>)}</div></div>
+            <div><p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--school-muted)]">Administration</p><div className="mt-2 space-y-1">{visiblePrimary.map((item) => <Link key={item.href} href={item.href} className="block rounded-xl px-3 py-2.5 text-sm font-semibold text-[var(--school-text)] transition hover:bg-[var(--school-primary-soft)] hover:text-[var(--school-primary)]">{item.label}</Link>)}</div></div>
+            <div><p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--school-muted)]">Modules</p><div className="mt-2 space-y-1">{visibleModules.map((item) => <Link key={item.href} href={item.href} className="group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-[var(--school-muted)] transition hover:bg-[var(--school-primary-soft)] hover:text-[var(--school-primary)]">{item.label}<span className="rounded-full border border-[var(--school-border)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide group-hover:border-[var(--school-primary-border)]">Open</span></Link>)}</div></div>
           </nav>
-          <div className="border-t border-[var(--school-border)] p-4"><div className="rounded-2xl bg-[var(--school-primary-soft)] p-4"><p className="truncate text-sm font-bold text-[var(--school-text)]">{profile.full_name || profile.email}</p><p className="mt-1 text-xs capitalize theme-primary">{roleLabel}</p></div></div>
+          <div className="border-t border-[var(--school-border)] p-4"><div className="rounded-2xl bg-[var(--school-primary-soft)] p-4"><p className="truncate text-sm font-bold text-[var(--school-text)]">{access.profile.full_name || access.profile.email}</p><p className="mt-1 text-xs capitalize theme-primary">{roleLabel}</p></div></div>
         </aside>
         <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-20 border-b border-[var(--school-border)] bg-[var(--school-surface)]/95 px-5 py-4 backdrop-blur lg:hidden"><div className="flex items-center justify-between gap-4"><div><p className="text-sm font-bold text-[var(--school-text)]">C.T. Model School</p><p className="mt-0.5 text-xs theme-primary">Administration</p></div><Link href="/store" className="rounded-xl border border-[var(--school-primary-border)] px-3 py-2 text-xs font-bold theme-primary">Store / SR</Link></div></header>
+          <header className="sticky top-0 z-20 border-b border-[var(--school-border)] bg-[var(--school-surface)]/95 px-5 py-4 backdrop-blur lg:hidden"><div className="flex items-center justify-between gap-4"><div><p className="text-sm font-bold text-[var(--school-text)]">C.T. Model School</p><p className="mt-0.5 text-xs theme-primary">{roleLabel}</p></div><Link href="/store" className="rounded-xl border border-[var(--school-primary-border)] px-3 py-2 text-xs font-bold theme-primary">Store / SR</Link></div></header>
           <main className="min-w-0 p-5 md:p-8 lg:p-10">{children}</main>
         </div>
       </div>
