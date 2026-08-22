@@ -1,0 +1,56 @@
+name: Sync homepage community cards
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: contains(github.event.head_commit.message, 'Prepare homepage community card sync')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update homepage community cards
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          path = Path('app/page.tsx')
+          text = path.read_text(encoding='utf-8')
+
+          text = text.replace(
+              'type Person = { id: string; category: string; full_name: string; photo_url: string | null; designation: string | null; committee_position: string | null; subject: string | null; short_description: string | null; email: string | null; phone: string | null; whatsapp: string | null };',
+              'type Person = { id: string; category: string; full_name: string; photo_url: string | null; designation: string | null; committee_position: string | null; subject: string | null; class_name: string | null; section: string | null; academic_year: string | null; exam_name: string | null; result_value: string | null; scholarship_type: string | null; short_description: string | null; email: string | null; phone: string | null; whatsapp: string | null };'
+          )
+
+          text = text.replace(
+              'supabase.from("people_profiles").select("id,category,full_name,photo_url,designation,committee_position,subject,short_description,email,phone,whatsapp")',
+              'supabase.from("people_profiles").select("id,category,full_name,photo_url,designation,committee_position,subject,class_name,section,academic_year,exam_name,result_value,scholarship_type,short_description,email,phone,whatsapp")'
+          )
+
+          new_section = r'''    {people.length > 0 ? <section className="px-4 py-14 sm:px-6 lg:px-8"><div className="mx-auto max-w-7xl rounded-[2rem] border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-7"><div className="mb-7 flex items-end justify-between gap-4"><div><p className="text-xs font-extrabold uppercase tracking-[0.18em] theme-primary">PEOPLE & ACHIEVEMENTS</p><h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Our School Community</h2><p className="mt-3 text-sm leading-6 text-[var(--school-muted)] sm:text-base">Meet the teachers, committee members, staff and students who make C.T. Model School special.</p></div><a href="/people" className="hidden shrink-0 rounded-xl border border-[var(--school-primary-border)] px-4 py-2 text-xs font-extrabold theme-primary transition hover:-translate-y-0.5 sm:inline-flex">Explore Community <span className="ml-1">→</span></a></div><div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-5">{people.map((person) => { const isStudent = person.category === "gpa5" || person.category === "scholarship"; const description = clean(person.short_description); const expanded = expandedPerson === person.id; const primary = person.designation || person.committee_position || person.subject || "School Community"; const metaInfo = [person.class_name, person.section, person.academic_year].filter(Boolean).join(" • "); const hasDetails = Boolean(description || metaInfo || person.exam_name || person.result_value || person.scholarship_type); return <article key={person.id} className="group relative flex min-h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] shadow-[0_5px_18px_rgba(15,23,42,.08)] transition duration-300 hover:-translate-y-1.5 hover:border-[var(--school-primary-border)] hover:shadow-[0_16px_36px_rgba(15,23,42,.14)]"><div className="h-2 theme-primary-bg" /><div className="relative px-3 pt-3 sm:px-4 sm:pt-4"><div className="mx-auto aspect-[4/5] max-w-[205px] overflow-hidden rounded-2xl border-[3px] border-[var(--school-primary)] bg-[var(--school-primary-soft)] shadow-inner">{person.photo_url ? <img src={person.photo_url} alt={person.full_name} className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.03]" loading="lazy" /> : <div className="flex h-full items-center justify-center text-xs font-bold theme-primary">PHOTO</div>}</div></div><div className="flex flex-1 flex-col px-3 pb-4 pt-3 text-center sm:px-4 sm:pb-5"><h3 className="line-clamp-2 text-sm font-black leading-5 text-[var(--school-text)] sm:text-base">{person.full_name}</h3>{isStudent ? <><p className="mt-2 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{person.result_value || "Result not available"}</p>{hasDetails ? <details className="mt-3 text-left"><summary className="cursor-pointer list-none text-center text-[10px] font-extrabold theme-primary hover:underline sm:text-xs">Read more</summary><div className="mt-2.5 space-y-1.5 rounded-xl border border-[var(--school-border)] bg-[var(--school-background)] p-2.5 text-[9px] leading-4 sm:text-[10px] sm:leading-5">{person.exam_name ? <p><strong className="font-extrabold text-[var(--school-text)]">Exam:</strong> {person.exam_name}</p> : null}{person.result_value ? <p><strong className="font-extrabold text-[var(--school-text)]">Result:</strong> {person.result_value}</p> : null}{person.scholarship_type ? <p><strong className="font-extrabold text-[var(--school-text)]">Scholarship:</strong> {person.scholarship_type}</p> : null}{description ? <p><strong className="font-extrabold text-[var(--school-text)]">About:</strong> {description}</p> : null}{metaInfo ? <p><strong className="font-extrabold text-[var(--school-text)]">Class:</strong> {metaInfo}</p> : null}</div></details> : null}</> : <><span className="mx-auto mt-2 max-w-full rounded-sm theme-primary-bg px-2.5 py-1 text-[9px] font-black uppercase leading-3 text-white sm:text-[10px]">{primary}</span>{metaInfo ? <p className="mt-2 line-clamp-2 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{metaInfo}</p> : null}{description ? <p className="mt-2 line-clamp-3 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{description}</p> : null}{hasDetails ? <details className="mt-3 text-left"><summary className="cursor-pointer list-none text-center text-[10px] font-extrabold theme-primary hover:underline sm:text-xs">Read more</summary><div className="mt-2.5 space-y-1.5 rounded-xl border border-[var(--school-border)] bg-[var(--school-background)] p-2.5 text-[9px] leading-4 sm:text-[10px] sm:leading-5">{description ? <p><strong className="font-extrabold text-[var(--school-text)]">About:</strong> {description}</p> : null}{metaInfo ? <p><strong className="font-extrabold text-[var(--school-text)]">Class/Dept:</strong> {metaInfo}</p> : null}{person.exam_name ? <p><strong className="font-extrabold text-[var(--school-text)]">Exam:</strong> {person.exam_name}</p> : null}{person.result_value ? <p><strong className="font-extrabold text-[var(--school-text)]">Result:</strong> {person.result_value}</p> : null}{person.scholarship_type ? <p><strong className="font-extrabold text-[var(--school-text)]">Scholarship:</strong> {person.scholarship_type}</p> : null}</div></details> : null}</>}{(person.email || person.phone || person.whatsapp) ? <div className="mt-auto flex items-center justify-center gap-2 border-t border-dashed border-[var(--school-border)] pt-4 sm:gap-3">{person.email ? <a href={`mailto:${person.email}`} aria-label={`Email ${person.full_name}`} title="Email" className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--school-primary-soft)] theme-primary transition hover:scale-110"><ContactIcon type="email" /></a> : null}{person.phone ? <a href={`tel:${person.phone.replace(/\s+/g, "")}`} aria-label={`Call ${person.full_name}`} title="Phone" className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50 text-orange-500 transition hover:scale-110"><ContactIcon type="phone" /></a> : null}{person.whatsapp ? <a href={`https://wa.me/${person.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" aria-label={`WhatsApp ${person.full_name}`} title="WhatsApp" className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-50 text-green-600 transition hover:scale-110"><ContactIcon type="whatsapp" /></a> : null}</div> : null}</div><div className="h-1 theme-primary-bg opacity-80" /></article>; })}</div><div className="mt-6 text-center sm:hidden"><a href="/people" className="text-sm font-bold theme-primary hover:underline">View all Community & achievements →</a></div></div></section> : null}
+'''
+
+          pattern = re.compile(r'    \{people\.length > 0 \? <section className="px-4 py-14.*?\n    <section id="contact"', re.S)
+          replacement = new_section + '    <section id="contact"'
+          updated, count = pattern.subn(replacement, text, count=1)
+          if count != 1:
+              raise SystemExit(f'Homepage community section replacement failed: {count}')
+
+          path.write_text(updated, encoding='utf-8')
+
+      - name: Commit and clean up
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/page.tsx .github/workflows/sync-home-community-cards.yml
+          git rm .github/workflows/sync-home-community-cards.yml
+          git commit -m "Sync homepage community cards with people page"
+          git push
