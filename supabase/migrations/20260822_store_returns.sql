@@ -44,7 +44,7 @@ as $$
     sri.id,
     sr.id,
     sr.sr_number,
-    coalesce(su.display_name, sr.store_user_id::text),
+    coalesce(pp.full_name, su.login_id),
     su.login_id,
     sri.item_id,
     ii.item_code,
@@ -59,6 +59,7 @@ as $$
   join public.inventory_items ii on ii.id = sri.item_id
   left join public.store_item_returns sir on sir.service_request_item_id = sri.id
   left join public.store_users su on su.id = sr.store_user_id
+  left join public.people_profiles pp on pp.id = su.people_profile_id
   where sri.issued_quantity > 0
     and (
       nullif(trim(p_search), '') is null
@@ -67,7 +68,7 @@ as $$
       or lower(ii.item_name) like '%' || lower(trim(p_search)) || '%'
       or lower(coalesce(su.login_id, '')) like '%' || lower(trim(p_search)) || '%'
     )
-  group by sri.id, sr.id, sr.sr_number, sr.store_user_id, su.display_name, su.login_id,
+  group by sri.id, sr.id, sr.sr_number, su.login_id, pp.full_name,
            sri.item_id, ii.item_code, ii.item_name, ii.unit, sri.issued_quantity, ii.current_stock
   having greatest(sri.issued_quantity - coalesce(sum(sir.return_quantity), 0), 0) > 0
   order by sr.requested_at desc, ii.item_name;
@@ -114,8 +115,7 @@ begin
   end if;
 
   update public.inventory_items
-  set current_stock = current_stock + p_quantity,
-      updated_at = now()
+  set current_stock = current_stock + p_quantity
   where id = v_item_id;
 
   insert into public.store_item_returns(
