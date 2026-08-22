@@ -10,7 +10,6 @@ type Member = {
   member_id: string;
   member_type: MemberType;
   full_name: string;
-  password_text: string;
   designation: string | null;
   department: string | null;
   subject: string | null;
@@ -24,6 +23,8 @@ type Member = {
   is_active: boolean;
   created_at: string;
 };
+
+type CredentialResult = { member_id: string; password: string };
 
 const emptyForm = {
   id: null as string | null,
@@ -49,6 +50,13 @@ const roleOptions = [
   { value: "other", label: "Other" },
 ];
 
+function generatePassword() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#";
+  const values = new Uint32Array(12);
+  crypto.getRandomValues(values);
+  return Array.from(values, (value) => chars[value % chars.length]).join("");
+}
+
 export default function StoreMembersPage() {
   const supabase = useMemo(() => createClient(), []);
   const [form, setForm] = useState(emptyForm);
@@ -58,6 +66,7 @@ export default function StoreMembersPage() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [issuedCredential, setIssuedCredential] = useState<CredentialResult | null>(null);
 
   async function loadMembers() {
     setLoading(true);
@@ -70,17 +79,23 @@ export default function StoreMembersPage() {
   useEffect(() => { void loadMembers(); }, []);
 
   function resetForm() {
-    setForm(emptyForm);
+    setForm({ ...emptyForm });
   }
 
   function changeType(value: MemberType) {
     setForm((current) => ({ ...current, member_type: value, access_role: value, password: "" }));
   }
 
+  function fillGeneratedPassword() {
+    setForm((current) => ({ ...current, password: generatePassword() }));
+  }
+
   async function saveMember(event: FormEvent) {
     event.preventDefault();
     setSaving(true);
     setMessage("");
+    setIssuedCredential(null);
+
     const { data, error } = await supabase.rpc("store_admin_save_member", {
       p_member_type: form.member_type,
       p_id: form.id,
@@ -97,10 +112,13 @@ export default function StoreMembersPage() {
       p_details: form.details,
       p_access_role: form.access_role,
     });
-    if (error) setMessage(error.message);
-    else {
-      const result = data as { member_id: string };
+
+    if (error) {
+      setMessage(error.message);
+    } else {
+      const result = data as { member_id: string; password?: string | null };
       setMessage(form.id ? "Member updated successfully." : `Member created: ${result.member_id}`);
+      if (result.password) setIssuedCredential({ member_id: result.member_id, password: result.password });
       resetForm();
       await loadMembers();
     }
@@ -108,6 +126,7 @@ export default function StoreMembersPage() {
   }
 
   function editMember(member: Member) {
+    setIssuedCredential(null);
     setForm({
       id: member.id,
       member_type: member.member_type,
@@ -127,18 +146,39 @@ export default function StoreMembersPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  async function resetMemberPassword(member: Member) {
+    if (!window.confirm(`Generate a new password for ${member.member_id} (${member.full_name})? The current password will stop working.`)) return;
+    setSaving(true);
+    setMessage("");
+    setIssuedCredential(null);
+    const { data, error } = await supabase.rpc("store_admin_reset_member_password", {
+      p_member_type: member.member_type,
+      p_id: member.id,
+    });
+    if (error) setMessage(error.message);
+    else {
+      const result = data as CredentialResult;
+      setIssuedCredential(result);
+      setMessage(`${result.member_id} password reset successfully.`);
+      await loadMembers();
+    }
+    setSaving(false);
+  }
+
   async function deactivateMember(member: Member) {
     if (!window.confirm(`Remove ${member.member_id} (${member.full_name}) from active Store users?`)) return;
+    setSaving(true);
     const { error } = await supabase.rpc("store_admin_deactivate_member", { p_member_type: member.member_type, p_id: member.id });
     if (error) setMessage(error.message);
     else { setMessage(`${member.member_id} deactivated.`); await loadMembers(); }
+    setSaving(false);
   }
 
   const visibleMembers = members.filter((member) => {
     if (filter !== "all" && member.member_type !== filter) return false;
     const q = search.trim().toLowerCase();
     if (!q) return true;
-    return [member.member_id, member.full_name, member.designation, member.department, member.access_role].some((value) => value?.toLowerCase().includes(q));
+    return [member.member_id, member.full_name, member.designation, member.department, member.access_role, member.email, member.phone].some((value) => value?.toLowerCase().includes(q));
   });
 
   const isTeacher = form.member_type === "teacher";
@@ -151,6 +191,18 @@ export default function StoreMembersPage() {
       title="Store User Management"
       description="Create and manage Store login accounts for Staff, Teachers, Accounts and other authorized community members. Parents, Students and Committee members are intentionally excluded here."
     >
+      {issuedCredential ? (
+        <section className="mb-6 rounded-3xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] p-5 md:p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] theme-primary">Credential issued once</p>
+          <h2 className="mt-1 text-lg font-black">Provide this credential to the user now</h2>
+          <p className="mt-1 text-sm text-[var(--school-muted)]">For security, the password is not saved in plaintext and will not appear in the member list again. If it is lost later, use Reset Password to issue a new one.</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] p-4"><span className="label">Store ID</span><p className="mt-1 font-mono text-lg font-black theme-primary">{issuedCredential.member_id}</p></div>
+            <div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] p-4"><span className="label">New Password</span><p className="mt-1 break-all font-mono text-lg font-black">{issuedCredential.password}</p></div>
+          </div>
+        </section>
+      ) : null}
+
       <div className="grid gap-6 xl:grid-cols-[minmax(360px,.75fr)_minmax(0,1.25fr)]">
         <form onSubmit={saveMember} className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm md:p-7">
           <div className="flex items-center justify-between gap-3">
@@ -166,8 +218,13 @@ export default function StoreMembersPage() {
             <label className="sm:col-span-2"><span className="label">Member Type *</span><select className="field" value={form.member_type} onChange={(e) => changeType(e.target.value as MemberType)}>{roleOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
             {form.id ? <label className="sm:col-span-2"><span className="label">Member ID</span><input className="field bg-[var(--school-background)] font-bold" value={members.find((m) => m.id === form.id)?.member_id || ""} readOnly /></label> : null}
             <label className="sm:col-span-2"><span className="label">Full Name *</span><input className="field" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} required /></label>
-            <label><span className="label">Password {form.id ? "(leave blank to keep)" : "*"}</span><input className="field" type="text" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required={!form.id} /></label>
-            <label><span className="label">Access Role *</span><select className="field" value={form.access_role} onChange={(e) => setForm({ ...form, access_role: e.target.value })}><option value="staff">Staff</option><option value="teacher">Teacher</option><option value="accounts">Accounts</option><option value="other">Other</option><option value="store_admin">Store Admin</option></select></label>
+            <div className="sm:col-span-2">
+              <div className="flex items-end gap-2">
+                <label className="min-w-0 flex-1"><span className="label">Password {form.id ? "(leave blank to keep)" : "*"}</span><input className="field" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} minLength={8} required={!form.id} autoComplete="new-password" /></label>
+                <button type="button" onClick={fillGeneratedPassword} className="rounded-xl border border-[var(--school-border)] px-4 py-3 text-xs font-bold">Generate</button>
+              </div>
+            </div>
+            <label><span className="label">Access Role *</span><select className="field" value={form.access_role} onChange={(e) => setForm({ ...form, access_role: e.target.value })}>{roleOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}<option value="store">Store</option></select></label>
 
             {isTeacher ? <>
               <label><span className="label">Designation</span><input className="field" value={form.designation} onChange={(e) => setForm({ ...form, designation: e.target.value })} placeholder="Assistant Teacher / Lecturer" /></label>
@@ -204,15 +261,15 @@ export default function StoreMembersPage() {
 
         <section className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm md:p-7">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-            <div><h2 className="text-xl font-black">All Store Members</h2><p className="mt-1 text-sm text-[var(--school-muted)]">IDs and assigned passwords remain available to Admin for later distribution.</p></div>
+            <div><h2 className="text-xl font-black">All Store Members</h2><p className="mt-1 text-sm text-[var(--school-muted)]">Passwords are never displayed or stored in plaintext. Admin can issue a new password whenever needed.</p></div>
             <div className="flex flex-col gap-2 sm:flex-row"><select className="field sm:w-36" value={filter} onChange={(e) => setFilter(e.target.value as MemberType | "all")}><option value="all">All</option>{roleOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select><input className="field sm:w-64" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search ID / name / role" /></div>
           </div>
 
           <div className="mt-5 overflow-x-auto">
             <table className="w-full min-w-[900px] text-left text-sm">
-              <thead><tr className="border-b border-[var(--school-border)]"><th className="px-3 py-3">ID</th><th className="px-3 py-3">Name</th><th className="px-3 py-3">Type / Role</th><th className="px-3 py-3">Password</th><th className="px-3 py-3">Department</th><th className="px-3 py-3">Status</th><th className="px-3 py-3">Action</th></tr></thead>
+              <thead><tr className="border-b border-[var(--school-border)]"><th className="px-3 py-3">ID</th><th className="px-3 py-3">Name</th><th className="px-3 py-3">Type / Role</th><th className="px-3 py-3">Department</th><th className="px-3 py-3">Status</th><th className="px-3 py-3">Action</th></tr></thead>
               <tbody>
-                {visibleMembers.map((member) => <tr key={member.id} className="border-b border-[var(--school-border)] last:border-0"><td className="px-3 py-4 font-black theme-primary">{member.member_id}</td><td className="px-3 py-4"><b>{member.full_name}</b><div className="text-xs text-[var(--school-muted)]">{member.designation || member.role_title || ""}</div></td><td className="px-3 py-4 capitalize">{member.member_type}<div className="text-xs text-[var(--school-muted)]">{member.access_role}</div></td><td className="px-3 py-4 font-mono">{member.password_text}</td><td className="px-3 py-4">{member.department || "-"}</td><td className="px-3 py-4"><span className="rounded-full border border-[var(--school-border)] px-2 py-1 text-xs font-bold">{member.is_active ? "Active" : "Inactive"}</span></td><td className="px-3 py-4"><div className="flex gap-2"><button onClick={() => editMember(member)} className="rounded-lg border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Edit</button>{member.is_active ? <button onClick={() => void deactivateMember(member)} className="rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-600">Remove</button> : null}</div></td></tr>)}
+                {visibleMembers.map((member) => <tr key={member.id} className="border-b border-[var(--school-border)] last:border-0"><td className="px-3 py-4 font-black theme-primary">{member.member_id}</td><td className="px-3 py-4"><b>{member.full_name}</b><div className="text-xs text-[var(--school-muted)]">{member.designation || member.role_title || ""}</div></td><td className="px-3 py-4 capitalize">{member.member_type}<div className="text-xs text-[var(--school-muted)]">{member.access_role}</div></td><td className="px-3 py-4">{member.department || "-"}</td><td className="px-3 py-4"><span className="rounded-full border border-[var(--school-border)] px-2 py-1 text-xs font-bold">{member.is_active ? "Active" : "Inactive"}</span></td><td className="px-3 py-4"><div className="flex flex-wrap gap-2"><button onClick={() => editMember(member)} className="rounded-lg border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Edit</button>{member.is_active ? <button disabled={saving} onClick={() => void resetMemberPassword(member)} className="rounded-lg border border-[var(--school-primary-border)] px-3 py-2 text-xs font-bold theme-primary disabled:opacity-50">Reset Password</button> : null}{member.is_active ? <button disabled={saving} onClick={() => void deactivateMember(member)} className="rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-600 disabled:opacity-50">Remove</button> : null}</div></td></tr>)}
               </tbody>
             </table>
             {!loading && !visibleMembers.length ? <p className="rounded-2xl border border-dashed border-[var(--school-border)] p-8 text-center text-sm text-[var(--school-muted)]">No Store members found.</p> : null}
