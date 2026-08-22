@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const BUCKET = "school-assets";
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export default function PrincipalPhotoPanel() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [photoUrl, setPhotoUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -26,66 +26,30 @@ export default function PrincipalPhotoPanel() {
   }, [supabase]);
 
   async function upload(file: File) {
-    setBusy(true);
-    setMessage("");
-    setError("");
-
-    if (!file.type.startsWith("image/")) {
-      setError("Principal photo must be an image.");
-      setBusy(false);
-      return;
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      setError("Principal photo must be 5 MB or smaller.");
-      setBusy(false);
-      return;
-    }
+    setBusy(true); setMessage(""); setError("");
+    if (!file.type.startsWith("image/")) { setError("Principal photo must be an image."); setBusy(false); return; }
+    if (file.size > MAX_FILE_SIZE) { setError("Principal photo must be 5 MB or smaller."); setBusy(false); return; }
 
     const extension = file.name.includes(".") ? file.name.split(".").pop()?.toLowerCase() : "jpg";
     const path = `principal/principal-${crypto.randomUUID()}.${extension}`;
-    const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, file, {
-      cacheControl: "3600",
-      contentType: file.type,
-      upsert: false,
-    });
-
-    if (uploadError) {
-      setError(uploadError.message);
-      setBusy(false);
-      return;
-    }
+    const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, file, { cacheControl: "3600", contentType: file.type, upsert: false });
+    if (uploadError) { setError(uploadError.message); setBusy(false); return; }
 
     const { data: publicData } = supabase.storage.from(BUCKET).getPublicUrl(path);
     const publicUrl = publicData.publicUrl;
     const { error: updateError } = await supabase.from("school_settings").update({ principal_photo_url: publicUrl }).eq("id", 1);
+    if (updateError) { await supabase.storage.from(BUCKET).remove([path]); setError(updateError.message); setBusy(false); return; }
 
-    if (updateError) {
-      await supabase.storage.from(BUCKET).remove([path]);
-      setError(updateError.message);
-      setBusy(false);
-      return;
-    }
-
-    setPhotoUrl(publicUrl);
-    setMessage("Principal photo uploaded successfully.");
-    setBusy(false);
+    setPhotoUrl(publicUrl); setMessage("Principal photo uploaded successfully."); setBusy(false);
   }
 
   async function removePhoto() {
     if (!photoUrl) return;
     if (!window.confirm("Remove the principal photo from the website?")) return;
-    setBusy(true);
-    setMessage("");
-    setError("");
+    setBusy(true); setMessage(""); setError("");
     const { error: updateError } = await supabase.from("school_settings").update({ principal_photo_url: null }).eq("id", 1);
-    if (updateError) {
-      setError(updateError.message);
-      setBusy(false);
-      return;
-    }
-    setPhotoUrl("");
-    setMessage("Principal photo removed.");
-    setBusy(false);
+    if (updateError) { setError(updateError.message); setBusy(false); return; }
+    setPhotoUrl(""); setMessage("Principal photo removed."); setBusy(false);
   }
 
   return (
