@@ -4,16 +4,17 @@ import { updateSupabaseSession } from "@/lib/supabase/middleware";
 const adminLoginPath = "/admin/login";
 
 export async function proxy(request: NextRequest) {
-  const { response, user } = await updateSupabaseSession(request);
   const isAdminPath = request.nextUrl.pathname.startsWith("/admin");
   const isLoginPath = request.nextUrl.pathname === adminLoginPath;
 
-  if (!isAdminPath || isLoginPath) return response;
-
-  if (user) {
-    response.headers.set("x-admin-pathname", request.nextUrl.pathname);
-    return response;
+  if (isAdminPath && !isLoginPath) {
+    request.headers.set("x-admin-pathname", request.nextUrl.pathname);
   }
+
+  const { response, user } = await updateSupabaseSession(request);
+
+  if (!isAdminPath || isLoginPath) return response;
+  if (user) return response;
 
   const loginUrl = new URL(adminLoginPath, request.url);
   loginUrl.searchParams.set("next", `${request.nextUrl.pathname}${request.nextUrl.search}`);
