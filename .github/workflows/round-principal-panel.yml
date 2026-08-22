@@ -1,0 +1,40 @@
+name: Round principal panel
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: ${{ !contains(github.event.head_commit.message, 'Round principal panel') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Round principal panel
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('app/page.tsx')
+          text = path.read_text()
+          old = '<section id="principal" className="scroll-mt-24 border-y border-[var(--school-border)] bg-[var(--school-surface)] px-5 py-20 lg:px-8"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[.35fr_.65fr] lg:items-center"><div><p className="text-xs font-extrabold uppercase tracking-[0.16em] theme-primary">Message from the Principal</p>{settings.principal_photo_url ? <div className="mt-5 flex justify-center lg:justify-start"><div className="h-36 w-36 overflow-hidden rounded-2xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] shadow-sm sm:h-44 sm:w-44"><img src={settings.principal_photo_url} alt={settings.principal_name || "Principal"} className="h-full w-full object-cover object-top" /></div></div> : null}<h2 className="mt-5 text-3xl font-black tracking-tight">{settings.principal_name || "Principal"}</h2></div><blockquote className="border-l-4 border-[var(--school-primary)] pl-6 text-lg leading-8 text-[var(--school-muted)]">{settings.principal_message || "Welcome to our school community."}</blockquote></div></section>'
+          new = '<section id="principal" className="scroll-mt-24 px-4 py-14 sm:px-6 lg:px-8"><div className="mx-auto max-w-7xl rounded-[2rem] border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-7"><div className="grid gap-10 lg:grid-cols-[.35fr_.65fr] lg:items-center"><div><p className="text-xs font-extrabold uppercase tracking-[0.16em] theme-primary">Message from the Principal</p>{settings.principal_photo_url ? <div className="mt-5 flex justify-center lg:justify-start"><div className="h-36 w-36 overflow-hidden rounded-2xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] shadow-sm sm:h-44 sm:w-44"><img src={settings.principal_photo_url} alt={settings.principal_name || "Principal"} className="h-full w-full object-cover object-top" /></div></div> : null}<h2 className="mt-5 text-3xl font-black tracking-tight">{settings.principal_name || "Principal"}</h2></div><blockquote className="border-l-4 border-[var(--school-primary)] pl-6 text-lg leading-8 text-[var(--school-muted)]">{settings.principal_message || "Welcome to our school community."}</blockquote></div></div></section>'
+          if text.count(old) != 1:
+              raise SystemExit(f'Expected exactly 1 principal section, found {text.count(old)}')
+          path.write_text(text.replace(old, new))
+          PY
+
+      - name: Remove temporary workflow
+        run: rm -f .github/workflows/round-principal-panel.yml
+
+      - name: Commit final change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/page.tsx .github/workflows/round-principal-panel.yml
+          git commit -m "Round principal panel" || exit 0
+          git push
