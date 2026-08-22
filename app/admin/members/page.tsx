@@ -10,6 +10,7 @@ type Division = { id: string; name: string; bn_name: string };
 type District = { id: string; division_id: string; name: string; bn_name: string };
 type Upazila = { id: string; district_id: string; name: string; bn_name: string };
 type Postcode = { division_id: string; district_id: string; upazila: string; postOffice: string; postCode: string };
+type Role = { id: string; role_name: string; permissions: Record<string, boolean>; is_system: boolean; is_active: boolean };
 
 type Member = {
   member_type: MemberType; id: string; member_id: string; full_name: string; role: string;
@@ -59,6 +60,7 @@ export default function MembersPage() {
   const supabase = useMemo(() => createClient(), []);
   const [type, setType] = useState<MemberType>("staff");
   const [members, setMembers] = useState<Member[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [form, setForm] = useState<FormState>({ ...blank });
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -82,7 +84,12 @@ export default function MembersPage() {
     setLoading(false);
   }
 
-  useEffect(() => { void load(); }, [type]);
+  async function loadRoles() {
+    const { data, error } = await supabase.rpc("store_admin_list_member_roles");
+    if (!error) setRoles((data ?? []) as Role[]);
+  }
+
+  useEffect(() => { void load(); void loadRoles(); }, [type]);
 
   useEffect(() => {
     let active = true;
@@ -240,6 +247,12 @@ export default function MembersPage() {
   function setThana(value: string) { setForm((current) => ({ ...current, thana: value, post_office: "", post_code: "" })); }
   function setPostOffice(value: string) { const match = filteredPostcodes.find((p) => p.postOffice === value); setForm((current) => ({ ...current, post_office: value, post_code: match?.postCode || current.post_code })); }
 
+  const roleOptions = useMemo(() => {
+    const names = roles.map((r) => r.role_name);
+    const defaultsForType = type === "other" ? otherRoles : type === "accounts" ? accountRoles : type === "teacher" ? ["Teacher"] : ["Staff"];
+    return Array.from(new Set([...defaultsForType, ...names, form.role].filter(Boolean)));
+  }, [roles, type, form.role]);
+
   const uploadButton = (label: string, kind: "profile" | "certificate" | "nidFront" | "nidBack", accept: string, file: File | null) => (
     <label className="inline-flex cursor-pointer items-center rounded-lg border border-[var(--school-border)] px-3 py-2 text-xs font-bold hover:bg-[var(--school-primary-soft)]">
       {file ? `✓ ${file.name}` : label}
@@ -249,7 +262,7 @@ export default function MembersPage() {
 
   return (
     <AdminPageShell eyebrow="Community Access" title="Staff, Teachers, Accounts & Others" description="Admin-created internal members only. Parents, Students and Management Committee are excluded because they use their own registration/profile flows.">
-      <div className="mb-5 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">{(["staff", "teacher", "accounts", "other"] as MemberType[]).map((t) => <button key={t} onClick={() => changeType(t)} className={`rounded-xl px-4 py-3 text-sm font-bold capitalize ${type === t ? "theme-primary-bg" : "border border-[var(--school-border)] bg-[var(--school-surface)]"}`}>{t}</button>)}</div>
+      <div className="mb-5 flex flex-wrap items-center gap-2">{(["staff", "teacher", "accounts", "other"] as MemberType[]).map((t) => <button key={t} onClick={() => changeType(t)} className={`rounded-xl px-4 py-3 text-sm font-bold capitalize ${type === t ? "theme-primary-bg" : "border border-[var(--school-border)] bg-[var(--school-surface)]"}`}>{t}</button>)}<a href="/admin/roles" className="ml-auto rounded-xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] px-4 py-3 text-sm font-bold theme-primary">Role Management</a></div>
       {message ? <p className="mb-5 rounded-xl bg-[var(--school-primary-soft)] px-4 py-3 text-sm font-semibold theme-primary">{message}</p> : null}
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.75fr)_minmax(300px,.95fr)]">
         <form onSubmit={save} className="order-1 rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-4 shadow-sm sm:p-6 lg:p-7">
@@ -257,7 +270,7 @@ export default function MembersPage() {
           <div className="mt-5 grid grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-4">
             <div className="sm:col-span-2 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3"><label><span className="label">Full Name *</span><input className="field w-full" value={form.full_name} onChange={(e) => set("full_name", e.target.value)} required /></label><div className="pb-0.5"><span className="label">Profile Picture</span><div className="flex items-center gap-2">{profilePreview || form.photo_url ? <img src={profilePreview || form.photo_url} alt="Profile" className="h-10 w-10 rounded-lg object-cover" /> : null}{uploadButton("Upload Picture", "profile", "image/*", profileFile)}</div></div></div>
             <label><span className="label">Password {form.id ? "(leave blank to keep current)" : "*"}</span><input className="field w-full" type="password" value={form.password} onChange={(e) => set("password", e.target.value)} required={!form.id} minLength={8} /></label>
-            {type === "other" ? <label><span className="label">Role *</span><select className="field w-full" value={form.role} onChange={(e) => set("role", e.target.value)} required>{!otherRoles.includes(form.role) && form.role ? <option value={form.role}>{form.role}</option> : null}{otherRoles.map((x) => <option key={x} value={x}>{x}</option>)}</select></label> : <label><span className="label">Role *</span><input className="field w-full" value={form.role} onChange={(e) => set("role", e.target.value)} required /></label>}
+            <label><span className="label">Role *</span><select className="field w-full" value={form.role} onChange={(e) => set("role", e.target.value)} required>{roleOptions.map((x) => <option key={x} value={x}>{x}</option>)}</select></label>
             {type === "teacher" ? <label className="sm:col-span-2"><span className="label">Subject</span><input className="field w-full" value={form.subject} onChange={(e) => set("subject", e.target.value)} /></label> : null}
             {type === "accounts" ? <label className="sm:col-span-2"><span className="label">Accounts Role</span><select className="field w-full" value={form.account_role} onChange={(e) => set("account_role", e.target.value)}>{accountRoles.map((x) => <option key={x}>{x}</option>)}</select></label> : null}
             {type === "other" ? <label className="sm:col-span-2"><span className="label">Role / Position</span><input className="field w-full" value={form.role_title} onChange={(e) => set("role_title", e.target.value)} placeholder="ICT / Maintenance / Librarian" /></label> : null}
