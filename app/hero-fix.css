@@ -8,7 +8,8 @@ main:has(> header + #top) {
   main:has(> header + #top) { margin-inline: 0; }
 }
 
-/* Hero stays exactly on the same 1280px content rail as the sections below it. */
+/* Hero stays exactly on the same 1280px content rail as the sections
+   below it. The image itself remains a 1600:400 (4:1) cover. */
 main:has(> header + #top) > #top + section:first-of-type {
   width: 100%;
   max-width: 1600px;
@@ -18,31 +19,4 @@ main:has(> header + #top) > #top + section:first-of-type {
 main:has(> header + #top) > #top + section:first-of-type > div {
   aspect-ratio: 1600 / 400;
   position: relative;
-}
-
-main:has(> header + #top) > #top + section:first-of-type > div > img:first-child,
-main:has(> header + #top) > #top + section:first-of-type > div > div > img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  object-position: center center;
-}
-
-main:has(> header + #top) > #top + section:first-of-type > div > div {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-/* Mobile keeps the same wide banner feel without affecting desktop. */
-@media (max-width: 767px) {
-  main:has(> header + #top) {
-    width: 100%;
-    min-width: 0;
-  }
-
-  main:has(> header + #top) > #top + section:first-of-type > div {
-    aspect-ratio: 1600 / 500;
-  }
 }
