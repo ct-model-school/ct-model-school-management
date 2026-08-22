@@ -14,16 +14,14 @@ function addCommunityLink(nav: Element, mobile = false) {
   if (mobile) nav.querySelector("div")?.appendChild(link); else nav.appendChild(link);
 }
 
-function syncHomeCommunity() {
+function syncHomeCommunityNav() {
   if (window.location.pathname !== "/") return;
-  const sections = Array.from(document.querySelectorAll("main > section"));
-  const section = sections.find((item) => item.querySelector("h2")?.textContent?.trim() === "Our School Community");
-  if (!section) return;
-  const eyebrow = section.querySelector("p");
-  if (eyebrow?.textContent?.trim() === "PEOPLE & ACHIEVEMENTS") eyebrow.textContent = "COMMUNITY & ACHIEVEMENTS";
-  const viewAll = Array.from(section.querySelectorAll("a")).find((link) => link.getAttribute("href") === "/people");
-  if (viewAll) viewAll.textContent = "View all Community & achievements";
-  section.remove();
+  const header = document.querySelector("main > header");
+  if (!header) return;
+  const desktopNav = header.querySelector("nav.hidden");
+  if (desktopNav) addCommunityLink(desktopNav, false);
+  const mobileNav = Array.from(header.querySelectorAll("nav")).find((nav) => !nav.classList.contains("hidden"));
+  if (mobileNav?.querySelector("div")) addCommunityLink(mobileNav, true);
 }
 
 function NavIcon({ type }: { type: "home" | "about" | "people" | "principal" | "contact" }) {
@@ -37,24 +35,17 @@ function NavIcon({ type }: { type: "home" | "about" | "people" | "principal" | "
 
 export default function PublicPeopleNav() {
   const [pathname, setPathname] = useState("");
+
   useEffect(() => {
     const currentPath = window.location.pathname;
     setPathname(currentPath);
     if (currentPath !== "/") return;
-    const ensureMenu = () => {
-      const header = document.querySelector("main > header");
-      if (header) {
-        const desktopNav = header.querySelector("nav.hidden");
-        if (desktopNav) addCommunityLink(desktopNav, false);
-        const mobileNav = Array.from(header.querySelectorAll("nav")).find((nav) => !nav.classList.contains("hidden"));
-        if (mobileNav?.querySelector("div")) addCommunityLink(mobileNav, true);
-      }
-      syncHomeCommunity();
-    };
-    ensureMenu();
-    const observer = new MutationObserver(ensureMenu);
-    observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
+
+    const frame = window.requestAnimationFrame(() => {
+      syncHomeCommunityNav();
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   const isPrivateRoute = pathname.startsWith("/admin") || pathname.startsWith("/management") || pathname.startsWith("/register");
