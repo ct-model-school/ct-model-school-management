@@ -32,13 +32,14 @@ body {
 /* Public home uses one fixed desktop canvas so browser zoom scales
    header, hero and all following sections together. Admin is unaffected. */
 main:has(> header + #top) {
-  width: 1320px;
-  min-width: 1320px;
+  width: min(100%, 1320px);
+  min-width: 0;
+  max-width: 1320px;
   margin-inline: auto;
 }
 
 @media (max-width: 1300px) {
-  main:has(> header + #top) { margin-inline: 0; }
+  main:has(> header + #top) { margin-inline: auto; }
 }
 
 /* Hero stays exactly on the same 1280px content rail as the sections
@@ -418,4 +419,19 @@ main:has(> header + #top) #contact > div > div:last-child a:hover > span:last-ch
   color: var(--school-on-primary);
   border-color: var(--school-primary);
   transform: translateY(-1px);
+}
+
+
+/* Centered public website content rail. */
+@media (min-width: 768px) {
+  main:has(> header + #top) > header > div,
+  main:has(> header + #top) > #top + section + section > div,
+  main:has(> header + #top) > #top + section + section + section > div,
+  main:has(> header + #top) #about > div,
+  main:has(> header + #top) #principal > div,
+  main:has(> header + #top) #contact > div,
+  main:has(> header + #top) > footer > div {
+    width: min(100%, 1240px);
+    margin-inline: auto;
+  }
 }
