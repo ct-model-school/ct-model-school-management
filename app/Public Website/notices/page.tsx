@@ -1,4 +1,5 @@
-/** Route reserved for a future, separately scoped implementation. */
+import { redirect } from "next/navigation";
+
 export default function Page() {
-  return null;
+  redirect("/notices");
 }
