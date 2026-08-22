@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 
 type SchoolSettings = {
   school_name: string | null; school_short_name: string | null; school_motto: string | null; school_headline: string | null; school_description: string | null;
-  established_year: number | null; eiin: string | null; board: string | null; principal_name: string | null; principal_message: string | null;
+  established_year: number | null; eiin: string | null; board: string | null; principal_name: string | null; principal_message: string | null; principal_photo_url: string | null;
   logo_url: string | null; hero_image: string | null; address: string | null; phone: string | null; whatsapp: string | null; telephone: string | null;
   email: string | null; website: string | null; google_map: string | null; office_time: string | null; facebook: string | null; messenger: string | null;
   instagram: string | null; youtube: string | null; linkedin: string | null; tiktok: string | null;
@@ -19,7 +19,7 @@ type Person = { id: string; category: string; full_name: string; photo_url: stri
 
 const DEFAULT_SETTINGS: SchoolSettings = {
   school_name: "C.T. Model School", school_short_name: "CTMS", school_motto: null, school_headline: null, school_description: null,
-  established_year: 2010, eiin: null, board: null, principal_name: null, principal_message: null, logo_url: null, hero_image: null,
+  established_year: 2010, eiin: null, board: null, principal_name: null, principal_message: null, principal_photo_url: null, logo_url: null, hero_image: null,
   address: "Station Road, Kumira, Sitakunda, Chattogram", phone: "+880 1831-988846", whatsapp: null, telephone: null, email: null,
   website: null, google_map: null, office_time: null, facebook: null, messenger: null, instagram: null, youtube: null, linkedin: null, tiktok: null,
   hero_badge: "WELCOME TO C.T. MODEL SCHOOL", hero_subtitle: "A place to learn, grow and build the future.", hero_title: "C.T. Model School",
@@ -31,27 +31,18 @@ const clean = (value: string | null) => value?.trim() || "";
 function normalizeHomeLink(value: string | null | undefined, fallback: string) { const link = clean(value ?? null); if (!link) return fallback; if (link === "/about" || link === "/about/" || link.endsWith("/about") || link.endsWith("/about/")) return "#about"; if (link === "/contact" || link === "/contact/" || link.endsWith("/contact") || link.endsWith("/contact/")) return "#contact"; return link; }
 function buildMapEmbedUrl(value: string | null, fallbackAddress: string) {
   const raw = clean(value);
-  const build = (query: string) =>
-    `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=k&z=17&ie=UTF8&iwloc=B&output=embed`;
-
+  const build = (query: string) => `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=k&z=17&ie=UTF8&iwloc=B&output=embed`;
   if (!raw) return build(fallbackAddress);
-
-  // Keep an Admin Settings supplied Google Maps embed URL untouched.
-  // This lets Google retain its interactive controls and saved view state.
   if (/google\.com\/maps\/embed/i.test(raw) || /[?&]output=embed(?:&|$)/i.test(raw)) return raw;
-
   try {
     const url = new URL(raw);
     const query = url.searchParams.get("q") || url.searchParams.get("query");
     if (query) return build(query);
-
     const coords = raw.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
     if (coords) return build(`${coords[1]},${coords[2]}`);
-
     const placeMatch = url.pathname.match(/\/maps\/place\/([^/]+)/i);
     if (placeMatch?.[1]) return build(decodeURIComponent(placeMatch[1].replace(/\+/g, " ")));
   } catch {}
-
   return build(raw);
 }
 
@@ -83,7 +74,7 @@ export default function Home() {
     {settings.show_hero ? <><section className="relative w-full overflow-hidden bg-[var(--school-text)]"><div className="relative w-full overflow-hidden">{heroImages.length ? <img src={heroImages[0].image_url} alt="" aria-hidden="true" className="block h-auto w-full select-none opacity-0" /> : <div className="aspect-video w-full theme-primary-bg" />}{heroImages.map((slide, index) => <div key={slide.id} className={`absolute inset-0 h-full w-full overflow-hidden transition-opacity ${index === activeSlide ? "opacity-100" : "pointer-events-none opacity-0"}`} style={{ transitionDuration: `${Math.max(200, settings.hero_transition_speed || 600)}ms` }}><img src={slide.image_url} alt={String(slide.alt_text || schoolName)} className="block h-full w-full object-cover object-center sm:object-center max-sm:object-contain" /></div>)}{heroImages.length > 1 ? <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2">{heroImages.map((slide, index) => <button key={slide.id} type="button" onClick={() => setActiveSlide(index)} className={`h-2.5 rounded-full transition-all ${index === activeSlide ? "theme-primary-bg w-9" : "w-2.5 bg-white/70"}`} aria-label={`Show hero slide ${index + 1}`} />)}</div> : null}</div></section><section className="border-b border-[var(--school-border)] bg-[var(--school-surface)]"><div className="mx-auto max-w-7xl px-5 py-12 lg:px-8 lg:py-14"><div className="max-w-4xl"><p className="text-xs font-extrabold uppercase tracking-[0.18em] theme-primary">{settings.hero_badge || DEFAULT_SETTINGS.hero_badge}</p><h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">{heroTitle}</h1>{settings.hero_subtitle ? <p className="mt-4 text-xl font-semibold text-[var(--school-muted)] sm:text-2xl">{settings.hero_subtitle}</p> : null}<p className="mt-5 max-w-3xl text-base leading-8 text-[var(--school-muted)] sm:text-lg">{heroDescription}</p><div className="mt-7 flex flex-wrap gap-3"><a href={heroButton1Link} className="theme-primary-bg rounded-xl px-5 py-3 text-sm font-extrabold text-white">{settings.hero_button_1_text || "Explore the School"}</a><a href={heroButton2Link} className="rounded-xl border border-[var(--school-primary-border)] px-5 py-3 text-sm font-extrabold">{settings.hero_button_2_text || "Contact Us"}</a></div></div></div></section></> : null}
     <section className="border-b border-[var(--school-border)] bg-[var(--school-surface)]"><div className="mx-auto flex max-w-7xl flex-wrap items-stretch justify-start gap-3 bg-[var(--school-surface)] px-3 py-3 sm:grid sm:grid-cols-2 sm:gap-px sm:bg-[var(--school-border)] sm:px-0 sm:py-0 lg:grid-cols-4">{[["Established", settings.established_year ? String(settings.established_year) : "2010"],["Board", settings.board || "Bangladesh"],["School", settings.school_short_name || "CTMS"],["Location", settings.address || DEFAULT_SETTINGS.address]].map(([label,value], index) => <div key={label} className={`min-w-0 overflow-hidden bg-[var(--school-surface)] px-4 py-3 sm:px-6 sm:py-7 ${index > 1 ? "hidden sm:block" : "rounded-2xl border border-[var(--school-primary-border)] shadow-sm sm:rounded-none sm:border-0 sm:shadow-none"}`}><p className="text-[10px] font-extrabold uppercase tracking-[0.14em] theme-primary sm:text-xs">{label}</p><p className="mt-1.5 break-words text-base font-black leading-6 sm:mt-2 sm:text-xl sm:leading-7">{value}</p></div>)}</div></section>
     <section id="about" className="scroll-mt-24 px-5 py-20 lg:px-8"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.05fr_.95fr] lg:items-center"><div><p className="text-xs font-extrabold uppercase tracking-[0.16em] theme-primary">About the School</p><h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">{settings.school_headline || `Welcome to ${schoolName}`}</h2><p className="mt-6 text-base leading-8 text-[var(--school-muted)]">{settings.school_description || `Learn more about ${schoolName}, its educational journey, school community and the people who make it a place for learning and growth.`}</p>{settings.school_motto ? <div className="mt-7 rounded-2xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] p-5"><p className="text-xs font-extrabold uppercase tracking-[0.14em] theme-primary">School Motto</p><p className="mt-2 text-lg font-bold">{settings.school_motto}</p></div> : null}</div><div className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-7 shadow-sm sm:p-9"><p className="text-xs font-extrabold uppercase tracking-[0.14em] theme-primary">School Information</p><div className="mt-6 divide-y divide-[var(--school-border)]">{[["Established",settings.established_year ? String(settings.established_year) : ""],["EIIN",settings.eiin || ""],["Board",settings.board || ""],["Address",settings.address || ""]].filter(([,v]) => v).map(([label,value]) => <div key={label} className="grid grid-cols-[120px_1fr] gap-4 py-4"><span className="text-sm font-bold text-[var(--school-muted)]">{label}</span><span className="text-sm font-semibold">{value}</span></div>)}</div></div></div></section>
-    {settings.principal_name || settings.principal_message ? <section id="principal" className="scroll-mt-24 border-y border-[var(--school-border)] bg-[var(--school-surface)] px-5 py-20 lg:px-8"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[.35fr_.65fr] lg:items-center"><div><p className="text-xs font-extrabold uppercase tracking-[0.16em] theme-primary">Message from the Principal</p><h2 className="mt-3 text-3xl font-black tracking-tight">{settings.principal_name || "Principal"}</h2></div><blockquote className="border-l-4 border-[var(--school-primary)] pl-6 text-lg leading-8 text-[var(--school-muted)]">{settings.principal_message || "Welcome to our school community."}</blockquote></div></section> : null}
+    {settings.principal_name || settings.principal_message || settings.principal_photo_url ? <section id="principal" className="scroll-mt-24 border-y border-[var(--school-border)] bg-[var(--school-surface)] px-5 py-20 lg:px-8"><div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[.35fr_.65fr] lg:items-center"><div><p className="text-xs font-extrabold uppercase tracking-[0.16em] theme-primary">Message from the Principal</p>{settings.principal_photo_url ? <div className="mt-5 flex justify-center lg:justify-start"><div className="h-36 w-36 overflow-hidden rounded-2xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] shadow-sm sm:h-44 sm:w-44"><img src={settings.principal_photo_url} alt={settings.principal_name || "Principal"} className="h-full w-full object-cover object-top" /></div></div> : null}<h2 className="mt-5 text-3xl font-black tracking-tight">{settings.principal_name || "Principal"}</h2></div><blockquote className="border-l-4 border-[var(--school-primary)] pl-6 text-lg leading-8 text-[var(--school-muted)]">{settings.principal_message || "Welcome to our school community."}</blockquote></div></section> : null}
     <section id="contact" className="scroll-mt-24 px-5 py-20 lg:px-8"><div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1.1fr_.9fr]"><div className="rounded-3xl theme-primary-bg p-8 sm:p-10"><p className="text-xs font-extrabold uppercase tracking-[0.16em] text-white/75">Contact</p><h2 className="mt-3 text-3xl font-black text-white sm:text-4xl">Get in touch with {schoolName}</h2><p className="mt-4 max-w-xl leading-7 text-white/75">For school information, admission enquiries or other official communication, use the contact details below.</p><div className="mt-8 space-y-3 text-sm font-semibold text-white">{settings.address ? <p>{settings.address}</p> : null}{phone ? <p><a href={`tel:${phone.replace(/\s+/g, "")}`}>{phone}</a></p> : null}{whatsapp ? <p><a href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`}>WhatsApp: {whatsapp}</a></p> : null}{email ? <p><a href={`mailto:${email}`}>{email}</a></p> : null}{settings.office_time ? <p>{settings.office_time}</p> : null}</div></div><div className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-8 sm:p-10"><p className="text-xs font-extrabold uppercase tracking-[0.16em] theme-primary">Official Links</p><div className="mt-6 grid grid-cols-2 gap-3">{[["Facebook",settings.facebook],["Messenger",settings.messenger],["Instagram",settings.instagram],["YouTube",settings.youtube],["LinkedIn",settings.linkedin],["Website",settings.website]].filter(([,url]) => url).map(([label,url]) => <a key={label} href={url as string} target="_blank" rel="noreferrer" className="flex min-w-0 items-center justify-between gap-2 rounded-xl border border-[var(--school-border)] px-3 py-3 text-sm font-bold sm:px-4"><span className="truncate">{label}</span><span className="theme-primary shrink-0">↗</span></a>)}{!settings.facebook && !settings.messenger && !settings.instagram && !settings.youtube && !settings.linkedin && !settings.website ? <p className="col-span-2 text-sm leading-6 text-[var(--school-muted)]">Official links will appear here when configured from Admin Settings.</p> : null}</div></div></div>
       <div className="mx-auto mt-8 max-w-7xl overflow-hidden rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] shadow-sm"><div className="flex items-center justify-between gap-4 border-b border-[var(--school-border)] px-5 py-4 sm:px-7"><div><p className="text-xs font-extrabold uppercase tracking-[0.16em] theme-primary">Our Location</p><h3 className="mt-1 text-lg font-black sm:text-xl">{schoolName}</h3><p className="mt-1 text-xs text-[var(--school-muted)]">{settings.address || DEFAULT_SETTINGS.address}</p></div>{mapLink ? <a href={mapLink} target="_blank" rel="noreferrer" className="hidden rounded-xl border border-[var(--school-primary-border)] px-4 py-2 text-xs font-extrabold theme-primary sm:inline-flex">Open in Maps ↗</a> : null}</div><div className="relative h-[320px] w-full sm:h-[380px] lg:h-[410px]"><iframe title={`${schoolName} location map`} src={mapSrc} className="absolute inset-0 h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen /></div><div className="flex items-center justify-end px-5 py-3 sm:px-7 sm:hidden">{mapLink ? <a href={mapLink} target="_blank" rel="noreferrer" className="text-xs font-extrabold theme-primary">Open in Google Maps ↗</a> : null}</div></div>
     </section>
@@ -97,45 +88,14 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-xs text-white/75">© {new Date().getFullYear()} {schoolName}. All rights reserved.</p>
-            <a href="/admin/login" className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[10px] font-semibold text-white/75 opacity-70 blur-[0.15px] transition hover:bg-white/15 hover:text-white hover:opacity-100 hover:blur-0">
-              Admin Login
-            </a>
+            <a href="/admin/login" className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[10px] font-semibold text-white/75 opacity-70 blur-[0.15px] transition hover:bg-white/15 hover:text-white hover:opacity-100 hover:blur-0">Admin Login</a>
           </div>
         </div>
-
         <div className="mt-5 flex flex-col gap-3 border-t border-white/15 pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[11px] text-white/75">
-            Developed by <span className="font-semibold text-white">Shafa Abid Automation BD</span>
-          </p>
-
+          <p className="text-[11px] text-white/75">Developed by <span className="font-semibold text-white">Shafa Abid Automation BD</span></p>
           <div className="flex items-center gap-3">
-            {clean(settings.facebook) ? (
-              <a
-                href={clean(settings.facebook)}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Facebook"
-                title="Facebook"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 transition hover:bg-white/20 hover:scale-105"
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor">
-                  <path d="M13.5 21v-7h2.4l.4-2.8h-2.8V9.4c0-.8.2-1.4 1.4-1.4h1.5V5.5c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2H8v2.8h2.5v7h3Z" />
-                </svg>
-              </a>
-            ) : null}
-
-            {whatsapp ? (
-              <a
-                href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="WhatsApp"
-                title="WhatsApp"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 transition hover:bg-white/20 hover:scale-105"
-              >
-                <ContactIcon type="whatsapp" />
-              </a>
-            ) : null}
+            {clean(settings.facebook) ? <a href={clean(settings.facebook)} target="_blank" rel="noreferrer" aria-label="Facebook" title="Facebook" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 transition hover:bg-white/20 hover:scale-105"><svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor"><path d="M13.5 21v-7h2.4l.4-2.8h-2.8V9.4c0-.8.2-1.4 1.4-1.4h1.5V5.5c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2H8v2.8h2.5v7h3Z" /></svg></a> : null}
+            {whatsapp ? <a href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" aria-label="WhatsApp" title="WhatsApp" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 transition hover:bg-white/20 hover:scale-105"><ContactIcon type="whatsapp" /></a> : null}
           </div>
         </div>
       </div>
