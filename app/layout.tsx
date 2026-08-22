@@ -3,6 +3,7 @@ import "./globals.css";
 import "./form-primitives.css";
 import "./store-inventory-mobile.css";
 import "./mobile-responsive.css";
+import "./hero-fix.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import PublicPeopleNav from "@/app/components/PublicPeopleNav";
 
