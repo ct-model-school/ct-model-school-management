@@ -71,7 +71,7 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
   const visibleModules = upcomingModules.filter((item) => Boolean(permissions[item.permission]));
 
   return (
-    <div className="min-h-screen bg-[var(--school-background)] text-[var(--school-text)]">
+    <div className="admin-shell min-h-screen bg-[var(--school-background)] text-[var(--school-text)]">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
         <aside className="hidden w-64 shrink-0 border-r border-[var(--school-border)] bg-[var(--school-surface)] lg:flex lg:flex-col">
           <div className="border-b border-[var(--school-border)] px-6 py-6"><p className="text-xs font-bold uppercase tracking-[0.16em] theme-primary">C.T. Model School</p><p className="mt-2 text-sm font-semibold text-[var(--school-text)]">Digital Management System</p></div>
@@ -82,7 +82,19 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
           <div className="border-t border-[var(--school-border)] p-4"><div className="rounded-2xl bg-[var(--school-primary-soft)] p-4"><p className="truncate text-sm font-bold text-[var(--school-text)]">{access.profile.full_name || access.profile.email}</p><p className="mt-1 text-xs capitalize theme-primary">{roleLabel}</p></div></div>
         </aside>
         <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-20 border-b border-[var(--school-border)] bg-[var(--school-surface)]/95 px-5 py-4 backdrop-blur lg:hidden"><div className="flex items-center justify-between gap-4"><div><p className="text-sm font-bold text-[var(--school-text)]">C.T. Model School</p><p className="mt-0.5 text-xs theme-primary">{roleLabel}</p></div><Link href="/store" className="rounded-xl border border-[var(--school-primary-border)] px-3 py-2 text-xs font-bold theme-primary">Store / SR</Link></div></header>
+          <header className="sticky top-0 z-20 border-b border-[var(--school-border)] bg-[var(--school-surface)]/95 px-4 py-3 backdrop-blur lg:hidden">
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <div className="min-w-0"><p className="truncate text-sm font-bold text-[var(--school-text)]">C.T. Model School</p><p className="mt-0.5 text-xs capitalize theme-primary">{roleLabel}</p></div>
+              <Link href="/store" className="shrink-0 rounded-xl border border-[var(--school-primary-border)] px-3 py-2 text-xs font-bold theme-primary">Store / SR</Link>
+            </div>
+            <nav className="mt-3 flex gap-2 overflow-x-auto pb-1" aria-label="Mobile admin navigation">
+              {[...visiblePrimary, ...visibleModules].map((item) => (
+                <Link key={item.href} href={item.href} className="shrink-0 rounded-full border border-[var(--school-border)] bg-[var(--school-surface)] px-3 py-1.5 text-[11px] font-bold text-[var(--school-muted)] shadow-sm">
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </header>
           <main className="min-w-0 p-5 md:p-8 lg:p-10">{children}</main>
         </div>
       </div>
