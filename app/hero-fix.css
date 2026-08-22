@@ -1,0 +1,52 @@
+/* Home hero fix: make the hero image fill the viewport cleanly on desktop and mobile. */
+main:has(> header + #top) > #top + section:first-of-type {
+  width: 100%;
+  overflow: hidden;
+  background: var(--school-text);
+}
+
+main:has(> header + #top) > #top + section:first-of-type > div {
+  position: relative;
+  width: 100%;
+  height: clamp(190px, 31vw, 430px);
+  overflow: hidden;
+}
+
+main:has(> header + #top) > #top + section:first-of-type > div > img:first-child {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+main:has(> header + #top) > #top + section:first-of-type > div > div {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+main:has(> header + #top) > #top + section:first-of-type > div > div > img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+@media (max-width: 767px) {
+  main:has(> header + #top) > #top + section:first-of-type > div {
+    height: clamp(155px, 48vw, 300px);
+  }
+
+  main:has(> header + #top) > #top + section:first-of-type > div > div > img {
+    object-position: center center !important;
+  }
+}
+
+@media (min-width: 768px) {
+  /* The uploaded hero artwork contains side padding. Crop it proportionally so the artwork reaches both edges. */
+  main:has(> header + #top) > #top + section:first-of-type > div > div > img {
+    transform: scale(1.26);
+  }
+}
