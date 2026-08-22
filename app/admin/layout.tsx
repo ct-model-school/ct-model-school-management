@@ -53,10 +53,12 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
     if (!required.some((key) => Boolean(permissions[key]))) redirect("/admin");
   }
 
+  if (pathname === "/admin" || pathname === "/admin/") {
+    if (!permissions.dashboard) redirect("/admin/login");
+  }
   if (pathname === "/admin/settings" || pathname.startsWith("/admin/settings/")) {
     if (!adminOnly) redirect("/admin");
   }
-
   if (pathname === "/admin/roles" || pathname.startsWith("/admin/roles/")) {
     if (!adminOnly) redirect("/admin");
   }
