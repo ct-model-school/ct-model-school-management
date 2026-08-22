@@ -6,25 +6,27 @@ const COMMUNITY_LINK = "public-community-nav-link";
 
 function addCommunityLink(nav: Element, mobile = false) {
   if (nav.querySelector(`[data-${COMMUNITY_LINK}]`)) return;
-
   const link = document.createElement("a");
   link.href = "/people";
   link.textContent = "Community";
   link.setAttribute(`data-${COMMUNITY_LINK}`, "true");
-  link.className = mobile
-    ? "rounded-lg px-3 py-2 text-sm font-semibold"
-    : "text-sm font-semibold";
+  link.className = mobile ? "rounded-lg px-3 py-2 text-sm font-semibold" : "text-sm font-semibold";
+  if (mobile) nav.querySelector("div")?.appendChild(link); else nav.appendChild(link);
+}
 
-  if (mobile) {
-    nav.querySelector("div")?.appendChild(link);
-  } else {
-    nav.appendChild(link);
-  }
+function syncHomeCommunity() {
+  if (window.location.pathname !== "/") return;
+  const sections = Array.from(document.querySelectorAll("main > section"));
+  const section = sections.find((item) => item.querySelector("h2")?.textContent?.trim() === "Our School Community");
+  if (!section) return;
+  const eyebrow = section.querySelector("p");
+  if (eyebrow?.textContent?.trim() === "PEOPLE & ACHIEVEMENTS") eyebrow.textContent = "COMMUNITY & ACHIEVEMENTS";
+  const viewAll = Array.from(section.querySelectorAll("a")).find((link) => link.getAttribute("href") === "/people");
+  if (viewAll) viewAll.textContent = "View all Community & achievements";
 }
 
 function NavIcon({ type }: { type: "home" | "about" | "people" | "principal" | "contact" }) {
   const common = "h-6 w-6";
-
   if (type === "home") return <svg viewBox="0 0 24 24" className={common} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8" /><path d="M5.5 9.8V21h13V9.8" /><path d="M9 21v-6h6v6" /></svg>;
   if (type === "about") return <svg viewBox="0 0 24 24" className={common} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 20h16" /><path d="M6 18V9h4v9" /><path d="M14 18V4h4v14" /><path d="M7.5 12h1M15.5 7h1M15.5 10h1M15.5 13h1" /></svg>;
   if (type === "people") return <svg viewBox="0 0 24 24" className={common} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3" /><path d="M3.5 20c.5-3.3 2.4-5 5.5-5s5 1.7 5.5 5" /><circle cx="17" cy="9" r="2.2" /><path d="M15.2 15.5c2.5.2 4.2 1.7 4.8 4.5" /></svg>;
@@ -34,28 +36,23 @@ function NavIcon({ type }: { type: "home" | "about" | "people" | "principal" | "
 
 export default function PublicPeopleNav() {
   const [pathname, setPathname] = useState("");
-
   useEffect(() => {
     const currentPath = window.location.pathname;
     setPathname(currentPath);
-
     if (currentPath !== "/") return;
-
     const ensureMenu = () => {
       const header = document.querySelector("main > header");
-      if (!header) return;
-
-      const desktopNav = header.querySelector("nav.hidden");
-      if (desktopNav) addCommunityLink(desktopNav, false);
-
-      const mobileNav = Array.from(header.querySelectorAll("nav")).find((nav) => !nav.classList.contains("hidden"));
-      if (mobileNav && mobileNav.querySelector("div")) addCommunityLink(mobileNav, true);
+      if (header) {
+        const desktopNav = header.querySelector("nav.hidden");
+        if (desktopNav) addCommunityLink(desktopNav, false);
+        const mobileNav = Array.from(header.querySelectorAll("nav")).find((nav) => !nav.classList.contains("hidden"));
+        if (mobileNav?.querySelector("div")) addCommunityLink(mobileNav, true);
+      }
+      syncHomeCommunity();
     };
-
     ensureMenu();
     const observer = new MutationObserver(ensureMenu);
     observer.observe(document.body, { childList: true, subtree: true });
-
     return () => observer.disconnect();
   }, []);
 
@@ -70,46 +67,21 @@ export default function PublicPeopleNav() {
     { label: "Contact", href: "/#contact", type: "contact" as const, active: false },
   ];
 
-  return (
-    <>
-      <nav className="ctms-mobile-bottom-nav" aria-label="Mobile navigation">
-        {items.map((item) => (
-          <a key={item.label} href={item.href} className={item.active ? "ctms-mobile-bottom-nav-item active" : "ctms-mobile-bottom-nav-item"} aria-current={item.active ? "page" : undefined}>
-            <NavIcon type={item.type} />
-            <span>{item.label}</span>
-          </a>
-        ))}
-      </nav>
-
-      <style>{`
-        .ctms-mobile-bottom-nav { display: none; }
-        @media (max-width: 767px) {
-          .ctms-mobile-bottom-nav {
-            position: fixed; left: 0; right: 0; bottom: 0; z-index: 9999;
-            display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
-            min-height: 70px; padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
-            border-top: 1px solid var(--school-border); background: var(--school-surface);
-            box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.10);
-          }
-          .ctms-mobile-bottom-nav-item {
-            position: relative; display: flex; min-width: 0; flex-direction: column;
-            align-items: center; justify-content: center; gap: 3px; padding: 5px 2px 4px;
-            color: var(--school-muted); text-decoration: none; font-size: 11px; font-weight: 700;
-            line-height: 1.1; transition: color 160ms ease, transform 160ms ease;
-          }
-          .ctms-mobile-bottom-nav-item svg { flex: 0 0 auto; }
-          .ctms-mobile-bottom-nav-item.active { color: var(--school-primary); }
-          .ctms-mobile-bottom-nav-item.active::before {
-            content: ""; position: absolute; top: -6px; left: 50%; width: 32px; height: 3px;
-            border-radius: 999px; transform: translateX(-50%); background: var(--school-primary);
-          }
-          body:has(.ctms-mobile-bottom-nav) main { padding-bottom: 78px; }
-          main:has(> header + #top) > #top + section:first-of-type > div { aspect-ratio: 1600 / 400 !important; min-height: 0 !important; }
-          main:has(> header + #top) > #top + section:first-of-type > div > div img {
-            width: 100% !important; height: 100% !important; object-fit: contain !important; object-position: center !important;
-          }
-        }
-      `}</style>
-    </>
-  );
+  return <>
+    <nav className="ctms-mobile-bottom-nav" aria-label="Mobile navigation">
+      {items.map((item) => <a key={item.label} href={item.href} className={item.active ? "ctms-mobile-bottom-nav-item active" : "ctms-mobile-bottom-nav-item"} aria-current={item.active ? "page" : undefined}><NavIcon type={item.type} /><span>{item.label}</span></a>)}
+    </nav>
+    <style>{`
+      .ctms-mobile-bottom-nav { display:none; }
+      @media (max-width:767px) {
+        .ctms-mobile-bottom-nav { position:fixed; left:0; right:0; bottom:0; z-index:9999; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); min-height:70px; padding:6px 4px calc(6px + env(safe-area-inset-bottom)); border-top:1px solid var(--school-border); background:var(--school-surface); box-shadow:0 -8px 24px rgba(15,23,42,.10); }
+        .ctms-mobile-bottom-nav-item { position:relative; display:flex; min-width:0; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:5px 2px 4px; color:var(--school-muted); text-decoration:none; font-size:11px; font-weight:700; line-height:1.1; }
+        .ctms-mobile-bottom-nav-item.active { color:var(--school-primary); }
+        .ctms-mobile-bottom-nav-item.active::before { content:""; position:absolute; top:-6px; left:50%; width:32px; height:3px; border-radius:999px; transform:translateX(-50%); background:var(--school-primary); }
+        body:has(.ctms-mobile-bottom-nav) main { padding-bottom:78px; }
+        main:has(> header + #top) > #top + section:first-of-type > div { aspect-ratio:1600 / 400 !important; min-height:0 !important; }
+        main:has(> header + #top) > #top + section:first-of-type > div > div img { width:100% !important; height:100% !important; object-fit:contain !important; object-position:center !important; }
+      }
+    `}</style>
+  </>;
 }
