@@ -1,0 +1,52 @@
+/* Store inventory mobile polish. Scoped to pages that expose the inventory search field. */
+@media (max-width: 767px) {
+  main:has(input[placeholder="Search items..."]) {
+    overflow-x: hidden;
+  }
+
+  main:has(input[placeholder="Search items..."]) .grid {
+    min-width: 0;
+  }
+
+  main:has(input[placeholder="Search items..."]) form,
+  main:has(input[placeholder="Search items..."]) section {
+    min-width: 0;
+  }
+
+  main:has(input[placeholder="Search items..."]) table {
+    font-size: 12px;
+  }
+
+  main:has(input[placeholder="Search items..."]) input,
+  main:has(input[placeholder="Search items..."]) select,
+  main:has(input[placeholder="Search items..."]) textarea,
+  main:has(input[placeholder="Search items..."]) button {
+    max-width: 100%;
+  }
+
+  main:has(input[placeholder="Search items..."]) > div {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  main:has(input[placeholder="Search items..."]) .rounded-3xl {
+    border-radius: 18px;
+  }
+
+  main:has(input[placeholder="Search items..."]) .rounded-2xl {
+    border-radius: 14px;
+  }
+
+  main:has(input[placeholder="Search items..."]) .flex.flex-wrap {
+    width: 100%;
+  }
+
+  main:has(input[placeholder="Search items..."]) .flex.flex-wrap > button {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  main:has(input[placeholder="Search items..."]) article {
+    overflow: hidden;
+  }
+}
