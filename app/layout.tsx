@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./form-primitives.css";
 import "./store-inventory-mobile.css";
+import "./mobile-responsive.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import PublicPeopleNav from "@/app/components/PublicPeopleNav";
 
