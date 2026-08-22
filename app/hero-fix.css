@@ -1,4 +1,4 @@
-/* Responsive home hero. Source artwork ratio: 1600x500 (3.2:1). */
+/* Home hero fix: restore the desktop presentation and keep the mobile banner compact. */
 main:has(> header + #top) > #top + section:first-of-type {
   width: 100%;
   overflow: hidden;
@@ -8,12 +8,23 @@ main:has(> header + #top) > #top + section:first-of-type {
 main:has(> header + #top) > #top + section:first-of-type > div {
   position: relative;
   width: 100%;
-  aspect-ratio: 1600 / 500;
-  height: auto;
+  height: clamp(190px, 31vw, 430px);
   overflow: hidden;
 }
 
-main:has(> header + #top) > #top + section:first-of-type > div > img:first-child,
+main:has(> header + #top) > #top + section:first-of-type > div > img:first-child {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+main:has(> header + #top) > #top + section:first-of-type > div > div {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
 main:has(> header + #top) > #top + section:first-of-type > div > div > img {
   display: block;
   width: 100% !important;
@@ -23,18 +34,11 @@ main:has(> header + #top) > #top + section:first-of-type > div > div > img {
   object-position: center center !important;
 }
 
-main:has(> header + #top) > #top + section:first-of-type > div > div {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-/* Believers-style responsive behavior: preserve the wide banner character on mobile,
-   while keeping the image full-bleed and avoiding a tall hero tile. */
+/* Mobile: keep the wide 1600x500 banner character without changing desktop. */
 @media (max-width: 767px) {
   main:has(> header + #top) > #top + section:first-of-type > div {
-    aspect-ratio: 1600 / 500;
     height: auto;
+    aspect-ratio: 1600 / 500;
     min-height: 0;
     max-height: none;
   }
@@ -45,8 +49,8 @@ main:has(> header + #top) > #top + section:first-of-type > div > div {
   }
 }
 
+/* Desktop: restore the previous edge-to-edge crop/scale. */
 @media (min-width: 768px) {
-  /* Keep the existing desktop edge-to-edge crop for the wide artwork. */
   main:has(> header + #top) > #top + section:first-of-type > div > div > img {
     transform: scale(1.26);
   }
