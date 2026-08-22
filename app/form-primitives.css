@@ -1,3 +1,6 @@
+/* Shared form primitives. Imported globally so every form gets a stable
+   visible field box instead of showing a border only on hover/focus. */
+
 .label {
   display: block;
   margin-bottom: 7px;
@@ -7,13 +10,16 @@
   font-weight: 700;
 }
 
-.field {
+.field,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+select,
+textarea {
   display: block;
   width: 100%;
   min-width: 0;
   min-height: 44px;
   padding: 0 12px;
-  border: 1px solid var(--school-border);
+  border: 1px solid var(--school-border) !important;
   border-radius: 11px;
   background: var(--school-surface);
   color: var(--school-text);
@@ -24,22 +30,80 @@
   transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
 }
 
-textarea.field {
+textarea.field,
+textarea {
   min-height: 110px;
   padding-top: 10px;
   padding-bottom: 10px;
   resize: vertical;
 }
 
+select,
 select.field { padding-right: 34px; }
-.field::placeholder { color: #98a2b3; opacity: 1; }
-.field:hover { border-color: var(--school-primary-border); }
-.field:focus { border-color: var(--school-primary); box-shadow: 0 0 0 3px var(--school-primary-soft); }
-.field:disabled { cursor: not-allowed; opacity: 0.65; background: var(--school-background); }
-.field[aria-invalid="true"] { border-color: var(--school-danger); box-shadow: 0 0 0 3px var(--school-danger-soft); }
+
+.field::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: #98a2b3;
+  opacity: 1;
+}
+
+.field:hover,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):hover,
+select:hover,
+textarea:hover {
+  border-color: var(--school-primary-border) !important;
+}
+
+.field:focus,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus,
+select:focus,
+textarea:focus {
+  border-color: var(--school-primary) !important;
+  box-shadow: 0 0 0 3px var(--school-primary-soft);
+}
+
+.field:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  background: var(--school-background);
+}
+
+.field[aria-invalid="true"],
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: var(--school-danger) !important;
+  box-shadow: 0 0 0 3px var(--school-danger-soft);
+}
+
+/* Preserve native controls that should not look like text-entry boxes. */
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"],
+input[type="file"] {
+  width: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
+}
 
 @media (max-width: 640px) {
-  .field { min-height: 42px; font-size: 14px; border-radius: 10px; }
-  textarea.field { min-height: 100px; }
+  .field,
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  select,
+  textarea {
+    min-height: 42px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  textarea.field,
+  textarea { min-height: 100px; }
   .label { font-size: 12px; margin-bottom: 6px; }
 }
