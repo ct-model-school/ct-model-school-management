@@ -107,12 +107,10 @@ begin
   join public.inventory_items ii on ii.id = sri.item_id
   where sri.service_request_id = v_request.id;
 
-  if v_session.store_user_id is not null then
-    select * into v_profile
-    from public.people_profiles pp
-    join public.store_users su on su.people_profile_id = pp.id
-    where su.id = v_session.store_user_id;
-  end if;
+  select pp.* into v_profile
+  from public.people_profiles pp
+  join public.store_users su on su.people_profile_id = pp.id
+  where su.id = v_session.store_user_id;
 
   update public.store_sessions
   set last_seen_at = now()
