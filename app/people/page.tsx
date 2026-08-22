@@ -74,17 +74,17 @@ export default async function PeoplePage() {
 
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                   {items.map((item) => {
-                    const primaryInfo = item.category === "gpa5" || item.category === "scholarship"
+                    const isStudent = item.category === "gpa5" || item.category === "scholarship";
+                    const primaryInfo = isStudent
                       ? "Student"
                       : item.designation || item.committee_position || item.subject || item.achievement_type || item.result_value || item.scholarship_type || "School Community";
                     const metaInfo = [item.department, item.class_name, item.section, item.academic_year].filter(Boolean).join(" • ");
-                    const hasDetails = Boolean(item.short_description || metaInfo || item.exam_name || item.result_value || item.scholarship_type);
+                    const hasDetails = !isStudent && Boolean(item.short_description || metaInfo || item.exam_name || item.result_value || item.scholarship_type);
 
                     return (
                       <article key={item.id} className="group relative flex min-h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] shadow-[0_5px_18px_rgba(15,23,42,.08)] transition duration-300 hover:-translate-y-1.5 hover:border-[var(--school-primary-border)] hover:shadow-[0_16px_36px_rgba(15,23,42,.14)]">
                         <div className="h-2 theme-primary-bg" />
                         <div className="relative px-3 pt-3 sm:px-4 sm:pt-4">
-                          <div className="absolute left-3 top-3 z-10 rounded-full bg-[var(--school-surface)]/90 px-2 py-1 text-[8px] font-black uppercase tracking-[0.12em] theme-primary shadow-sm sm:left-4 sm:top-4">{category.label}</div>
                           <div className="mx-auto aspect-[4/5] max-w-[205px] overflow-hidden rounded-2xl border-[3px] border-[var(--school-primary)] bg-[var(--school-primary-soft)] shadow-inner">
                             {item.photo_url ? <img src={item.photo_url} alt={item.full_name} className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.03]" loading="lazy" /> : <div className="flex h-full items-center justify-center text-xs font-bold theme-primary">PHOTO</div>}
                           </div>
@@ -94,21 +94,29 @@ export default async function PeoplePage() {
                           <h3 className="line-clamp-2 text-sm font-black leading-5 text-[var(--school-text)] sm:text-base">{item.full_name}</h3>
                           <span className="mx-auto mt-2 max-w-full rounded-sm theme-primary-bg px-2.5 py-1 text-[9px] font-black uppercase leading-3 text-white sm:text-[10px]">{primaryInfo}</span>
 
-                          {metaInfo ? <p className="mt-2 line-clamp-2 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{metaInfo}</p> : null}
-                          {item.short_description ? <p className="mt-2 line-clamp-3 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{item.short_description}</p> : null}
+                          {isStudent ? (
+                            <p className="mt-2 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">
+                              {item.result_value || "Result not available"}
+                            </p>
+                          ) : (
+                            <>
+                              {metaInfo ? <p className="mt-2 line-clamp-2 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{metaInfo}</p> : null}
+                              {item.short_description ? <p className="mt-2 line-clamp-3 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{item.short_description}</p> : null}
 
-                          {hasDetails ? (
-                            <details className="mt-3 text-left">
-                              <summary className="cursor-pointer list-none text-center text-[10px] font-extrabold theme-primary hover:underline sm:text-xs">Read more</summary>
-                              <div className="mt-2.5 space-y-1.5 rounded-xl border border-[var(--school-border)] bg-[var(--school-background)] p-2.5 text-[9px] leading-4 sm:text-[10px] sm:leading-5">
-                                {item.short_description ? <p><strong className="font-extrabold text-[var(--school-text)]">About:</strong> {item.short_description}</p> : null}
-                                {metaInfo ? <p><strong className="font-extrabold text-[var(--school-text)]">Class/Dept:</strong> {metaInfo}</p> : null}
-                                {item.exam_name ? <p><strong className="font-extrabold text-[var(--school-text)]">Exam:</strong> {item.exam_name}</p> : null}
-                                {item.result_value ? <p><strong className="font-extrabold text-[var(--school-text)]">Result:</strong> {item.result_value}</p> : null}
-                                {item.scholarship_type ? <p><strong className="font-extrabold text-[var(--school-text)]">Scholarship:</strong> {item.scholarship_type}</p> : null}
-                              </div>
-                            </details>
-                          ) : null}
+                              {hasDetails ? (
+                                <details className="mt-3 text-left">
+                                  <summary className="cursor-pointer list-none text-center text-[10px] font-extrabold theme-primary hover:underline sm:text-xs">Read more</summary>
+                                  <div className="mt-2.5 space-y-1.5 rounded-xl border border-[var(--school-border)] bg-[var(--school-background)] p-2.5 text-[9px] leading-4 sm:text-[10px] sm:leading-5">
+                                    {item.short_description ? <p><strong className="font-extrabold text-[var(--school-text)]">About:</strong> {item.short_description}</p> : null}
+                                    {metaInfo ? <p><strong className="font-extrabold text-[var(--school-text)]">Class/Dept:</strong> {metaInfo}</p> : null}
+                                    {item.exam_name ? <p><strong className="font-extrabold text-[var(--school-text)]">Exam:</strong> {item.exam_name}</p> : null}
+                                    {item.result_value ? <p><strong className="font-extrabold text-[var(--school-text)]">Result:</strong> {item.result_value}</p> : null}
+                                    {item.scholarship_type ? <p><strong className="font-extrabold text-[var(--school-text)]">Scholarship:</strong> {item.scholarship_type}</p> : null}
+                                  </div>
+                                </details>
+                              ) : null}
+                            </>
+                          )}
 
                           {(item.email || item.phone || item.whatsapp) ? (
                             <div className="mt-auto flex items-center justify-center gap-2 border-t border-dashed border-[var(--school-border)] pt-4 sm:gap-3">
