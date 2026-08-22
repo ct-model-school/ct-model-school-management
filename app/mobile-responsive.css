@@ -1,0 +1,141 @@
+/* Shared mobile responsiveness. Desktop layouts remain unchanged. */
+@media (max-width: 767px) {
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    max-width: 100%;
+  }
+
+  input,
+  select,
+  textarea {
+    min-width: 0;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  /* Admin: collapse desktop form grids into a clean single-column flow. */
+  .admin-shell .grid.grid-cols-2,
+  .admin-shell .grid.grid-cols-3,
+  .admin-shell .grid.grid-cols-4,
+  .admin-shell .grid.grid-cols-5 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .admin-shell main {
+    width: 100%;
+    min-width: 0;
+    padding: 14px !important;
+  }
+
+  .admin-shell main > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .admin-shell .overflow-x-auto {
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-shell input,
+  .admin-shell select,
+  .admin-shell textarea {
+    width: 100%;
+  }
+
+  .admin-shell button {
+    min-height: 40px;
+  }
+
+  /* Prevent long labels, IDs and URLs from forcing horizontal overflow. */
+  .admin-shell p,
+  .admin-shell h1,
+  .admin-shell h2,
+  .admin-shell h3,
+  .admin-shell label,
+  .admin-shell a,
+  .admin-shell span {
+    overflow-wrap: anywhere;
+  }
+
+  /* Public website: keep header controls inside the viewport. */
+  main:has(> header + #top) > header > div {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  main:has(> header + #top) > header nav {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  main:has(> header + #top) > header nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  main:has(> header + #top) > header nav a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  main:has(> header + #top) section,
+  main:has(> header + #top) section > div {
+    max-width: 100%;
+  }
+
+  main:has(> header + #top) .grid {
+    min-width: 0;
+  }
+
+  main:has(> header + #top) .grid > * {
+    min-width: 0;
+  }
+
+  main:has(> header + #top) #principal img {
+    max-height: 220px;
+    object-fit: cover;
+  }
+}
+
+@media (max-width: 479px) {
+  .admin-shell main {
+    padding: 10px !important;
+  }
+
+  main:has(> header + #top) > header > div {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  main:has(> header + #top) > header img {
+    height: 38px;
+    width: 48px;
+  }
+
+  main:has(> header + #top) #about,
+  main:has(> header + #top) #principal,
+  main:has(> header + #top) #contact {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
