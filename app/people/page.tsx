@@ -79,7 +79,7 @@ export default async function PeoplePage() {
                       ? "Student"
                       : item.designation || item.committee_position || item.subject || item.achievement_type || item.result_value || item.scholarship_type || "School Community";
                     const metaInfo = [item.department, item.class_name, item.section, item.academic_year].filter(Boolean).join(" • ");
-                    const hasDetails = !isStudent && Boolean(item.short_description || metaInfo || item.exam_name || item.result_value || item.scholarship_type);
+                    const hasDetails = Boolean(item.short_description || metaInfo || item.exam_name || item.result_value || item.scholarship_type);
 
                     return (
                       <article key={item.id} className="group relative flex min-h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] shadow-[0_5px_18px_rgba(15,23,42,.08)] transition duration-300 hover:-translate-y-1.5 hover:border-[var(--school-primary-border)] hover:shadow-[0_16px_36px_rgba(15,23,42,.14)]">
@@ -92,14 +92,28 @@ export default async function PeoplePage() {
 
                         <div className="flex flex-1 flex-col px-3 pb-4 pt-3 text-center sm:px-4 sm:pb-5">
                           <h3 className="line-clamp-2 text-sm font-black leading-5 text-[var(--school-text)] sm:text-base">{item.full_name}</h3>
-                          <span className="mx-auto mt-2 max-w-full rounded-sm theme-primary-bg px-2.5 py-1 text-[9px] font-black uppercase leading-3 text-white sm:text-[10px]">{primaryInfo}</span>
 
                           {isStudent ? (
-                            <p className="mt-2 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">
-                              {item.result_value || "Result not available"}
-                            </p>
+                            <>
+                              <p className="mt-2 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">
+                                {item.result_value || "Result not available"}
+                              </p>
+                              {hasDetails ? (
+                                <details className="mt-3 text-left">
+                                  <summary className="cursor-pointer list-none text-center text-[10px] font-extrabold theme-primary hover:underline sm:text-xs">Read more</summary>
+                                  <div className="mt-2.5 space-y-1.5 rounded-xl border border-[var(--school-border)] bg-[var(--school-background)] p-2.5 text-[9px] leading-4 sm:text-[10px] sm:leading-5">
+                                    {item.exam_name ? <p><strong className="font-extrabold text-[var(--school-text)]">Exam:</strong> {item.exam_name}</p> : null}
+                                    {item.result_value ? <p><strong className="font-extrabold text-[var(--school-text)]">Result:</strong> {item.result_value}</p> : null}
+                                    {item.scholarship_type ? <p><strong className="font-extrabold text-[var(--school-text)]">Scholarship:</strong> {item.scholarship_type}</p> : null}
+                                    {item.short_description ? <p><strong className="font-extrabold text-[var(--school-text)]">About:</strong> {item.short_description}</p> : null}
+                                    {metaInfo ? <p><strong className="font-extrabold text-[var(--school-text)]">Class:</strong> {metaInfo}</p> : null}
+                                  </div>
+                                </details>
+                              ) : null}
+                            </>
                           ) : (
                             <>
+                              <span className="mx-auto mt-2 max-w-full rounded-sm theme-primary-bg px-2.5 py-1 text-[9px] font-black uppercase leading-3 text-white sm:text-[10px]">{primaryInfo}</span>
                               {metaInfo ? <p className="mt-2 line-clamp-2 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{metaInfo}</p> : null}
                               {item.short_description ? <p className="mt-2 line-clamp-3 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{item.short_description}</p> : null}
 
