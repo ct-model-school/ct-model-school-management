@@ -1,0 +1,45 @@
+.label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--school-text);
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--school-border);
+  border-radius: 11px;
+  background: var(--school-surface);
+  color: var(--school-text);
+  font-size: 14px;
+  line-height: 1.4;
+  outline: none;
+  box-shadow: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+textarea.field {
+  min-height: 110px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  resize: vertical;
+}
+
+select.field { padding-right: 34px; }
+.field::placeholder { color: #98a2b3; opacity: 1; }
+.field:hover { border-color: var(--school-primary-border); }
+.field:focus { border-color: var(--school-primary); box-shadow: 0 0 0 3px var(--school-primary-soft); }
+.field:disabled { cursor: not-allowed; opacity: 0.65; background: var(--school-background); }
+.field[aria-invalid="true"] { border-color: var(--school-danger); box-shadow: 0 0 0 3px var(--school-danger-soft); }
+
+@media (max-width: 640px) {
+  .field { min-height: 42px; font-size: 14px; border-radius: 10px; }
+  textarea.field { min-height: 100px; }
+  .label { font-size: 12px; margin-bottom: 6px; }
+}
