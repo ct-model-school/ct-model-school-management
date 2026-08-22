@@ -71,9 +71,6 @@ export default async function PeoplePage() {
                     <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] theme-primary">School Community</p>
                     <h2 className="mt-0.5 text-xl font-black tracking-tight sm:text-2xl">{category.label}</h2>
                   </div>
-                  <div className="shrink-0 rounded-full border border-[var(--school-primary-border)] bg-[var(--school-surface)] px-3 py-1.5 text-xs font-black theme-primary shadow-sm">
-                    {items.length} {items.length === 1 ? "Profile" : "Profiles"}
-                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
@@ -90,14 +87,11 @@ export default async function PeoplePage() {
                         <div className="relative aspect-[4/5] overflow-hidden bg-[var(--school-primary-soft)]">
                           {item.photo_url ? <img src={item.photo_url} alt={item.full_name} className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.04]" /> : <div className="flex h-full items-center justify-center text-xs font-bold theme-primary">PHOTO</div>}
                           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/25 to-transparent" />
-                          <div className="absolute left-3 top-3 rounded-full border border-white/40 bg-black/35 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-wide text-white backdrop-blur-sm">{category.label.replace("Our ", "")}</div>
                         </div>
 
                         <div className="flex flex-1 flex-col px-3.5 py-4 sm:px-4 sm:py-4.5">
                           <h3 className="line-clamp-2 text-sm font-black leading-5 text-[var(--school-text)] sm:text-base">{item.full_name}</h3>
-                          <div className="mt-2 inline-flex w-fit max-w-full rounded-lg px-2 py-1 text-[10px] font-extrabold leading-4 theme-primary sm:text-xs" style={{ backgroundColor: "color-mix(in srgb, var(--school-primary) 9%, transparent)" }}>
-                            {primaryInfo}
-                          </div>
+                          <p className="mt-2 text-[10px] font-extrabold leading-4 theme-primary sm:text-xs">{primaryInfo}</p>
 
                           {hasDetails ? (
                             <details className="mt-3">
