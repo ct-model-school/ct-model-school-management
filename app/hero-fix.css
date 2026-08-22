@@ -1,57 +1,48 @@
-/* Home hero fix: restore the desktop presentation and keep the mobile banner compact. */
+main:has(> header + #top) {
+  width: 1320px;
+  min-width: 1320px;
+  margin-inline: auto;
+}
+
+@media (max-width: 1300px) {
+  main:has(> header + #top) { margin-inline: 0; }
+}
+
+/* Hero stays exactly on the same 1280px content rail as the sections below it. */
 main:has(> header + #top) > #top + section:first-of-type {
   width: 100%;
-  overflow: hidden;
-  background: var(--school-text);
+  max-width: 1600px;
+  margin-inline: auto;
 }
 
 main:has(> header + #top) > #top + section:first-of-type > div {
+  aspect-ratio: 1600 / 400;
   position: relative;
-  width: 100%;
-  height: clamp(190px, 31vw, 430px);
-  overflow: hidden;
 }
 
-main:has(> header + #top) > #top + section:first-of-type > div > img:first-child {
-  display: block;
+main:has(> header + #top) > #top + section:first-of-type > div > img:first-child,
+main:has(> header + #top) > #top + section:first-of-type > div > div > img {
   width: 100%;
   height: 100%;
+  display: block;
   object-fit: cover;
+  object-position: center center;
 }
 
 main:has(> header + #top) > #top + section:first-of-type > div > div {
-  height: 100%;
   width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
-main:has(> header + #top) > #top + section:first-of-type > div > div > img {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-}
-
-/* Mobile: keep the wide 1600x500 banner character without changing desktop. */
+/* Mobile keeps the same wide banner feel without affecting desktop. */
 @media (max-width: 767px) {
+  main:has(> header + #top) {
+    width: 100%;
+    min-width: 0;
+  }
+
   main:has(> header + #top) > #top + section:first-of-type > div {
-    height: auto;
     aspect-ratio: 1600 / 500;
-    min-height: 0;
-    max-height: none;
-  }
-
-  main:has(> header + #top) > #top + section:first-of-type > div > div > img {
-    object-position: center center !important;
-    transform: none !important;
-  }
-}
-
-/* Desktop: restore the previous edge-to-edge crop/scale. */
-@media (min-width: 768px) {
-  main:has(> header + #top) > #top + section:first-of-type > div > div > img {
-    transform: scale(1.26);
   }
 }
