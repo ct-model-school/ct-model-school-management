@@ -58,6 +58,7 @@ export default function Home() {
   const [people, setPeople] = useState<Person[]>([]);
   const [activeSlide, setActiveSlide] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [communityDetailsOpen, setCommunityDetailsOpen] = useState(false);
   useEffect(() => { let mounted = true; const supabase = createClient(); async function loadHome() { const [settingsResult, slidesResult, peopleResult] = await Promise.all([supabase.from("school_settings").select("*").eq("id", 1).maybeSingle(), supabase.from("hero_slides").select("id,image_url,storage_path,alt_text,sort_order,is_active").eq("is_active", true).order("sort_order", { ascending: true }).order("created_at", { ascending: true }), supabase.from("people_profiles").select("id,category,full_name,photo_url,designation,committee_position,subject,class_name,section,academic_year,exam_name,result_value,scholarship_type,short_description,email,phone,whatsapp").eq("is_active", true).order("display_order", { ascending: true }).order("full_name", { ascending: true }).limit(5)]); if (!mounted) return; if (settingsResult.data) setSettings({ ...DEFAULT_SETTINGS, ...(settingsResult.data as SchoolSettings) }); if (!slidesResult.error && slidesResult.data?.length) setSlides((slidesResult.data as HeroSlide[]).slice(0, Math.max(1, settingsResult.data?.hero_max_items ?? 5))); if (!peopleResult.error) setPeople((peopleResult.data ?? []) as Person[]); } void loadHome(); return () => { mounted = false; }; }, []);
   useEffect(() => { if (slides.length < 2 || !settings.hero_auto_slide) return; const timer = window.setInterval(() => setActiveSlide((current) => (current + 1) % slides.length), Math.max(2, settings.hero_slide_interval || 5) * 1000); return () => window.clearInterval(timer); }, [slides.length, settings.hero_auto_slide, settings.hero_slide_interval]);
   useEffect(() => { if (activeSlide >= slides.length && slides.length) setActiveSlide(0); }, [activeSlide, slides.length]);
@@ -102,15 +103,20 @@ return <article key={person.id} className="group relative flex min-h-full min-w-
         {description ? <p className="mt-2 line-clamp-3 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{description}</p> : null}
       </>
     )}
-    {hasDetails ? <details className="mt-auto pt-3 text-left">
-      <summary className="cursor-pointer list-none text-center text-[10px] font-extrabold theme-primary hover:underline sm:text-xs">Read more</summary>
-      <div className="mt-2.5 space-y-1.5 rounded-xl border border-[var(--school-border)] bg-[var(--school-background)] p-2.5 text-[9px] leading-4 sm:text-[10px] sm:leading-5">
+    {hasDetails ? <details open={communityDetailsOpen} className="mt-auto pt-3 text-left">
+      <summary
+        onClick={(event) => { event.preventDefault(); setCommunityDetailsOpen((open) => !open); }}
+        className="flex min-h-8 cursor-pointer list-none items-center justify-center text-center text-[10px] font-extrabold theme-primary hover:underline sm:text-xs"
+      >
+        {communityDetailsOpen ? "Read less" : "Read more"}
+      </summary>
+      {communityDetailsOpen ? <div className="mt-2.5 space-y-1.5 rounded-xl border border-[var(--school-border)] bg-[var(--school-background)] p-2.5 text-left text-[9px] leading-4 sm:text-[10px] sm:leading-5">
         {description ? <p><strong className="font-extrabold text-[var(--school-text)]">About:</strong> {description}</p> : null}
         {metaInfo ? <p><strong className="font-extrabold text-[var(--school-text)]">Class/Dept:</strong> {metaInfo}</p> : null}
         {person.exam_name ? <p><strong className="font-extrabold text-[var(--school-text)]">Exam:</strong> {person.exam_name}</p> : null}
         {person.result_value ? <p><strong className="font-extrabold text-[var(--school-text)]">Result:</strong> {person.result_value}</p> : null}
         {person.scholarship_type ? <p><strong className="font-extrabold text-[var(--school-text)]">Scholarship:</strong> {person.scholarship_type}</p> : null}
-      </div>
+      </div> : null}
     </details> : null}
     {(person.email || person.phone || person.whatsapp) ? <div className="mt-auto flex items-center justify-center gap-2 border-t border-dashed border-[var(--school-border)] pt-4 sm:gap-3">
       {person.email ? <a href={`mailto:${person.email}`} aria-label={`Email ${person.full_name}`} title="Email" className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--school-primary-soft)] theme-primary transition hover:scale-110"><ContactIcon type="email" /></a> : null}
