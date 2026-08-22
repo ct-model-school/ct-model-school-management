@@ -17,6 +17,6 @@ main:has(> header + #top) > #top + section:first-of-type {
 }
 
 main:has(> header + #top) > #top + section:first-of-type > div {
-  aspect-ratio: 1600 / 400;
+  aspect-ratio: 1600 / 500;
   position: relative;
 }
