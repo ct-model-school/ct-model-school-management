@@ -6,6 +6,8 @@
 
 The project is an integrated school website and management system for **C.T. Model School**. The public website, Community/People foundation, admin management modules, theme system, Supabase integration and Vercel deployment workflow are already in active development.
 
+<!-- Vercel deployment trigger: restored baseline 1aad3339. No application code change. -->
+
 ---
 
 ## Phase 1: Public Website
