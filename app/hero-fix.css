@@ -20,8 +20,8 @@
   }
 }
 
-/* Mobile: the public site must use the actual viewport width.
-   The old fixed 1320px rail caused the whole page to overflow horizontally. */
+/* Mobile only: keep the top edge fixed while the hero expands downward and
+   crops horizontally to remove the embedded side/top/bottom empty bands. */
 @media (max-width: 767px) {
   main:has(> header + #top) {
     width: 100%;
@@ -38,26 +38,44 @@
     overflow: hidden;
   }
 
+  /* Do not use the desktop 1600/500 aspect ratio on phones. The hero height
+     follows the viewport so the artwork gets more vertical presence. */
   main:has(> header + #top) > #top + section:first-of-type > div {
     width: 100%;
     max-width: 100%;
-    aspect-ratio: 1600 / 500;
+    height: clamp(220px, 55vw, 380px) !important;
     min-height: 0;
+    aspect-ratio: auto !important;
     position: relative;
     overflow: hidden;
   }
 
-  main:has(> header + #top) > #top + section:first-of-type > div > img:first-child,
-  main:has(> header + #top) > #top + section:first-of-type > div > div,
-  main:has(> header + #top) > #top + section:first-of-type > div > div > img {
-    max-width: 100%;
+  /* This first transparent image establishes the exact mobile hero height. */
+  main:has(> header + #top) > #top + section:first-of-type > div > img:first-child {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+  }
+
+  main:has(> header + #top) > #top + section:first-of-type > div > div {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
   }
 
   main:has(> header + #top) > #top + section:first-of-type > div > div > img {
     width: 100% !important;
     height: 100% !important;
+    max-width: none !important;
     object-fit: cover !important;
-    object-position: center center !important;
+    object-position: center top !important;
     transform: none !important;
+  }
+
+  main:has(> header + #top) > #top + section:first-of-type .absolute.bottom-6 {
+    bottom: 10px;
   }
 }
