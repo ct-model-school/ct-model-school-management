@@ -1,32 +1,32 @@
 /* Mobile-only community section refinement. Desktop remains unchanged. */
 @media (max-width: 639px) {
-  section:has(article.group.relative.flex.min-h-full) { --community-accent: var(--school-primary); }
-  section:has(article.group.relative.flex.min-h-full) p.text-xs.font-extrabold.uppercase { font-size:0 !important; letter-spacing:.2em; }
-  section:has(article.group.relative.flex.min-h-full) p.text-xs.font-extrabold.uppercase::after { content:"OUR COMMUNITY"; font-size:11px; font-weight:900; letter-spacing:.2em; color:var(--school-primary); }
-  section:has(article.group.relative.flex.min-h-full) h2 { background:linear-gradient(90deg,var(--school-primary),color-mix(in srgb,var(--school-primary) 65%,var(--school-primary-soft)),var(--school-primary)); background-size:180% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:community-title-shift 5s ease-in-out infinite; }
+  section:has(article.group) { --community-accent: var(--school-primary); }
+  section:has(article.group) p.text-xs.font-extrabold.uppercase { font-size:0 !important; letter-spacing:.2em; }
+  section:has(article.group) p.text-xs.font-extrabold.uppercase::after { content:"OUR COMMUNITY"; font-size:11px; font-weight:900; letter-spacing:.2em; color:var(--school-primary); }
+  section:has(article.group) h2 { background:linear-gradient(90deg,var(--school-primary),color-mix(in srgb,var(--school-primary) 65%,var(--school-primary-soft)),var(--school-primary)); background-size:180% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:community-title-shift 5s ease-in-out infinite; }
   @keyframes community-title-shift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full { min-height:0 !important; height:auto !important; }
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) > div { width:82px !important; height:82px !important; max-width:82px !important; aspect-ratio:1/1 !important; border-radius:9999px !important; border-width:4px !important; border-color:color-mix(in srgb,var(--school-primary) 72%,var(--school-surface)) !important; background:var(--school-primary-soft) !important; box-shadow:0 0 0 5px color-mix(in srgb,var(--school-primary) 10%,transparent),0 7px 18px color-mix(in srgb,var(--school-primary) 18%,transparent) !important; }
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) { padding-top:6px !important; padding-bottom:0 !important; }
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) img { border-radius:9999px !important; object-position:center top !important; }
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) { padding-top:3px !important; padding-bottom:5px !important; }
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) h3 { margin-top:0 !important; font-size:13px !important; line-height:1.15 !important; }
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) > span { margin-top:2px !important; padding-top:2px !important; padding-bottom:2px !important; }
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) p { margin-top:3px !important; line-height:1.2 !important; }
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full details { margin-top:3px !important; }
+  section:has(article.group) article.group { min-height:0 !important; height:auto !important; }
+  section:has(article.group) article.group > div:nth-child(2) > div { width:82px !important; height:82px !important; max-width:82px !important; aspect-ratio:1/1 !important; border-radius:9999px !important; border-width:4px !important; border-color:color-mix(in srgb,var(--school-primary) 72%,var(--school-surface)) !important; background:var(--school-primary-soft) !important; box-shadow:0 0 0 5px color-mix(in srgb,var(--school-primary) 10%,transparent),0 7px 18px color-mix(in srgb,var(--school-primary) 18%,transparent) !important; }
+  section:has(article.group) article.group > div:nth-child(2) { padding-top:6px !important; padding-bottom:0 !important; }
+  section:has(article.group) article.group > div:nth-child(2) img { border-radius:9999px !important; object-position:center top !important; }
+  section:has(article.group) article.group > div:nth-child(3) { padding-top:3px !important; padding-bottom:5px !important; }
+  section:has(article.group) article.group > div:nth-child(3) h3 { margin-top:0 !important; font-size:13px !important; line-height:1.15 !important; }
+  section:has(article.group) article.group > div:nth-child(3) > span { margin-top:2px !important; padding-top:2px !important; padding-bottom:2px !important; }
+  section:has(article.group) article.group > div:nth-child(3) p { margin-top:3px !important; line-height:1.2 !important; }
+  section:has(article.group) article.group details { margin-top:3px !important; }
 
-  /* Home only: aggressively compact cards. */
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full { min-height:0 !important; height:auto !important; }
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:first-child { height:3px !important; min-height:3px !important; }
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) { padding-top:0 !important; padding-bottom:0 !important; }
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) > div { width:56px !important; height:56px !important; max-width:56px !important; }
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) { padding-top:0 !important; padding-bottom:1px !important; }
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) h3 { font-size:11px !important; line-height:1 !important; margin-top:0 !important; }
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) > span { margin-top:0 !important; padding-top:1px !important; padding-bottom:1px !important; font-size:10px !important; line-height:1 !important; }
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) p { margin-top:0 !important; line-height:1 !important; font-size:10px !important; }
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full details { margin-top:0 !important; }
+  /* Home only: aggressively compact community cards. Uses the actual Home card marker: article.group. */
+  main:not(.px-4.py-10) > section:has(article.group) article.group { min-height:0 !important; height:auto !important; }
+  main:not(.px-4.py-10) > section:has(article.group) article.group > div:first-child { height:5px !important; min-height:5px !important; }
+  main:not(.px-4.py-10) > section:has(article.group) article.group > div:nth-child(2) { padding-top:0 !important; padding-bottom:0 !important; }
+  main:not(.px-4.py-10) > section:has(article.group) article.group > div:nth-child(2) > div { width:56px !important; height:56px !important; max-width:56px !important; }
+  main:not(.px-4.py-10) > section:has(article.group) article.group > div:nth-child(3) { padding-top:0 !important; padding-bottom:1px !important; }
+  main:not(.px-4.py-10) > section:has(article.group) article.group > div:nth-child(3) h3 { font-size:11px !important; line-height:1 !important; margin-top:0 !important; }
+  main:not(.px-4.py-10) > section:has(article.group) article.group > div:nth-child(3) > span { margin-top:0 !important; padding-top:1px !important; padding-bottom:1px !important; font-size:10px !important; line-height:1 !important; }
+  main:not(.px-4.py-10) > section:has(article.group) article.group > div:nth-child(3) p { margin-top:0 !important; line-height:1 !important; font-size:10px !important; }
+  main:not(.px-4.py-10) > section:has(article.group) article.group details { margin-top:0 !important; }
   /* Requested: Home bottom accent is 10px. */
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:last-child { height:10px !important; min-height:10px !important; }
+  main:not(.px-4.py-10) > section:has(article.group) article.group > div:last-child { height:10px !important; min-height:10px !important; }
 
   /* Mobile header. Theme colors only, desktop untouched. */
   main > header { background:linear-gradient(135deg,color-mix(in srgb,var(--school-surface) 92%,var(--school-primary)),var(--school-surface)) !important; border-bottom:3px solid var(--school-primary) !important; box-shadow:0 5px 18px color-mix(in srgb,var(--school-primary) 16%,transparent) !important; }
