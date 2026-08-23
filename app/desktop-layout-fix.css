@@ -95,7 +95,9 @@
   main:has(> header + #top) section:has(article.group) article.group {
     min-width: 0;
     width: 70%;
+    justify-self: center;
     box-sizing: border-box;
+    padding-bottom: calc(0.6rem + 21px);
   }
 
   /* Keep compact community cards readable after moving from 2 to 4 columns. */
