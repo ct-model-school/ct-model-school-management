@@ -41,9 +41,10 @@ main:has(> header + #top) img { max-width:100%; }
   main:has(> header + #top) > header > div { min-height:64px; padding:10px 16px; }
   main:has(> header + #top) > header img { height:42px; width:52px; }
   main:has(> header + #top) > header .text-sm { font-size:13px; }
-  main:has(> header + #top) > #top + section:first-of-type > div { aspect-ratio:auto; height:320px; min-height:320px; width:100%; position:relative; overflow:hidden; }
+  /* Mobile hero is locked to the actual 1600:500 artwork ratio. The top edge stays fixed, the image fills the viewport width, and there is no blue/empty space on any side. */
+  main:has(> header + #top) > #top + section:first-of-type > div { aspect-ratio:1600 / 500; height:auto; min-height:0; width:100%; position:relative; overflow:hidden; }
   main:has(> header + #top) > #top + section:first-of-type > div > div { position:absolute; inset:0; width:100%; height:100%; overflow:hidden; }
-  main:has(> header + #top) > #top + section:first-of-type > div > div img { width:calc(100% + 36px); max-width:none; height:100%; object-fit:cover; object-position:center top; transform:translateX(-18px); transform-origin:center top; }
+  main:has(> header + #top) > #top + section:first-of-type > div > div img { display:block; width:100%; max-width:none; height:100%; object-fit:cover; object-position:center top; transform:none; }
   main:has(> header + #top) > #top + section + section > div { padding:32px 18px; }
   main:has(> header + #top) > #top + section + section h1 { font-size:30px; line-height:1.12; }
   main:has(> header + #top) > #top + section + section p.text-xl { font-size:18px; line-height:1.5; }
