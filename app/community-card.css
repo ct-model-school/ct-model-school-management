@@ -2,66 +2,107 @@
 
 main > section:has(article) article.group,
 main.px-4.py-10 article.group {
-  border-color: var(--school-border);
+  border-color: color-mix(in srgb, var(--school-primary) 24%, var(--school-border));
   border-radius: 1.35rem;
   background: var(--school-surface);
   box-shadow: 0 8px 24px color-mix(in srgb, var(--school-primary) 10%, transparent);
 }
 
-main > section:has(article) article.group > div:nth-child(2),
-main.px-4.py-10 article.group > div:nth-child(2) {
-  padding: 0.65rem 0.65rem 0;
+/* Same colorful theme-accent strips on Home and /people. */
+main > section:has(article) article.group > div:first-child,
+main.px-4.py-10 article.group > div:first-child {
+  height: 5px !important;
+  background: linear-gradient(90deg, var(--school-primary), color-mix(in srgb, var(--school-primary) 55%, #b026d8), var(--school-primary)) !important;
+  background-size: 180% 100%;
+  animation: community-card-shift 5s ease-in-out infinite;
 }
 
+main > section:has(article) article.group > div:last-child,
+main.px-4.py-10 article.group > div:last-child {
+  height: 4px !important;
+  background: linear-gradient(90deg, var(--school-primary), color-mix(in srgb, var(--school-primary) 55%, #b026d8), var(--school-primary)) !important;
+  background-size: 180% 100%;
+}
+
+@keyframes community-card-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+main > section:has(article) article.group > div:nth-child(2),
+main.px-4.py-10 article.group > div:nth-child(2) {
+  padding: 0.55rem 0.55rem 0;
+}
+
+/* Compact circular portrait, matching the Principal-style frame. */
 main > section:has(article) article.group > div:nth-child(2) > div,
 main.px-4.py-10 article.group > div:nth-child(2) > div {
-  width: 96px;
-  max-width: 96px;
+  width: 88px;
+  max-width: 88px;
   aspect-ratio: 1;
   border-radius: 9999px;
-  border: 4px solid var(--school-primary);
+  border: 4px solid color-mix(in srgb, var(--school-primary) 72%, var(--school-surface));
   background: var(--school-primary-soft);
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--school-primary) 10%, transparent), 0 8px 18px color-mix(in srgb, var(--school-primary) 12%, transparent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--school-primary) 10%, transparent), 0 7px 18px color-mix(in srgb, var(--school-primary) 18%, transparent);
+}
+
+main > section:has(article) article.group > div:nth-child(2) img,
+main.px-4.py-10 article.group > div:nth-child(2) img {
+  border-radius: 9999px;
+  object-position: center top;
 }
 
 main > section:has(article) article.group > div:nth-child(3),
 main.px-4.py-10 article.group > div:nth-child(3) {
-  padding: 0.65rem 0.65rem 0.8rem;
+  padding: 0.5rem 0.55rem 0.6rem;
 }
 
 main > section:has(article) article.group > div:nth-child(3) h3,
 main.px-4.py-10 article.group > div:nth-child(3) h3 {
-  font-size: 0.9rem;
-  line-height: 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.15rem;
 }
 
 main > section:has(article) article.group > div:nth-child(3) > span,
 main.px-4.py-10 article.group > div:nth-child(3) > span {
-  margin-top: 0.35rem;
-  padding: 0.3rem 0.65rem;
+  margin-top: 0.25rem;
+  padding: 0.25rem 0.55rem;
 }
 
 main > section:has(article) article.group > div:nth-child(3) > p,
 main.px-4.py-10 article.group > div:nth-child(3) > p {
-  margin-top: 0.4rem;
-  line-height: 1.15rem;
+  margin-top: 0.3rem;
+  line-height: 1.08rem;
 }
 
 main > section:has(article) article.group > div:nth-child(3) > div,
 main.px-4.py-10 article.group > div:nth-child(3) > div {
-  padding-top: 0.65rem;
+  padding-top: 0.5rem;
 }
 
 main > section:has(article) article.group > div:nth-child(3) a.flex,
 main.px-4.py-10 article.group > div:nth-child(3) a.flex {
-  width: 2rem;
-  height: 2rem;
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+@media (max-width: 639px) {
+  main > section:has(article) article.group,
+  main.px-4.py-10 article.group {
+    border-radius: 1.15rem;
+  }
+
+  main > section:has(article) article.group > div:nth-child(2) > div,
+  main.px-4.py-10 article.group > div:nth-child(2) > div {
+    width: 86px !important;
+    max-width: 86px !important;
+  }
 }
 
 @media (min-width: 768px) {
   main > section:has(article) article.group > div:nth-child(2) > div,
   main.px-4.py-10 article.group > div:nth-child(2) > div {
-    width: 112px;
-    max-width: 112px;
+    width: 104px;
+    max-width: 104px;
   }
 }
