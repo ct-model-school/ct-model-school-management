@@ -1,0 +1,40 @@
+name: Apply community card update
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply home profile limit
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('app/page.tsx')
+          text = path.read_text()
+          old = '.limit(5)]);'
+          if old not in text:
+              raise SystemExit('Expected home people query limit was not found.')
+          path.write_text(text.replace(old, '.limit(6)]);', 1))
+          PY
+
+      - name: Commit update
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add app/page.tsx
+          rm -f .github/workflows/community-card-fix.yml
+          git add -A .github/workflows/community-card-fix.yml
+          git commit -m 'feat: compact community cards and show six profiles [skip ci]'
+          git push
