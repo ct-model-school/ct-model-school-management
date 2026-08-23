@@ -30,7 +30,7 @@ export default async function PeoplePage() {
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
     .from("people_profiles")
-    .select("id,category,full_name,photo_url,designation,department,subject,committee_position,class_name,section,academic_year,exam_name,result_value,achievement_type,scholarship_type,short_description,email,phone,whatsapp")
+    .select("id,category,full_name,photo_url,designation,department,subject,committee_position,class_name,section,academic_year,exam_name,result_value,achievement_type,scholarship_type,short_description,email,phone,whatsapp,qualification")
     .eq("is_active", true)
     .order("display_order", { ascending: true })
     .order("full_name", { ascending: true });
@@ -114,6 +114,7 @@ export default async function PeoplePage() {
                           ) : (
                             <>
                               <span className="mx-auto mt-2 max-w-full rounded-sm theme-primary-bg px-2.5 py-1 text-[9px] font-black uppercase leading-3 text-white sm:text-[10px]">{primaryInfo}</span>
+                              {category.value === "teacher" && item.qualification ? <p className="mt-1.5 line-clamp-2 text-[9px] font-semibold leading-4 text-[var(--school-muted)] sm:text-[10px]">{item.qualification}</p> : null}
                               {metaInfo ? <p className="mt-2 line-clamp-2 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{metaInfo}</p> : null}
                               {item.short_description ? <p className="mt-2 line-clamp-3 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{item.short_description}</p> : null}
 
