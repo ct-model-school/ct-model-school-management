@@ -1,0 +1,69 @@
+.page {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 767px) {
+  .page {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Keep the member type navigation inside the phone viewport. */
+  .page :global(> div:first-child) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .page :global(> div:first-child > a) {
+    width: 100%;
+    margin-left: 0;
+    text-align: center;
+  }
+
+  /* The name + profile picture row must become one column on phones. */
+  .page :global(form > div:nth-child(2) > div:first-child) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page :global(form > div:nth-child(2) > div:first-child > div) {
+    min-width: 0;
+  }
+
+  .page :global(form > div:nth-child(2) > div:first-child > div > div) {
+    flex-wrap: wrap;
+  }
+
+  /* Document upload controls should wrap instead of creating horizontal scroll. */
+  .page :global(form > div:nth-child(2) > div > div.flex.items-end) {
+    flex-wrap: wrap;
+  }
+
+  .page :global(form > div:nth-child(2) > div > div.flex.items-end > div) {
+    max-width: 100%;
+  }
+
+  .page :global(form > div:nth-child(2) > div > div.flex.items-end > div > label) {
+    min-width: 0;
+  }
+
+  /* NID front/back buttons can move below the input on narrow screens. */
+  .page :global(form > div:nth-child(2) > div.flex.items-end) {
+    flex-wrap: wrap;
+  }
+
+  .page :global(form > div:nth-child(2) > div.flex.items-end > div.flex) {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .page :global(form > div:nth-child(2) > div.flex.items-end > div.flex > label) {
+    flex: 1 1 auto;
+  }
+
+  .page :global(input, select, textarea) {
+    max-width: 100%;
+  }
+}
