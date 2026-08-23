@@ -7,8 +7,6 @@ main.px-4.py-10 article.group {
   background: var(--school-surface);
   box-shadow: 0 8px 24px color-mix(in srgb, var(--school-primary) 10%, transparent);
   position: relative;
-
-  /* Center the complete card content as one visual group. */
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -16,7 +14,6 @@ main.px-4.py-10 article.group {
   text-align: center !important;
 }
 
-/* Same colorful theme-accent strips on Home and /people. */
 main > section:has(article) article.group > div:first-child,
 main.px-4.py-10 article.group > div:first-child {
   height: 5px !important;
@@ -31,7 +28,6 @@ main.px-4.py-10 article.group > div:first-child {
   z-index: 1;
 }
 
-/* Bottom accent line: anchor it to the actual bottom edge of the card. */
 main > section:has(article) article.group > div:last-child,
 main.px-4.py-10 article.group > div:last-child {
   position: absolute !important;
@@ -56,7 +52,6 @@ main.px-4.py-10 article.group > div:last-child {
   50% { background-position: 100% 50%; }
 }
 
-/* Portrait area. */
 main > section:has(article) article.group > div:nth-child(2),
 main.px-4.py-10 article.group > div:nth-child(2) {
   width: 100% !important;
@@ -67,7 +62,6 @@ main.px-4.py-10 article.group > div:nth-child(2) {
   padding: 0.45rem 0.55rem 0.2rem !important;
 }
 
-/* Compact circular portrait, matching the Principal-style frame. */
 main > section:has(article) article.group > div:nth-child(2) > div,
 main.px-4.py-10 article.group > div:nth-child(2) > div {
   width: 88px;
@@ -85,7 +79,6 @@ main.px-4.py-10 article.group > div:nth-child(2) img {
   object-position: center top;
 }
 
-/* Text area stays directly under the portrait. Do not push Read more to the bottom. */
 main > section:has(article) article.group > div:nth-child(3),
 main.px-4.py-10 article.group > div:nth-child(3) {
   width: 100% !important;
@@ -119,7 +112,6 @@ main.px-4.py-10 article.group > div:nth-child(3) > p {
   text-align: center !important;
 }
 
-/* Keep scholarship description compact so the visual group remains centered. */
 main > section:has(a[href="/people#scholarship"]) article.group > div:nth-child(3) > p:nth-of-type(2),
 main.px-4.py-10:has(a[href="/people#scholarship"]) article.group > div:nth-child(3) > p:nth-of-type(2) {
   display: -webkit-box;
@@ -128,7 +120,6 @@ main.px-4.py-10:has(a[href="/people#scholarship"]) article.group > div:nth-child
   overflow: hidden;
 }
 
-/* Scholarship cards show the scholarship name in the compact visible slot. */
 main > section:has(a[href="/people#scholarship"]) article.group > div:nth-child(3) > p:first-of-type,
 main.px-4.py-10:has(a[href="/people#scholarship"]) article.group > div:nth-child(3) > p:first-of-type {
   font-size: 0 !important;
@@ -143,7 +134,6 @@ main.px-4.py-10:has(a[href="/people#scholarship"]) article.group > div:nth-child
   font-weight: 700;
 }
 
-/* Read more sits immediately after the card information. */
 main > section:has(article) article.group > div:nth-child(3) details,
 main.px-4.py-10 article.group > div:nth-child(3) details {
   margin-top: 0.35rem !important;
@@ -164,6 +154,22 @@ main.px-4.py-10 article.group > div:nth-child(3) a.flex {
   height: 1.9rem;
 }
 
+/* Scholarship cards: move the complete visual content group down into the true vertical center. */
+@media (min-width: 768px) {
+  main > section:has(a[href="/people#scholarship"]) article.group > div:nth-child(2),
+  main.px-4.py-10:has(a[href="/people#scholarship"]) article.group > div:nth-child(2),
+  main > section:has(a[href="/people#scholarship"]) article.group > div:nth-child(3),
+  main.px-4.py-10:has(a[href="/people#scholarship"]) article.group > div:nth-child(3) {
+    transform: translateY(32px);
+  }
+
+  main > section:has(article) article.group > div:nth-child(2) > div,
+  main.px-4.py-10 article.group > div:nth-child(2) > div {
+    width: 104px;
+    max-width: 104px;
+  }
+}
+
 @media (max-width: 639px) {
   main > section:has(article) article.group,
   main.px-4.py-10 article.group {
@@ -174,13 +180,5 @@ main.px-4.py-10 article.group > div:nth-child(3) a.flex {
   main.px-4.py-10 article.group > div:nth-child(2) > div {
     width: 86px !important;
     max-width: 86px !important;
-  }
-}
-
-@media (min-width: 768px) {
-  main > section:has(article) article.group > div:nth-child(2) > div,
-  main.px-4.py-10 article.group > div:nth-child(2) > div {
-    width: 104px;
-    max-width: 104px;
   }
 }
