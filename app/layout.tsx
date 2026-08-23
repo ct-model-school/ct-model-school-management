@@ -7,6 +7,7 @@ import "./hero-fix.css";
 import "./contact-enhancements.css";
 import "./community-mobile.css";
 import "./community-card.css";
+import "./footer-header-fix.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import PublicPeopleNav from "@/app/components/PublicPeopleNav";
 
