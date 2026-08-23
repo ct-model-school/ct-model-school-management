@@ -81,10 +81,10 @@ export default function PublicPeopleNav() {
     let ticking = false;
 
     const updateScrollState = () => {
-      const currentScrollY = window.scrollY;
+      const currentScrollY = Math.max(0, window.scrollY);
       const delta = currentScrollY - lastScrollY;
-      const shouldHide = currentScrollY > 72 && delta > 4;
-      const shouldShow = delta < -4 || currentScrollY <= 20;
+      const shouldHide = currentScrollY > 72 && delta > 3;
+      const shouldShow = delta < -3 || currentScrollY <= 20;
 
       if (shouldHide) document.body.classList.add("ctms-scroll-hidden");
       else if (shouldShow) document.body.classList.remove("ctms-scroll-hidden");
@@ -134,8 +134,8 @@ export default function PublicPeopleNav() {
       .ctms-home-community-button span:last-child { font-size:1.15rem; line-height:1; }
       @media (max-width:767px) {
         main > header { transform:translateY(0); transition:transform 220ms ease,opacity 180ms ease; will-change:transform; }
-        .ctms-mobile-bottom-nav { position:fixed; left:0; right:0; bottom:0; z-index:9999; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); min-height:70px; padding:6px 4px calc(6px + env(safe-area-inset-bottom)); border-top:1px solid var(--school-border); background:var(--school-surface); box-shadow:0 -8px 24px rgba(15,23,42,.10); transform:translateY(0); opacity:1; transition:transform 220ms ease,opacity 180ms ease; will-change:transform; }
         body.ctms-scroll-hidden main > header { transform:translateY(-110%); opacity:0; pointer-events:none; }
+        .ctms-mobile-bottom-nav { position:fixed; left:0; right:0; bottom:0; z-index:9999; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); min-height:70px; padding:6px 4px calc(6px + env(safe-area-inset-bottom)); border-top:1px solid var(--school-border); background:var(--school-surface); box-shadow:0 -8px 24px rgba(15,23,42,.10); transform:translateY(0); opacity:1; transition:transform 220ms ease,opacity 180ms ease; will-change:transform; }
         body.ctms-scroll-hidden .ctms-mobile-bottom-nav { transform:translateY(110%); opacity:0; pointer-events:none; }
         .ctms-mobile-bottom-nav-item { position:relative; display:flex; min-width:0; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:5px 2px 4px; color:var(--school-muted); text-decoration:none; font-size:11px; font-weight:700; line-height:1.1; }
         .ctms-mobile-bottom-nav-item.active { color:var(--school-primary); }
