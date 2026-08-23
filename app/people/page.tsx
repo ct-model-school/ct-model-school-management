@@ -96,6 +96,7 @@ export default async function PeoplePage() {
                           {isStudent ? (
                             <>
                               <p className="mt-2 text-[9px] leading-4 text-[var(--school-muted)] sm:text-[10px]">{item.result_value || "Result not available"}</p>
+                              {metaInfo ? <p className="mt-0.5 text-[9px] font-semibold leading-4 text-[var(--school-muted)] sm:text-[10px]">Class/Dept: {metaInfo}</p> : null}
                               {item.exam_name ? <p className="mt-0.5 text-[9px] font-semibold leading-4 text-[var(--school-muted)] sm:text-[10px]">{item.exam_name}</p> : null}
                               {hasDetails ? (
                                 <details className="mt-3 text-left">
