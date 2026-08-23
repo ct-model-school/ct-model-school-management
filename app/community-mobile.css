@@ -55,34 +55,14 @@
   }
 }
 
-/* Move the Contact panel's primary background treatment to the footer. */
-#contact > div.mx-auto.grid > div:first-child {
-  background: var(--school-surface) !important;
-  color: var(--school-text) !important;
-}
-#contact > div.mx-auto.grid > div:first-child h2,
-#contact > div.mx-auto.grid > div:first-child p,
-#contact > div.mx-auto.grid > div:first-child a {
-  color: var(--school-text) !important;
-}
-#contact > div.mx-auto.grid > div:first-child p.text-white\/75 {
-  color: var(--school-muted) !important;
-}
-#contact > div.mx-auto.grid > div:first-child p.text-white {
-  color: var(--school-text) !important;
-}
-
-/* Let the footer use the same theme-primary background as the former Contact panel. */
-main > footer.theme-primary-bg {
-  background-color: transparent !important;
-}
-
-/* Remove visible space below the footer. */
-html, body {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
-  background: var(--school-primary) !important;
-}
+/* Footer uses the same blue-to-violet background as the Contact panel. */
 main > footer {
-  margin-bottom: 0 !important;
+  background:linear-gradient(135deg,#244ddb 0%,#7c3aed 100%) !important;
+  color:#fff !important;
+  border-top-color:rgba(255,255,255,.18) !important;
 }
+main > footer p,
+main > footer span,
+main > footer a { color:#fff !important; }
+main > footer a { border-color:rgba(255,255,255,.22) !important; }
+main > footer a:hover { background:rgba(255,255,255,.14) !important; }
