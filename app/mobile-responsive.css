@@ -279,3 +279,147 @@
     padding-right: 12px;
   }
 }
+
+/* Principal card: mobile-only visual refresh. Desktop remains unchanged. */
+@media (max-width: 767px) {
+  main:has(> header + #top) #principal {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 8% 12%, color-mix(in srgb, var(--school-primary) 13%, transparent), transparent 28%),
+      radial-gradient(circle at 92% 82%, color-mix(in srgb, #f59e0b 10%, transparent), transparent 30%),
+      var(--school-background);
+  }
+
+  main:has(> header + #top) #principal::before,
+  main:has(> header + #top) #principal::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    border-radius: 999px;
+    filter: blur(1px);
+  }
+
+  main:has(> header + #top) #principal::before {
+    width: 130px;
+    height: 130px;
+    top: -58px;
+    right: -46px;
+    background: color-mix(in srgb, var(--school-primary) 14%, transparent);
+  }
+
+  main:has(> header + #top) #principal::after {
+    width: 105px;
+    height: 105px;
+    bottom: -48px;
+    left: -40px;
+    background: color-mix(in srgb, #f59e0b 12%, transparent);
+  }
+
+  main:has(> header + #top) #principal > div {
+    position: relative;
+    z-index: 1;
+    padding: clamp(20px, 6vw, 30px) !important;
+    border: 1px solid color-mix(in srgb, var(--school-primary) 20%, var(--school-border)) !important;
+    border-radius: 28px !important;
+    background: linear-gradient(145deg, var(--school-surface), color-mix(in srgb, var(--school-primary) 4%, var(--school-surface))) !important;
+    box-shadow: 0 16px 40px color-mix(in srgb, var(--school-primary) 12%, transparent), 0 4px 12px rgba(15,23,42,.06) !important;
+  }
+
+  main:has(> header + #top) #principal > div::before {
+    content: "";
+    display: block;
+    height: 5px;
+    width: 78px;
+    margin: -20px auto 22px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--school-primary), #f59e0b, #ec4899);
+  }
+
+  main:has(> header + #top) #principal .grid {
+    display: block !important;
+  }
+
+  main:has(> header + #top) #principal .grid > div:first-child {
+    text-align: center;
+  }
+
+  main:has(> header + #top) #principal .grid > div:first-child > p {
+    color: var(--school-primary);
+    text-align: center;
+    font-size: clamp(11px, 3.2vw, 14px);
+    letter-spacing: .18em;
+  }
+
+  main:has(> header + #top) #principal .grid > div:first-child > div {
+    margin-top: 18px;
+  }
+
+  main:has(> header + #top) #principal .grid > div:first-child > div > div {
+    position: relative;
+    width: clamp(130px, 42vw, 175px);
+    height: clamp(130px, 42vw, 175px);
+    margin: 0 auto;
+    border: 4px solid var(--school-primary) !important;
+    border-radius: 50% !important;
+    padding: 5px;
+    background: linear-gradient(135deg, var(--school-surface), color-mix(in srgb, var(--school-primary) 12%, var(--school-surface))) !important;
+    box-shadow: 0 10px 25px color-mix(in srgb, var(--school-primary) 18%, transparent), 0 0 0 7px color-mix(in srgb, var(--school-primary) 7%, transparent);
+  }
+
+  main:has(> header + #top) #principal .grid > div:first-child > div > div::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border: 1px dashed color-mix(in srgb, #f59e0b 70%, transparent);
+    border-radius: 50%;
+    animation: principal-orbit 8s linear infinite;
+  }
+
+  main:has(> header + #top) #principal .grid > div:first-child > div > div img {
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  main:has(> header + #top) #principal .grid > div:first-child > h2 {
+    margin-top: 20px !important;
+    text-align: center;
+    font-size: clamp(27px, 8vw, 38px) !important;
+    line-height: 1.12;
+    background: linear-gradient(90deg, var(--school-primary), #7c3aed, #ec4899);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  main:has(> header + #top) #principal blockquote {
+    margin-top: 24px;
+    border: 0 !important;
+    border-left: 0 !important;
+    padding: 22px 20px !important;
+    border-radius: 22px;
+    text-align: center;
+    font-size: clamp(15px, 4.25vw, 18px) !important;
+    line-height: 1.75 !important;
+    color: var(--school-muted);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--school-primary) 7%, var(--school-surface)), color-mix(in srgb, #f59e0b 5%, var(--school-surface)));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--school-primary) 10%, transparent);
+  }
+
+  main:has(> header + #top) #principal blockquote::before {
+    content: "“";
+    display: block;
+    height: 24px;
+    font-size: 42px;
+    line-height: 28px;
+    font-weight: 900;
+    color: var(--school-primary);
+    opacity: .65;
+  }
+}
+
+@keyframes principal-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
