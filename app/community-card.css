@@ -6,6 +6,7 @@ main.px-4.py-10 article.group {
   border-radius: 1.35rem;
   background: var(--school-surface);
   box-shadow: 0 8px 24px color-mix(in srgb, var(--school-primary) 10%, transparent);
+  position: relative;
 }
 
 /* Same colorful theme-accent strips on Home and /people. */
@@ -17,9 +18,15 @@ main.px-4.py-10 article.group > div:first-child {
   animation: community-card-shift 5s ease-in-out infinite;
 }
 
-/* Bottom accent line: keep it clearly visible and visually matched to the top line. */
+/* Bottom accent line: anchor it to the actual bottom edge of the card. */
 main > section:has(article) article.group > div:last-child,
 main.px-4.py-10 article.group > div:last-child {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  top: auto !important;
+  width: 100% !important;
   height: 4px !important;
   min-height: 4px !important;
   padding: 0 !important;
