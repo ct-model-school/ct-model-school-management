@@ -92,7 +92,7 @@
   }
 
   main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:first-child {
-    height: 5px !important;
+    height: 3px !important;
   }
 
   main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) {
@@ -130,8 +130,22 @@
     margin-top: 2px !important;
   }
 
-  /* Requested: Home card bottom accent line = 10px. */
+  /* Home card accents: top 3px, bottom 8px. */
   main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:last-child {
-    height: 10px !important;
+    height: 8px !important;
+  }
+
+  /* Reduce Home card content height by approximately 10% while preserving the current layout. */
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) > div {
+    width: 65px !important;
+    height: 65px !important;
+    max-width: 65px !important;
+  }
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) {
+    padding-top: 2px !important;
+  }
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) {
+    padding-top: 1px !important;
+    padding-bottom: 3px !important;
   }
 }
