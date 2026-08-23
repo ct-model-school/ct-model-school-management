@@ -1,0 +1,120 @@
+/* Mobile contact polish. Theme variables only, desktop untouched. */
+@media (max-width:767px) {
+  main:has(> header + #top) #contact {
+    background:
+      radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--school-primary) 16%, transparent), transparent 34%),
+      radial-gradient(circle at 92% 48%, color-mix(in srgb, var(--school-primary-hover) 12%, transparent), transparent 38%),
+      var(--school-background);
+  }
+
+  /* Official Links */
+  main:has(> header + #top) #contact > div > div:last-child a {
+    position:relative;
+    min-height:58px;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    border:1px solid var(--school-primary-border);
+    border-left:4px solid var(--school-primary);
+    border-radius:16px;
+    background:color-mix(in srgb, var(--school-surface) 94%, var(--school-primary-soft));
+    box-shadow:0 5px 16px color-mix(in srgb, var(--school-primary) 10%, transparent);
+  }
+
+  main:has(> header + #top) #contact > div > div:last-child a:nth-child(2n) {
+    border-left-color:var(--school-primary-hover);
+  }
+
+  main:has(> header + #top) #contact > div > div:last-child a:hover,
+  main:has(> header + #top) #contact > div > div:last-child a:active {
+    transform:translateY(-2px);
+    border-color:var(--school-primary-border);
+    background:var(--school-surface);
+  }
+
+  /* Restore real social icons instead of empty square placeholders. */
+  main:has(> header + #top) #contact > div > div:last-child a > span:last-child::before {
+    width:20px;
+    height:20px;
+    background-color:currentColor;
+  }
+
+  main:has(> header + #top) #contact > div > div:last-child a:nth-child(1) > span:last-child::before {
+    content:"f";
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:Arial,sans-serif;
+    font-size:20px;
+    font-weight:800;
+    background:none;
+  }
+
+  main:has(> header + #top) #contact > div > div:last-child a:nth-child(2) > span:last-child::before {
+    content:"";
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 3C6.48 3 2 6.92 2 11.75c0 3.27 1.96 6.15 5.02 7.63L6 22l3.48-1.73c.8.22 1.64.33 2.52.33 5.52 0 10-3.92 10-8.85S17.52 3 12 3Zm-4.2 8.4c-.4 0-.73-.33-.73-.73s.33-.73.73-.73h8.4c.4 0 .73.33.73.73s-.33.73-.73.73H7.8Zm0 3.2c-.4 0-.73-.33-.73-.73s.33-.73.73-.73h5.8c.4 0 .73.33.73.73s-.33.73-.73.73H7.8Z'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 3C6.48 3 2 6.92 2 11.75c0 3.27 1.96 6.15 5.02 7.63L6 22l3.48-1.73c.8.22 1.64.33 2.52.33 5.52 0 10-3.92 10-8.85S17.52 3 12 3Zm-4.2 8.4c-.4 0-.73-.33-.73-.73s.33-.73.73-.73h8.4c.4 0 .73.33.73.73s-.33.73-.73.73H7.8Zm0 3.2c-.4 0-.73-.33-.73-.73s.33-.73.73-.73h5.8c.4 0 .73.33.73.73s-.33.73-.73.73H7.8Z'/%3E%3C/svg%3E");
+  }
+
+  main:has(> header + #top) #contact > div > div:last-child a:nth-child(3) > span:last-child::before {
+    content:"";
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5A4.5 4.5 0 1 1 12 16.5 4.5 4.5 0 0 1 12 7.5Zm0 2A2.5 2.5 0 1 0 12 14.5 2.5 2.5 0 0 0 12 9.5ZM17.5 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3.5A4.5 4.5 0 1 1 12 16.5 4.5 4.5 0 0 1 12 7.5Zm0 2A2.5 2.5 0 1 0 12 14.5 2.5 2.5 0 0 0 12 9.5ZM17.5 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z'/%3E%3C/svg%3E");
+  }
+
+  main:has(> header + #top) #contact > div > div:last-child a:nth-child(4) > span:last-child::before {
+    content:"";
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M21 7.2v9.6A2.2 2.2 0 0 1 18.8 19H5.2A2.2 2.2 0 0 1 3 16.8V7.2A2.2 2.2 0 0 1 5.2 5h13.6A2.2 2.2 0 0 1 21 7.2ZM10 9v6l5-3-5-3Z'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M21 7.2v9.6A2.2 2.2 0 0 1 18.8 19H5.2A2.2 2.2 0 0 1 3 16.8V7.2A2.2 2.2 0 0 1 5.2 5h13.6A2.2 2.2 0 0 1 21 7.2ZM10 9v6l5-3-5-3Z'/%3E%3C/svg%3E");
+  }
+
+  main:has(> header + #top) #contact > div > div:last-child a:nth-child(5) > span:last-child::before {
+    content:"in";
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:Arial,sans-serif;
+    font-size:17px;
+    font-weight:800;
+    background:none;
+  }
+
+  main:has(> header + #top) #contact > div > div:last-child a:nth-child(6) > span:last-child::before {
+    content:"";
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.92 6h-3.05a15.7 15.7 0 0 0-1.18-3.17A8.04 8.04 0 0 1 18.92 8ZM12 4c.65.9 1.25 2.25 1.68 4h-3.36C10.75 6.25 11.35 4.9 12 4ZM4.26 10h3.03c-.06.64-.09 1.3-.09 2s.03 1.36.09 2H4.26a8.04 8.04 0 0 1 0-4Zm.82 6h2.47a15.7 15.7 0 0 0 1.18 3.17A8.04 8.04 0 0 1 5.08 16ZM7.31 8H5.08a8.04 8.04 0 0 1 3.65-3.17A15.7 15.7 0 0 0 7.31 8ZM12 20c-.65-.9-1.25-2.25-1.68-4h3.36c-.43 1.75-1.03 3.1-1.68 4Zm2.07-6H9.93a14.1 14.1 0 0 1 0-4h4.14a14.1 14.1 0 0 1 0 4Zm.62 5.17A15.7 15.7 0 0 0 15.87 16h2.47a8.04 8.04 0 0 1-3.65 3.17ZM16.71 14c.06-.64.09-1.3.09-2s-.03-1.36-.09-2h3.03a8.04 8.04 0 0 1 0 4h-3.03Z'/%3E%3C/svg%3E");
+    mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.92 6h-3.05a15.7 15.7 0 0 0-1.18-3.17A8.04 8.04 0 0 1 18.92 8ZM12 4c.65.9 1.25 2.25 1.68 4h-3.36C10.75 6.25 10.35 4.9 10.32 4H12ZM4.26 10h3.03c-.06.64-.09 1.3-.09 2H4.26a8.04 8.04 0 0 1 0-4Zm.82 6h2.47a15.7 15.7 0 0 0 1.18 3.17A8.04 8.04 0 0 1 5.08 16ZM7.31 8H5.08a8.04 8.04 0 0 1 3.65-3.17A15.7 15.7 0 0 0 7.31 8ZM12 20c-.65-.9-1.25-2.25-1.68-4h3.36c-.43 1.75-1.03 3.1-1.68 4Zm2.07-6H9.93a14.1 14.1 0 0 1 0-4h4.14a14.1 14.1 0 0 1 0 4Zm.62 5.17A15.7 15.7 0 0 0 15.87 16h2.47a8.04 8.04 0 0 1-3.65 3.17ZM16.71 14c.06-.64.09-1.3.09-2s-.03-1.36-.09-2h3.03a8.04 8.04 0 0 1 0 4h-3.03Z'/%3E%3C/svg%3E");
+  }
+
+  /* Location / map panel */
+  main:has(> header + #top) #contact iframe {
+    display:block;
+    width:100%;
+    height:300px;
+    margin-top:0;
+    border:0;
+    border-radius:0;
+    box-shadow:0 10px 26px color-mix(in srgb, var(--school-primary) 13%, transparent);
+  }
+
+  main:has(> header + #top) #contact iframe + * {
+    border-radius:0 0 18px 18px;
+  }
+
+  main:has(> header + #top) #contact a[href*="google.com/maps"] {
+    border-color:var(--school-primary-border);
+    color:var(--school-primary-hover);
+    background:var(--school-surface);
+    box-shadow:0 5px 15px color-mix(in srgb, var(--school-primary) 10%, transparent);
+  }
+
+  /* Keep map heading readable and theme-driven. */
+  main:has(> header + #top) #contact h2 { color:var(--school-text); }
+  main:has(> header + #top) #contact iframe + div a,
+  main:has(> header + #top) #contact iframe + div p { color:var(--school-text); }
+
+  /* Remove the washed-out/overly colorful location treatment and keep it theme-based. */
+  main:has(> header + #top) #contact [class*="bg-gradient"] {
+    background:linear-gradient(135deg,var(--school-primary),var(--school-primary-hover)) !important;
+    color:var(--school-on-primary) !important;
+  }
+}
