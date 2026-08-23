@@ -17,11 +17,18 @@ main.px-4.py-10 article.group > div:first-child {
   animation: community-card-shift 5s ease-in-out infinite;
 }
 
+/* Bottom accent line: keep it clearly visible and visually matched to the top line. */
 main > section:has(article) article.group > div:last-child,
 main.px-4.py-10 article.group > div:last-child {
   height: 4px !important;
-  background: linear-gradient(90deg, var(--school-primary), color-mix(in srgb, var(--school-primary) 55%, #b026d8), var(--school-primary)) !important;
-  background-size: 180% 100%;
+  min-height: 4px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background-image: linear-gradient(90deg, var(--school-primary), color-mix(in srgb, var(--school-primary) 55%, #b026d8), var(--school-primary)) !important;
+  background-color: var(--school-primary) !important;
+  background-size: 180% 100% !important;
+  opacity: 1 !important;
+  border: 0 !important;
 }
 
 @keyframes community-card-shift {
