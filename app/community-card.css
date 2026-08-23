@@ -1,0 +1,67 @@
+/* Shared compact community card treatment. Uses the active school theme tokens only. */
+
+main > section:has(article) article.group,
+main.px-4.py-10 article.group {
+  border-color: var(--school-border);
+  border-radius: 1.35rem;
+  background: var(--school-surface);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--school-primary) 10%, transparent);
+}
+
+main > section:has(article) article.group > div:nth-child(2),
+main.px-4.py-10 article.group > div:nth-child(2) {
+  padding: 0.65rem 0.65rem 0;
+}
+
+main > section:has(article) article.group > div:nth-child(2) > div,
+main.px-4.py-10 article.group > div:nth-child(2) > div {
+  width: 96px;
+  max-width: 96px;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  border: 4px solid var(--school-primary);
+  background: var(--school-primary-soft);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--school-primary) 10%, transparent), 0 8px 18px color-mix(in srgb, var(--school-primary) 12%, transparent);
+}
+
+main > section:has(article) article.group > div:nth-child(3),
+main.px-4.py-10 article.group > div:nth-child(3) {
+  padding: 0.65rem 0.65rem 0.8rem;
+}
+
+main > section:has(article) article.group > div:nth-child(3) h3,
+main.px-4.py-10 article.group > div:nth-child(3) h3 {
+  font-size: 0.9rem;
+  line-height: 1.25rem;
+}
+
+main > section:has(article) article.group > div:nth-child(3) > span,
+main.px-4.py-10 article.group > div:nth-child(3) > span {
+  margin-top: 0.35rem;
+  padding: 0.3rem 0.65rem;
+}
+
+main > section:has(article) article.group > div:nth-child(3) > p,
+main.px-4.py-10 article.group > div:nth-child(3) > p {
+  margin-top: 0.4rem;
+  line-height: 1.15rem;
+}
+
+main > section:has(article) article.group > div:nth-child(3) > div,
+main.px-4.py-10 article.group > div:nth-child(3) > div {
+  padding-top: 0.65rem;
+}
+
+main > section:has(article) article.group > div:nth-child(3) a.flex,
+main.px-4.py-10 article.group > div:nth-child(3) a.flex {
+  width: 2rem;
+  height: 2rem;
+}
+
+@media (min-width: 768px) {
+  main > section:has(article) article.group > div:nth-child(2) > div,
+  main.px-4.py-10 article.group > div:nth-child(2) > div {
+    width: 112px;
+    max-width: 112px;
+  }
+}
