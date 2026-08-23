@@ -54,3 +54,35 @@
     -webkit-text-fill-color:var(--school-surface) !important;
   }
 }
+
+/* Move the Contact panel's primary background treatment to the footer. */
+#contact > div.mx-auto.grid > div:first-child {
+  background: var(--school-surface) !important;
+  color: var(--school-text) !important;
+}
+#contact > div.mx-auto.grid > div:first-child h2,
+#contact > div.mx-auto.grid > div:first-child p,
+#contact > div.mx-auto.grid > div:first-child a {
+  color: var(--school-text) !important;
+}
+#contact > div.mx-auto.grid > div:first-child p.text-white\/75 {
+  color: var(--school-muted) !important;
+}
+#contact > div.mx-auto.grid > div:first-child p.text-white {
+  color: var(--school-text) !important;
+}
+
+/* Let the footer use the same theme-primary background as the former Contact panel. */
+main > footer.theme-primary-bg {
+  background-color: transparent !important;
+}
+
+/* Remove visible space below the footer. */
+html, body {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  background: var(--school-primary) !important;
+}
+main > footer {
+  margin-bottom: 0 !important;
+}
