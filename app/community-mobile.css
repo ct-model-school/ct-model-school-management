@@ -18,63 +18,21 @@
   section:has(article.group) article.group details { margin-top:3px !important; }
 
   main > header { background:linear-gradient(135deg,color-mix(in srgb,var(--school-surface) 92%,var(--school-primary)),var(--school-surface)) !important; border-bottom:3px solid var(--school-primary) !important; box-shadow:0 5px 18px color-mix(in srgb,var(--school-primary) 16%,transparent) !important; }
-  main > header > div { padding-top:8px !important; padding-bottom:8px !important; }
-  main > header a[href="#top"] > span:last-child > span { background:linear-gradient(90deg,var(--school-primary),color-mix(in srgb,var(--school-primary) 60%,var(--school-primary-soft))); -webkit-background-clip:text; background-clip:text; color:transparent; }
-  main > header button { border-color:var(--school-primary-border) !important; color:var(--school-primary) !important; background:var(--school-primary-soft) !important; box-shadow:0 4px 12px color-mix(in srgb,var(--school-primary) 14%,transparent) !important; }
-  main > header nav { border-top-color:var(--school-primary-border) !important; background:var(--school-primary-soft) !important; }
-  main > header nav a:active,main > header nav a:hover { background:var(--school-surface); color:var(--school-primary); border-color:var(--school-primary-border); }
 
-  /* Mobile footer: retain the blue theme background and improve contrast. */
-  main > footer {
-    position:relative;
-    overflow:hidden;
-    color:var(--school-surface) !important;
-    background:var(--school-primary) !important;
-    border-top:3px solid var(--school-primary) !important;
-    box-shadow:0 -5px 22px color-mix(in srgb,var(--school-primary) 30%,transparent) !important;
+  /* Keep Admin Login available, but visually hidden on mobile. */
+  main > footer a[href="/admin/login"] {
+    opacity:0.08 !important;
+    filter:blur(2.8px) !important;
+    transform:scale(.92) !important;
+    border-color:color-mix(in srgb,var(--school-surface) 10%,transparent) !important;
+    background:color-mix(in srgb,var(--school-surface) 4%,transparent) !important;
+    color:color-mix(in srgb,var(--school-surface) 25%,transparent) !important;
+    transition:opacity .25s ease,filter .25s ease,transform .25s ease !important;
   }
-  main > footer * { opacity:1 !important; filter:none !important; }
-  main > footer p,
-  main > footer h1,
-  main > footer h2,
-  main > footer h3,
-  main > footer strong,
-  main > footer span { color:var(--school-surface) !important; opacity:1 !important; }
-  main > footer a { color:var(--school-surface) !important; font-weight:700; opacity:1 !important; }
-  main > footer a:hover { color:var(--school-surface) !important; text-decoration:underline; text-underline-offset:3px; }
-  main > footer svg { color:var(--school-surface) !important; }
-  main > footer a[class*="rounded"] { color:var(--school-primary) !important; border-color:var(--school-surface) !important; background:var(--school-surface) !important; box-shadow:0 5px 14px color-mix(in srgb,var(--school-primary) 20%,transparent) !important; }
-  main > footer a[class*="rounded"] svg { color:var(--school-primary) !important; }
-  main > footer::before { content:""; position:absolute; width:150px; height:150px; right:-55px; top:-65px; border-radius:9999px; background:color-mix(in srgb,var(--school-surface) 14%,transparent); pointer-events:none; }
-  main > footer::after { content:""; position:absolute; width:100px; height:100px; left:-45px; bottom:-45px; border-radius:9999px; background:color-mix(in srgb,var(--school-surface) 10%,transparent); pointer-events:none; }
-
-  /* Footer mobile refinements: hide admin access and add subtle theme motion to text. */
-  main > footer a[href="/admin/login"] { display:none !important; }
-  main > footer p {
-    background:linear-gradient(90deg,var(--school-surface),var(--school-primary-soft),var(--school-surface));
-    background-size:220% 100%;
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent !important;
-    animation:footer-text-shift 6s ease-in-out infinite;
-  }
-  main > footer p span {
-    background:inherit;
-    background-size:inherit;
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent !important;
-  }
-  main > footer a:not([href="/admin/login"]) {
-    background:linear-gradient(90deg,var(--school-surface),var(--school-primary-soft),var(--school-surface));
-    background-size:220% 100%;
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent !important;
-    animation:footer-text-shift 6s ease-in-out infinite;
-  }
-  @keyframes footer-text-shift {
-    0%,100% { background-position:0% 50%; }
-    50% { background-position:100% 50%; }
+  main > footer a[href="/admin/login"]:hover,
+  main > footer a[href="/admin/login"]:focus-visible {
+    opacity:.75 !important;
+    filter:blur(0) !important;
+    transform:scale(1) !important;
   }
 }
