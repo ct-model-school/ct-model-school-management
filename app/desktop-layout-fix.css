@@ -94,7 +94,7 @@
   }
   main:has(> header + #top) section:has(article.group) article.group {
     min-width: 0;
-    width: 100%;
+    width: 70%;
     box-sizing: border-box;
   }
 
