@@ -41,6 +41,12 @@ const defaults = (t: MemberType): Partial<FormState> =>
   t === "other" ? { role: "Other", designation: "", department: "" } : { role: "Staff", designation: "", department: "" };
 
 const idPrefix = (t: MemberType) => t === "staff" ? "STID00001" : t === "teacher" ? "TCID00001" : t === "accounts" ? "ACID00001" : "OTID00001";
+const memberPhotoFolders: Record<MemberType, string> = {
+  staff: "staff",
+  teacher: "teachers",
+  accounts: "accounts",
+  other: "others",
+};
 const departments = ["Administration", "Academic", "Accounts", "Examination", "Library", "ICT", "Maintenance", "Store", "Other"];
 const accountRoles = ["Accounts Manager", "Accounts Officer", "Accountant", "Cashier", "Billing Officer", "Finance Officer", "Other Accounts"];
 const otherRoles = ["Librarian", "ICT Officer", "ICT Assistant", "Maintenance Officer", "Maintenance Staff", "Lab Assistant", "Office Assistant", "Receptionist", "Driver", "Security Guard", "Cleaner", "Peon", "Support Staff", "Other"];
@@ -166,7 +172,7 @@ export default function MembersPage() {
 
   async function uploadDocument(file: File, memberId: string, documentType: DocumentType) {
     const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
-    const path = `${type}/${memberId}/${documentType}-${Date.now()}.${ext}`;
+    const path = `${memberPhotoFolders[type]}/${memberId}/${documentType}-${Date.now()}.${ext}`;
     const { data, error } = await supabase.storage.from(photoBucket).upload(path, file, { cacheControl: "3600", contentType: file.type, upsert: true });
     if (error) throw error;
     const { data: publicData } = supabase.storage.from(photoBucket).getPublicUrl(data.path);
@@ -200,7 +206,7 @@ export default function MembersPage() {
       setUploading(true);
       if (profileFile) {
         const ext = profileFile.name.split(".").pop()?.toLowerCase() || "jpg";
-        const path = `${type}/${memberId}/profile-${Date.now()}.${ext}`;
+        const path = `${memberPhotoFolders[type]}/${memberId}/profile-${Date.now()}.${ext}`;
         const { data: uploaded, error: uploadError } = await supabase.storage.from(photoBucket).upload(path, profileFile, { cacheControl: "3600", contentType: profileFile.type, upsert: true });
         if (uploadError) throw uploadError;
         const { data: publicData } = supabase.storage.from(photoBucket).getPublicUrl(uploaded.path);
