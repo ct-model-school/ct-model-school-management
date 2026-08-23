@@ -1,8 +1,8 @@
-/* Desktop mirror of the mobile visual treatment. Geometry/layout remains desktop-owned. */
+/* Desktop visual layer mirrors the mobile reference. Layout, spacing, sizing and positioning remain desktop-owned. */
 @media (min-width: 768px) {
   main:has(> header + #top) { background:var(--school-background); }
 
-  /* Header visual treatment mirrors mobile. */
+  /* Header: mobile gradient, accent border and shadow. */
   main:has(> header + #top) > header {
     background:linear-gradient(135deg,color-mix(in srgb,var(--school-surface) 92%,var(--school-primary)),var(--school-surface)) !important;
     border-bottom:3px solid var(--school-primary) !important;
@@ -12,100 +12,243 @@
   main:has(> header + #top) > header nav a:hover,
   main:has(> header + #top) > header nav a.theme-primary { color:var(--school-primary); }
 
-  /* Intro visual language mirrors mobile. No desktop geometry changes. */
+  /* Hero image area: keep its desktop geometry, only carry the mobile visual base. */
+  main:has(> header + #top) > #top + section:first-of-type { background:var(--school-text) !important; }
+
+  /* Intro: mobile colorful background and gradient heading, without changing typography or spacing. */
   main:has(> header + #top) > #top + section + section {
-    background:linear-gradient(135deg,var(--school-primary-soft),color-mix(in srgb,var(--school-primary-soft) 72%,var(--school-surface)),var(--school-surface)) !important;
-    border-bottom-color:var(--school-primary-border) !important;
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(135deg,#f8fbff 0%,#eef4ff 52%,#fff7fb 100%) !important;
+    border-bottom:0 !important;
+  }
+  main:has(> header + #top) > #top + section + section::before {
+    content:"";
+    position:absolute;
+    width:190px;
+    height:190px;
+    top:-100px;
+    right:-75px;
+    border-radius:50%;
+    background:radial-gradient(circle,#7c3aed33 0%,#ec489922 45%,transparent 72%);
+    animation:desktop-mobile-float 7s ease-in-out infinite;
+    pointer-events:none;
+  }
+  main:has(> header + #top) > #top + section + section::after {
+    content:"";
+    position:absolute;
+    width:130px;
+    height:130px;
+    bottom:-70px;
+    left:-45px;
+    border-radius:50%;
+    background:radial-gradient(circle,#0ea5e933 0%,#22c55e18 50%,transparent 72%);
+    animation:desktop-mobile-float 9s ease-in-out infinite reverse;
+    pointer-events:none;
+  }
+  main:has(> header + #top) > #top + section + section > div { position:relative; z-index:1; }
+  main:has(> header + #top) > #top + section + section h1 {
+    background:linear-gradient(90deg,var(--school-text),#4f46e5,#c026d3);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent !important;
+  }
+  main:has(> header + #top) > #top + section + section p.text-xl { color:#4f46e5 !important; }
+  main:has(> header + #top) > #top + section + section .flex.flex-wrap a:first-child {
+    box-shadow:0 10px 24px color-mix(in srgb,var(--school-primary) 22%,transparent);
   }
 
+  /* Information strip: mobile card treatment only. Existing desktop grid and dimensions stay intact. */
   main:has(> header + #top) > #top + section + section + section {
-    background:var(--school-surface) !important;
-    border-bottom-color:var(--school-primary-border) !important;
+    position:relative;
+    background:linear-gradient(180deg,#ffffff 0%,#f4f8ff 100%) !important;
+    border-bottom:0 !important;
   }
   main:has(> header + #top) > #top + section + section + section > div > div {
-    background:var(--school-primary-soft) !important;
-    border-color:var(--school-primary-border) !important;
+    position:relative;
+    overflow:hidden;
+    border:1px solid #d7e1f0 !important;
+    border-radius:20px;
+    background:linear-gradient(145deg,#fff,#f8fbff) !important;
+    box-shadow:0 7px 20px rgba(37,99,235,.08);
   }
+  main:has(> header + #top) > #top + section + section + section > div > div::before {
+    content:"";
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:4px;
+    background:linear-gradient(90deg,#2563eb,#7c3aed,#ec4899);
+    pointer-events:none;
+  }
+  main:has(> header + #top) > #top + section + section + section > div > div:nth-child(2)::before { background:linear-gradient(90deg,#06b6d4,#2563eb,#7c3aed); }
+  main:has(> header + #top) > #top + section + section + section > div > div:nth-child(4)::before { background:linear-gradient(90deg,#22c55e,#06b6d4,#2563eb); }
 
-  /* About mirrors the mobile theme treatment. */
+  /* About: reproduce the mobile background, floating accents and card surfaces. */
   main:has(> header + #top) #about {
-    background:
-      radial-gradient(circle at 8% 8%,color-mix(in srgb,var(--school-primary) 16%,transparent),transparent 34%),
-      radial-gradient(circle at 92% 48%,color-mix(in srgb,var(--school-primary-hover) 12%,transparent),transparent 38%),
-      var(--school-background) !important;
-    border-bottom-color:var(--school-primary-border) !important;
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(135deg,#eef4ff 0%,#f9f5ff 50%,#fff7fb 100%) !important;
+    border-bottom:0 !important;
+  }
+  main:has(> header + #top) #about::before {
+    content:"";
+    position:absolute;
+    width:180px;
+    height:180px;
+    right:-85px;
+    top:-70px;
+    border-radius:50%;
+    background:radial-gradient(circle,#2563eb25 0%,#8b5cf625 45%,transparent 72%);
+    animation:desktop-mobile-float 8s ease-in-out infinite;
+    pointer-events:none;
+  }
+  main:has(> header + #top) #about::after {
+    content:"";
+    position:absolute;
+    width:140px;
+    height:140px;
+    left:-75px;
+    bottom:-60px;
+    border-radius:50%;
+    background:radial-gradient(circle,#f59e0b22 0%,#ec489918 50%,transparent 72%);
+    pointer-events:none;
+  }
+  main:has(> header + #top) #about > div { position:relative; z-index:1; }
+  main:has(> header + #top) #about > div > div:first-child {
+    position:relative;
+    overflow:hidden;
+    border:1px solid #dce5f4 !important;
+    border-radius:28px;
+    background:linear-gradient(145deg,#ffffffee,#f7faffee) !important;
+    box-shadow:0 14px 35px rgba(79,70,229,.10);
+  }
+  main:has(> header + #top) #about > div > div:first-child::before {
+    content:"";
+    display:block;
+    width:92px;
+    height:5px;
+    margin-bottom:20px;
+    border-radius:999px;
+    background:linear-gradient(90deg,#ec4899,#f59e0b,#22c55e,#2563eb);
+    animation:desktop-mobile-shimmer 4s linear infinite;
+    background-size:200% 100%;
+  }
+  main:has(> header + #top) #about h2 {
+    background:linear-gradient(90deg,var(--school-text),#4338ca,#be185d);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent !important;
+  }
+  main:has(> header + #top) #about .rounded-2xl {
+    border-color:#dbe4f1 !important;
+    background:linear-gradient(135deg,#eef2ff,#fff7ed) !important;
+    box-shadow:0 8px 22px rgba(99,102,241,.08);
   }
   main:has(> header + #top) #about > div > div:last-child {
-    background:color-mix(in srgb,var(--school-surface) 94%,var(--school-primary-soft)) !important;
-    border-color:var(--school-primary-border) !important;
+    position:relative;
+    overflow:hidden;
+    border:1px solid #d9e3f1 !important;
+    border-radius:26px;
+    background:linear-gradient(145deg,#ffffff,#f7fbff) !important;
+    box-shadow:0 14px 32px rgba(15,23,42,.09);
   }
-  main:has(> header + #top) #about .rounded-2xl { background:var(--school-primary-soft) !important; }
+  main:has(> header + #top) #about > div > div:last-child::before {
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:5px;
+    background:linear-gradient(90deg,#2563eb,#7c3aed,#ec4899,#f59e0b);
+    background-size:200% 100%;
+    animation:desktop-mobile-shimmer 5s linear infinite;
+  }
 
-  /* Principal mirrors mobile color/accent treatment only. */
+  /* Principal: same visual language, while preserving its desktop grid and dimensions. */
   main:has(> header + #top) #principal {
-    background:var(--school-surface) !important;
-    border-color:var(--school-primary-border) !important;
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(145deg,#f1f5ff 0%,#ffffff 48%,#fff4fb 100%) !important;
+    border:0 !important;
+  }
+  main:has(> header + #top) #principal::before {
+    content:"";
+    position:absolute;
+    width:220px;
+    height:220px;
+    right:-100px;
+    top:-105px;
+    border-radius:50%;
+    background:radial-gradient(circle,#7c3aed22 0%,#ec489916 48%,transparent 72%);
+    animation:desktop-mobile-float 8s ease-in-out infinite;
+    pointer-events:none;
+  }
+  main:has(> header + #top) #principal > div { position:relative; z-index:1; }
+  main:has(> header + #top) #principal > div > div {
+    position:relative;
+    overflow:hidden;
+    border-color:#dce4f1 !important;
+    border-radius:32px;
+    background:linear-gradient(145deg,#ffffffee,#f7faffee) !important;
+    box-shadow:0 14px 36px rgba(37,99,235,.08);
+  }
+  main:has(> header + #top) #principal > div > div::before {
+    content:"";
+    position:absolute;
+    left:50%;
+    top:0;
+    width:92px;
+    height:5px;
+    transform:translateX(-50%);
+    border-radius:999px;
+    background:linear-gradient(90deg,#2563eb,#f59e0b,#ec4899);
   }
   main:has(> header + #top) #principal blockquote {
-    background:var(--school-primary-soft) !important;
+    background:linear-gradient(145deg,#ffffff,#f8fbff) !important;
     border-left-color:var(--school-primary) !important;
+    border-radius:0 18px 18px 0;
+    box-shadow:0 8px 22px rgba(37,99,235,.08);
+  }
+  main:has(> header + #top) #principal img {
+    border-radius:9999px;
+    box-shadow:0 0 0 5px color-mix(in srgb,var(--school-primary) 10%,transparent),0 7px 18px color-mix(in srgb,var(--school-primary) 18%,transparent);
+  }
+  main:has(> header + #top) #principal h2 {
+    background:linear-gradient(90deg,var(--school-text),#4338ca,#be185d);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent !important;
   }
 
-  /* Contact / Location mirrors mobile visual treatment. */
-  main:has(> header + #top) #contact {
-    background:
-      radial-gradient(circle at 8% 8%,color-mix(in srgb,var(--school-primary) 16%,transparent),transparent 34%),
-      radial-gradient(circle at 92% 48%,color-mix(in srgb,var(--school-primary-hover) 12%,transparent),transparent 38%),
-      var(--school-background) !important;
-    border-top-color:var(--school-primary-border) !important;
+  /* Community: mobile colors, gradients, borders, shadows and accents. No desktop card sizing/spacing changes. */
+  main:has(> header + #top) section:has(article.group) {
+    --community-accent:var(--school-primary);
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(145deg,#f1f5ff 0%,#ffffff 48%,#fff4fb 100%) !important;
+    border:0 !important;
   }
-  main:has(> header + #top) #contact > div > div:last-child {
-    background:color-mix(in srgb,var(--school-surface) 94%,var(--school-primary-soft)) !important;
-    border-color:var(--school-primary-border) !important;
+  main:has(> header + #top) section:has(article.group)::before {
+    content:"";
+    position:absolute;
+    width:220px;
+    height:220px;
+    right:-100px;
+    top:-105px;
+    border-radius:50%;
+    background:radial-gradient(circle,#7c3aed22 0%,#ec489916 48%,transparent 72%);
+    animation:desktop-mobile-float 8s ease-in-out infinite;
+    pointer-events:none;
   }
-  main:has(> header + #top) #contact > div > div:last-child a {
-    background:color-mix(in srgb,var(--school-surface) 94%,var(--school-primary-soft)) !important;
-    border-color:var(--school-primary-border) !important;
+  main:has(> header + #top) section:has(article.group) > div {
+    position:relative;
+    z-index:1;
+    border-color:#dce4f1 !important;
+    background:linear-gradient(145deg,#ffffffee,#f7faffee) !important;
+    box-shadow:0 14px 36px rgba(37,99,235,.08);
   }
-  main:has(> header + #top) #contact > div > div:last-child a:hover {
-    background:var(--school-surface) !important;
-    border-color:var(--school-primary-border) !important;
-  }
-  main:has(> header + #top) #contact [class*="bg-gradient"] {
-    background:linear-gradient(135deg,var(--school-primary),var(--school-primary-hover)) !important;
-    color:var(--school-on-primary) !important;
-  }
-
-  /* Footer mirrors the mobile footer treatment. */
-  main:has(> header + #top) > footer {
-    background:linear-gradient(135deg,#244ddb 0%,#7c3aed 100%) !important;
-    color:#fff !important;
-    border-top-color:rgba(255,255,255,.18) !important;
-  }
-  main:has(> header + #top) > footer p,
-  main:has(> header + #top) > footer span,
-  main:has(> header + #top) > footer a { color:#fff !important; }
-  main:has(> header + #top) > footer a { border-color:rgba(255,255,255,.22) !important; }
-  main:has(> header + #top) > footer a:hover { background:rgba(255,255,255,.14) !important; }
-
-  /* Admin login link gets the same subtle/blurred treatment as mobile. */
-  main:has(> header + #top) > footer a[href="/admin/login"] {
-    opacity:.08 !important;
-    filter:blur(2.8px) !important;
-    transform:scale(.92) !important;
-    border-color:color-mix(in srgb,var(--school-surface) 10%,transparent) !important;
-    background:color-mix(in srgb,var(--school-surface) 4%,transparent) !important;
-    color:color-mix(in srgb,var(--school-surface) 25%,transparent) !important;
-  }
-  main:has(> header + #top) > footer a[href="/admin/login"]:hover,
-  main:has(> header + #top) > footer a[href="/admin/login"]:focus-visible {
-    opacity:.75 !important;
-    filter:blur(0) !important;
-    transform:scale(1) !important;
-  }
-
-  /* Community: mirror mobile visual style, while preserving desktop card geometry. */
-  main:has(> header + #top) section:has(article.group) { --community-accent:var(--school-primary); }
   main:has(> header + #top) section:has(article.group) p.text-xs.font-extrabold.uppercase {
     font-size:0 !important;
     letter-spacing:.2em;
@@ -125,26 +268,111 @@
     color:transparent !important;
     animation:desktop-community-title-shift 5s ease-in-out infinite;
   }
-  @keyframes desktop-community-title-shift {
-    0%,100%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-  }
   main:has(> header + #top) section:has(article.group) article.group {
-    background:linear-gradient(145deg,var(--school-surface),var(--school-primary-soft)) !important;
-    border-color:color-mix(in srgb,var(--school-primary) 72%,var(--school-surface)) !important;
+    border-color:#d7e2f0 !important;
+    background:linear-gradient(160deg,#ffffff 0%,#f8fbff 100%) !important;
+    box-shadow:0 8px 24px rgba(30,64,175,.10);
+  }
+  main:has(> header + #top) section:has(article.group) article.group > div:first-child,
+  main:has(> header + #top) section:has(article.group) article.group > div:last-child {
+    background:linear-gradient(90deg,#2563eb,#7c3aed,#ec4899) !important;
+    background-size:200% 100%;
+  }
+  main:has(> header + #top) section:has(article.group) article.group:nth-child(2n) > div:first-child,
+  main:has(> header + #top) section:has(article.group) article.group:nth-child(2n) > div:last-child {
+    background:linear-gradient(90deg,#06b6d4,#2563eb,#7c3aed) !important;
   }
   main:has(> header + #top) section:has(article.group) article.group > div:nth-child(2) > div {
     border-color:color-mix(in srgb,var(--school-primary) 72%,var(--school-surface)) !important;
     background:var(--school-primary-soft) !important;
     box-shadow:0 0 0 5px color-mix(in srgb,var(--school-primary) 10%,transparent),0 7px 18px color-mix(in srgb,var(--school-primary) 18%,transparent) !important;
   }
-  main:has(> header + #top) section:has(article.group) article.group > div:first-child,
-  main:has(> header + #top) section:has(article.group) article.group > div:last-child {
-    background:linear-gradient(90deg,var(--school-primary),color-mix(in srgb,var(--school-primary) 65%,var(--school-primary-soft)),var(--school-primary)) !important;
-    background-size:180% 100%;
+
+  /* Contact: same mobile gradient panel/card language, no desktop geometry changes. */
+  main:has(> header + #top) #contact {
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(145deg,#edf4ff 0%,#f8f5ff 50%,#fff5f8 100%) !important;
+    border-top:0 !important;
+  }
+  main:has(> header + #top) #contact::before {
+    content:"";
+    position:absolute;
+    width:220px;
+    height:220px;
+    right:-110px;
+    top:-95px;
+    border-radius:50%;
+    background:radial-gradient(circle,#2563eb25,#7c3aed18 48%,transparent 72%);
+    animation:desktop-mobile-float 8s ease-in-out infinite;
+    pointer-events:none;
+  }
+  main:has(> header + #top) #contact > div { position:relative; z-index:1; }
+  main:has(> header + #top) #contact > div > div:first-child {
+    background:linear-gradient(145deg,#1d4ed8,#4f46e5 55%,#9333ea) !important;
+    border:0 !important;
+    box-shadow:0 16px 38px rgba(79,70,229,.25);
+  }
+  main:has(> header + #top) #contact > div > div:last-child {
+    border:1px solid #d7e2f0 !important;
+    background:linear-gradient(145deg,#ffffff,#f8fbff) !important;
+    box-shadow:0 14px 30px rgba(37,99,235,.09);
+  }
+  main:has(> header + #top) #contact > div > div:last-child a {
+    border-color:#d9e2ef !important;
+    background:linear-gradient(135deg,#ffffff,#f8fbff) !important;
+  }
+  main:has(> header + #top) #contact > div > div:last-child a:hover {
+    background:var(--school-surface) !important;
+    border-color:var(--school-primary-border) !important;
+  }
+  main:has(> header + #top) #contact [class*="bg-gradient"] {
+    background:linear-gradient(135deg,var(--school-primary),var(--school-primary-hover)) !important;
+    color:var(--school-on-primary) !important;
   }
 
-  /* Explicitly leave Other-member section alone. */
+  /* Footer: exact mobile visual treatment. */
+  main:has(> header + #top) > footer {
+    background:linear-gradient(135deg,#244ddb 0%,#7c3aed 100%) !important;
+    color:#fff !important;
+    border-top-color:rgba(255,255,255,.18) !important;
+  }
+  main:has(> header + #top) > footer p,
+  main:has(> header + #top) > footer span,
+  main:has(> header + #top) > footer a { color:#fff !important; }
+  main:has(> header + #top) > footer a { border-color:rgba(255,255,255,.22) !important; }
+  main:has(> header + #top) > footer a:hover { background:rgba(255,255,255,.14) !important; }
+
+  /* Keep Admin Login available but visually subtle, matching mobile. */
+  main:has(> header + #top) > footer a[href="/admin/login"] {
+    opacity:.08 !important;
+    filter:blur(2.8px) !important;
+    transform:scale(.92) !important;
+    border-color:color-mix(in srgb,var(--school-surface) 10%,transparent) !important;
+    background:color-mix(in srgb,var(--school-surface) 4%,transparent) !important;
+    color:color-mix(in srgb,var(--school-surface) 25%,transparent) !important;
+  }
+  main:has(> header + #top) > footer a[href="/admin/login"]:hover,
+  main:has(> header + #top) > footer a[href="/admin/login"]:focus-visible {
+    opacity:.75 !important;
+    filter:blur(0) !important;
+    transform:scale(1) !important;
+  }
+
+  /* Do not touch unrelated member sections. */
   main:has(> header + #top) .other-members-section,
   main:has(> header + #top) [data-member-type="other"] { color:inherit; }
+
+  @keyframes desktop-mobile-float {
+    0%,100% { transform:translate3d(0,0,0) scale(1); }
+    50% { transform:translate3d(-8px,10px,0) scale(1.06); }
+  }
+  @keyframes desktop-mobile-shimmer {
+    0% { background-position:0% 50%; }
+    100% { background-position:200% 50%; }
+  }
+  @keyframes desktop-community-title-shift {
+    0%,100% { background-position:0% 50%; }
+    50% { background-position:100% 50%; }
+  }
 }
