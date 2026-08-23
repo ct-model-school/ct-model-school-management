@@ -74,6 +74,39 @@ export default function PublicPeopleNav() {
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
+  useEffect(() => {
+    if (!pathname || pathname.startsWith("/admin") || pathname.startsWith("/management") || pathname.startsWith("/register")) return;
+
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const updateScrollState = () => {
+      const currentScrollY = window.scrollY;
+      const delta = currentScrollY - lastScrollY;
+      const shouldHide = currentScrollY > 72 && delta > 4;
+      const shouldShow = delta < -4 || currentScrollY <= 20;
+
+      if (shouldHide) document.body.classList.add("ctms-scroll-hidden");
+      else if (shouldShow) document.body.classList.remove("ctms-scroll-hidden");
+
+      lastScrollY = currentScrollY;
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateScrollState);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      document.body.classList.remove("ctms-scroll-hidden");
+    };
+  }, [pathname]);
+
   const isPrivateRoute = pathname.startsWith("/admin") || pathname.startsWith("/management") || pathname.startsWith("/register");
   if (!pathname || isPrivateRoute) return null;
 
@@ -100,7 +133,10 @@ export default function PublicPeopleNav() {
       .ctms-home-community-button:hover { transform:translateY(-2px); opacity:.92; }
       .ctms-home-community-button span:last-child { font-size:1.15rem; line-height:1; }
       @media (max-width:767px) {
-        .ctms-mobile-bottom-nav { position:fixed; left:0; right:0; bottom:0; z-index:9999; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); min-height:70px; padding:6px 4px calc(6px + env(safe-area-inset-bottom)); border-top:1px solid var(--school-border); background:var(--school-surface); box-shadow:0 -8px 24px rgba(15,23,42,.10); }
+        main > header { transform:translateY(0); transition:transform 220ms ease,opacity 180ms ease; will-change:transform; }
+        .ctms-mobile-bottom-nav { position:fixed; left:0; right:0; bottom:0; z-index:9999; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); min-height:70px; padding:6px 4px calc(6px + env(safe-area-inset-bottom)); border-top:1px solid var(--school-border); background:var(--school-surface); box-shadow:0 -8px 24px rgba(15,23,42,.10); transform:translateY(0); opacity:1; transition:transform 220ms ease,opacity 180ms ease; will-change:transform; }
+        body.ctms-scroll-hidden main > header { transform:translateY(-110%); opacity:0; pointer-events:none; }
+        body.ctms-scroll-hidden .ctms-mobile-bottom-nav { transform:translateY(110%); opacity:0; pointer-events:none; }
         .ctms-mobile-bottom-nav-item { position:relative; display:flex; min-width:0; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:5px 2px 4px; color:var(--school-muted); text-decoration:none; font-size:11px; font-weight:700; line-height:1.1; }
         .ctms-mobile-bottom-nav-item.active { color:var(--school-primary); }
         .ctms-mobile-bottom-nav-item.active::before { content:""; position:absolute; top:-6px; left:50%; width:32px; height:3px; border-radius:999px; transform:translateX(-50%); background:var(--school-primary); }
