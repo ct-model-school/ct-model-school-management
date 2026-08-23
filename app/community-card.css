@@ -8,7 +8,7 @@ main.px-4.py-10 article.group {
   box-shadow: 0 8px 24px color-mix(in srgb, var(--school-primary) 10%, transparent);
   position: relative;
 
-  /* Center the complete card content both vertically and horizontally. */
+  /* Keep the whole card content vertically centered. Accent strips are decorative. */
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -24,6 +24,11 @@ main.px-4.py-10 article.group > div:first-child {
   background-size: 180% 100%;
   animation: community-card-shift 5s ease-in-out infinite;
   align-self: stretch !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 0 !important;
+  z-index: 1;
 }
 
 /* Bottom accent line: anchor it to the actual bottom edge of the card. */
@@ -57,7 +62,7 @@ main.px-4.py-10 article.group > div:nth-child(2) {
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-  padding: 0.55rem 0.55rem 0 !important;
+  padding: 0.8rem 0.55rem 0.25rem !important;
 }
 
 /* Compact circular portrait, matching the Principal-style frame. */
@@ -85,7 +90,7 @@ main.px-4.py-10 article.group > div:nth-child(3) {
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 0.5rem 0.55rem 0.6rem !important;
+  padding: 0.5rem 0.55rem 0.75rem !important;
   text-align: center !important;
 }
 
@@ -107,6 +112,21 @@ main.px-4.py-10 article.group > div:nth-child(3) > p {
   margin-top: 0.3rem;
   line-height: 1.08rem;
   text-align: center !important;
+}
+
+/* Scholarship cards show the scholarship name in the compact visible slot. */
+main > section:has(a[href="/people#scholarship"]) article.group > div:nth-child(3) > p:first-of-type,
+main.px-4.py-10:has(a[href="/people#scholarship"]) article.group > div:nth-child(3) > p:first-of-type {
+  font-size: 0 !important;
+  line-height: 1rem !important;
+}
+
+main > section:has(a[href="/people#scholarship"]) article.group > div:nth-child(3) > p:first-of-type::before,
+main.px-4.py-10:has(a[href="/people#scholarship"]) article.group > div:nth-child(3) > p:first-of-type::before {
+  content: "Talent Scholarship";
+  font-size: 0.625rem;
+  line-height: 1rem;
+  font-weight: 700;
 }
 
 main > section:has(article) article.group > div:nth-child(3) > div,
