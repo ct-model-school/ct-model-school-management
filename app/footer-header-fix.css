@@ -1,9 +1,11 @@
-/* Final mobile layout fix: keep the public header pinned and remove the
-   viewport-sized blank area that can remain below the footer. */
+/* Final mobile layout fix. */
 @media (max-width: 767px) {
+  /* The previous overflow-x:hidden on main creates an overflow container,
+     which prevents position:sticky from behaving as the page header. */
   main:has(> header + #top) {
     min-height: 0 !important;
     height: auto !important;
+    overflow-x: clip !important;
   }
 
   main:has(> header + #top) > header {
@@ -13,5 +15,17 @@
     transform: none !important;
     visibility: visible !important;
     opacity: 1 !important;
+  }
+
+  /* Keep the area below the footer visually continuous with the footer.
+     This also covers the mobile browser/navigation inset without changing
+     the footer content or its height. */
+  html:has(main > header + #top),
+  body:has(main > header + #top) {
+    background: var(--school-primary) !important;
+  }
+
+  main:has(> header + #top) > footer {
+    margin-bottom: 0 !important;
   }
 }
