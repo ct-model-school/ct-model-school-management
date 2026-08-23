@@ -15,7 +15,7 @@
   section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) p { margin-top:3px !important; line-height:1.2 !important; }
   section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full details { margin-top:3px !important; }
 
-  /* Home only: extra-compact cards. */
+  /* Home only: aggressively compact cards. */
   main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full { min-height:0 !important; height:auto !important; }
   main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:first-child { height:3px !important; min-height:3px !important; }
   main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) { padding-top:0 !important; padding-bottom:0 !important; }
@@ -25,6 +25,7 @@
   main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) > span { margin-top:0 !important; padding-top:1px !important; padding-bottom:1px !important; font-size:10px !important; line-height:1 !important; }
   main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) p { margin-top:0 !important; line-height:1 !important; font-size:10px !important; }
   main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full details { margin-top:0 !important; }
+  /* Requested: Home bottom accent is 10px. */
   main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:last-child { height:10px !important; min-height:10px !important; }
 
   /* Mobile header. Theme colors only, desktop untouched. */
@@ -34,8 +35,6 @@
   main > header button { border-color:var(--school-primary-border) !important; color:var(--school-primary) !important; background:var(--school-primary-soft) !important; box-shadow:0 4px 12px color-mix(in srgb,var(--school-primary) 14%,transparent) !important; }
   main > header nav { border-top-color:var(--school-primary-border) !important; background:var(--school-primary-soft) !important; }
   main > header nav a:active,main > header nav a:hover { background:var(--school-surface); color:var(--school-primary); border-color:var(--school-primary-border); }
-
-  /* Mobile footer. Theme colors only, desktop untouched. */
   main > footer { position:relative; overflow:hidden; background:linear-gradient(160deg,var(--school-surface),var(--school-primary-soft)) !important; border-top:3px solid var(--school-primary) !important; box-shadow:0 -5px 20px color-mix(in srgb,var(--school-primary) 12%,transparent) !important; }
   main > footer::before { content:""; position:absolute; width:150px; height:150px; right:-55px; top:-65px; border-radius:9999px; background:color-mix(in srgb,var(--school-primary) 14%,transparent); pointer-events:none; }
   main > footer::after { content:""; position:absolute; width:100px; height:100px; left:-45px; bottom:-45px; border-radius:9999px; background:color-mix(in srgb,var(--school-primary) 10%,transparent); pointer-events:none; }
