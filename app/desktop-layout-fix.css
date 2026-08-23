@@ -3,28 +3,53 @@
  * Mobile remains untouched.
  */
 @media (min-width: 768px) {
-  /* Keep editable sections aligned to their existing desktop content frame. */
-  main:has(> header + #top) > #top + section + section + section > div,
+  /* Keep the desktop content frame consistent with the Quick Facts reference width. */
   main:has(> header + #top) #about > div,
   main:has(> header + #top) #principal > div,
   main:has(> header + #top) section:has(article.group) > div,
   main:has(> header + #top) #contact > div {
-    width: 100% !important;
+    width: calc(100% + 40px) !important;
     max-width: none !important;
-    margin-inline: auto !important;
+    margin-left: -20px !important;
+    margin-right: -20px !important;
     box-sizing: border-box;
   }
 
-  /* Quick Facts: undo the previous +40px expansion that pushed the row outside the reference frame. */
+  /* Quick Facts remains the reference frame. */
   main:has(> header + #top) > #top + section + section + section {
     overflow: visible;
   }
   main:has(> header + #top) > #top + section + section + section > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: auto !important;
     padding-inline: 0 !important;
+    box-sizing: border-box;
   }
   main:has(> header + #top) > #top + section + section + section > div > div {
     min-width: 0;
     box-sizing: border-box;
+  }
+
+  /* Reduce vertical whitespace between desktop sections without touching mobile. */
+  main:has(> header + #top) #about {
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+  }
+  main:has(> header + #top) #principal {
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+  }
+  main:has(> header + #top) section:has(article.group) {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+  }
+  main:has(> header + #top) #contact {
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+  }
+  main:has(> header + #top) section:has(article.group) + section:has(article.group) {
+    padding-top: 4px !important;
   }
 
   /* About: balanced desktop proportions, no squeezed text. */
