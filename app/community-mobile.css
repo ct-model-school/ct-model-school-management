@@ -1,0 +1,86 @@
+/* Mobile-only community section refinement. Desktop remains unchanged. */
+@media (max-width: 639px) {
+  section:has(article.group.relative.flex.min-h-full) {
+    --community-accent: var(--school-primary);
+  }
+
+  section:has(article.group.relative.flex.min-h-full) p.text-xs.font-extrabold.uppercase {
+    font-size: 0 !important;
+    letter-spacing: .2em;
+  }
+
+  section:has(article.group.relative.flex.min-h-full) p.text-xs.font-extrabold.uppercase::after {
+    content: "OUR COMMUNITY";
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .2em;
+    color: var(--school-primary);
+  }
+
+  section:has(article.group.relative.flex.min-h-full) h2 {
+    background: linear-gradient(90deg, var(--school-primary), color-mix(in srgb, var(--school-primary) 65%, #b026d8), var(--school-primary));
+    background-size: 180% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: community-title-shift 5s ease-in-out infinite;
+  }
+
+  @keyframes community-title-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Smaller portraits with the same circular treatment used by the Principal panel. */
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) > div {
+    width: 92px !important;
+    height: 92px !important;
+    max-width: 92px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 9999px !important;
+    border-width: 4px !important;
+    border-color: color-mix(in srgb, var(--school-primary) 72%, var(--school-surface)) !important;
+    background: var(--school-primary-soft) !important;
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--school-primary) 10%, transparent), 0 7px 18px color-mix(in srgb, var(--school-primary) 18%, transparent) !important;
+  }
+
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) {
+    padding-top: 10px !important;
+    padding-bottom: 0 !important;
+  }
+
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) img {
+    border-radius: 9999px !important;
+    object-position: center top !important;
+  }
+
+  /* Compact the cards so the reduced portrait also reduces overall card height. */
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) {
+    padding-top: 8px !important;
+    padding-bottom: 10px !important;
+  }
+
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) h3 {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+  }
+
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) > span {
+    margin-top: 5px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+  }
+
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) p {
+    margin-top: 6px !important;
+    line-height: 1.35 !important;
+  }
+
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full details {
+    margin-top: 6px !important;
+  }
+
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:last-child {
+    height: 3px !important;
+  }
+}
