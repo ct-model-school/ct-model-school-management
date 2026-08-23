@@ -191,6 +191,15 @@
     box-shadow: 0 3px 12px rgba(15, 23, 42, 0.05);
   }
 
+  /* Mobile home: remove the School card and make Location span the full row. */
+  main:has(> header + #top) > #top + section + section + section > div > div:nth-child(3) {
+    display: none !important;
+  }
+
+  main:has(> header + #top) > #top + section + section + section > div > div:nth-child(4) {
+    grid-column: 1 / -1;
+  }
+
   main:has(> header + #top) > #top + section + section + section > div > div p:last-child {
     font-size: clamp(14px, 3.8vw, 20px);
     line-height: 1.4;
