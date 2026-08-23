@@ -7,6 +7,13 @@ main.px-4.py-10 article.group {
   background: var(--school-surface);
   box-shadow: 0 8px 24px color-mix(in srgb, var(--school-primary) 10%, transparent);
   position: relative;
+
+  /* Center the complete card content both vertically and horizontally. */
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
 }
 
 /* Same colorful theme-accent strips on Home and /people. */
@@ -16,6 +23,7 @@ main.px-4.py-10 article.group > div:first-child {
   background: linear-gradient(90deg, var(--school-primary), color-mix(in srgb, var(--school-primary) 55%, #b026d8), var(--school-primary)) !important;
   background-size: 180% 100%;
   animation: community-card-shift 5s ease-in-out infinite;
+  align-self: stretch !important;
 }
 
 /* Bottom accent line: anchor it to the actual bottom edge of the card. */
@@ -45,7 +53,11 @@ main.px-4.py-10 article.group > div:last-child {
 
 main > section:has(article) article.group > div:nth-child(2),
 main.px-4.py-10 article.group > div:nth-child(2) {
-  padding: 0.55rem 0.55rem 0;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0.55rem 0.55rem 0 !important;
 }
 
 /* Compact circular portrait, matching the Principal-style frame. */
@@ -68,13 +80,20 @@ main.px-4.py-10 article.group > div:nth-child(2) img {
 
 main > section:has(article) article.group > div:nth-child(3),
 main.px-4.py-10 article.group > div:nth-child(3) {
-  padding: 0.5rem 0.55rem 0.6rem;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.5rem 0.55rem 0.6rem !important;
+  text-align: center !important;
 }
 
 main > section:has(article) article.group > div:nth-child(3) h3,
 main.px-4.py-10 article.group > div:nth-child(3) h3 {
   font-size: 0.88rem;
   line-height: 1.15rem;
+  text-align: center !important;
 }
 
 main > section:has(article) article.group > div:nth-child(3) > span,
@@ -87,11 +106,15 @@ main > section:has(article) article.group > div:nth-child(3) > p,
 main.px-4.py-10 article.group > div:nth-child(3) > p {
   margin-top: 0.3rem;
   line-height: 1.08rem;
+  text-align: center !important;
 }
 
 main > section:has(article) article.group > div:nth-child(3) > div,
 main.px-4.py-10 article.group > div:nth-child(3) > div {
   padding-top: 0.5rem;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
 }
 
 main > section:has(article) article.group > div:nth-child(3) a.flex,
