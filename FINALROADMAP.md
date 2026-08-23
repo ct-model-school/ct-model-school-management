@@ -1,95 +1,278 @@
 # C.T. Model School Management System
-## Final Architecture & Implementation Roadmap
+## FINAL ROADMAP, ARCHITECTURE & IMPLEMENTATION GUIDE
 
-> **LOCKED ROADMAP:** This document is the project-level reference for authentication, members, roles, permissions, dashboards and future management modules. New work must extend this architecture rather than create parallel systems.
+> **STATUS: LOCKED REFERENCE**
+>
+> This document explains what the system is supposed to become, why each part exists, how the parts connect, and the order in which they should be implemented. It is the project reference for future development. Existing working functionality must not be replaced with a parallel architecture without deliberately updating this document first.
 
-## 1. Core Principles
+---
 
-- Preserve all existing working website, Admin, database and management functionality unless a specific change is requested.
-- Desktop remains untouched during mobile-specific work unless explicitly requested.
-- Every new UI feature must be responsive and theme-aware.
-- Existing theme variables/tokens must be used. Do not introduce hardcoded primary/gold/theme colors.
-- Use the existing Role Management and Permission system as the single source of truth.
-- Do not create a second/duplicate role or permission system.
-- Backend/RLS/API authorization must enforce permissions. Hiding a menu is not sufficient.
-- Each member has an isolated dashboard. Member dashboards must never mix with Admin Dashboard or another member's dashboard.
-- Future modules must register their permissions in the same central permission system.
+# 1. Project Goal
 
-## 2. Unified Login Portal
+C.T. Model School is being developed as **one integrated school website + management system**.
 
-Create one public login entry point for all authenticated users.
+The public website, Admin system, Member system, Roles, Permissions, Inventory, Accounts, Academic modules, SR, Reports and future modules must ultimately work from one consistent architecture.
 
-Login options:
+The central rule is:
 
-1. Admin
-2. Teacher
-3. Staff
-4. Accounts
-5. Other Member
+```text
+Authentication
+      ↓
+User / Member Identity
+      ↓
+Member Type
+      ↓
+Role
+      ↓
+Permissions
+      ↓
+Individual Dashboard
+      ↓
+Allowed Modules / Actions
+```
 
-Category login selection is part of the login flow. A Teacher login panel must accept only a valid Teacher member account; a Staff/Accounts/Other panel must reject IDs belonging to another member type.
+A member does not receive access simply because they are a Teacher, Staff or Accounts user. **The assigned Role and its checked Permissions determine what that person can see and do.**
 
-Member login uses **Member ID + Password**. Member ID is the human-readable login ID such as `TCID...`, `STID...`, `ACID...`, or `OTID...`. The internal authentication identity must remain separate from the readable Member ID.
+---
 
-Admin login remains an administrative identity and must not be mixed with ordinary member dashboards.
+# 2. What Must NOT Change Accidentally
 
-## 3. Authentication Identity & Member Profile
+The management-system work must not break the existing public website.
 
-A member's authentication identity, profile and member record must be linked consistently.
+## Locked website rules
 
-Conceptually:
+- Existing working desktop sections remain unchanged unless explicitly requested.
+- Mobile-only fixes must remain mobile-scoped.
+- The existing theme system remains the source for primary/theme colors.
+- New features must be theme-aware.
+- Existing working database data must be preserved.
+- Existing Community/People functionality must remain intact.
+- Hero, Principal, About, Map/Official Links and other explicitly locked sections must not be touched unless the user asks for it.
+- Screenshots are reference material only. They must never be treated as requests to generate/edit an image.
+- Website work means code, database and deployment work.
 
-`Authentication User → Profile/Identity → Member Record → Member Type → Role → Permissions`
+---
 
-Requirements:
+# 3. The Core Identity Model
 
-- New member creation must create/maintain the authentication/login identity and member record as one coherent workflow.
-- Editing a member must update the correct member identity without creating duplicate users.
-- Member ID is the login/display identifier, not the security identity.
-- Password is stored securely as a password hash/auth credential and must never be exposed in profile views.
-- Password changes must update the authenticated credential only.
-- Existing member records must be migrated/linked safely where required.
-- Do not break existing Admin authentication.
+There are two different concepts that must not be confused.
 
-## 4. Member Types
+## 3.1 Internal authentication identity
 
-The same member architecture applies to all four member types:
+The authentication system needs a secure internal user identity, normally a UUID.
 
-- Teacher
-- Staff
-- Accounts
-- Other
+This is the identity used by authentication, sessions, ownership checks and database security.
 
-The member type identifies the broad category. The **Role** determines the actual access.
+## 3.2 Human-readable Member ID
 
-A member type must not be used as a substitute for permissions.
+Every member also has a readable Member ID, for example:
 
-## 5. Existing Role Management Is the Authority
+```text
+TCID000001   Teacher
+STID000001   Staff
+ACID000001   Accounts
+OTID000001   Other
+```
 
-The Admin Panel already has Role Management. Keep and extend that system.
+The Member ID is what the member can type into the login form.
 
-When creating a Role:
+It is **not** the same thing as the internal authentication UUID.
 
-- Admin enters Role Name/description.
-- Available permissions appear as checkboxes.
-- Checked permissions belong to that Role.
-- Unchecked permissions do not belong to that Role.
-- Saving the Role applies the selected permission set.
+## 3.3 Required relationship
 
-When editing a Role:
+The final relationship should be conceptually:
 
-- Existing permissions are loaded.
-- Admin can check/uncheck permissions.
-- Saving changes the Role's permission set.
-- Members assigned to that Role receive the updated access automatically.
+```text
+Auth User
+   │
+   └── internal user ID
+          │
+          ▼
+      Profile / Identity
+          │
+          ▼
+      Member Record
+          │
+          ├── Member ID
+          ├── Member Type
+          └── Role
+                 │
+                 ▼
+             Permissions
+```
 
-Do not create a separate role editor for members.
+Creating a member must create/maintain this relationship consistently. Editing a member must update the existing identity rather than accidentally creating another login identity.
 
-## 6. Central Permission Model
+---
 
-Permissions must be granular enough to support real school workflows. `View`, `Create`, `Edit`, `Delete`, `Approve`, `Reject`, `Publish`, `Process`, etc. should be separate where appropriate.
+# 4. Member Types
 
-### Profile & Account
+The same authentication/profile/dashboard architecture applies to all four member categories:
+
+1. **Teacher**
+2. **Staff**
+3. **Accounts**
+4. **Other**
+
+Member Type tells the system which broad category the person belongs to.
+
+Member Type is **not** the permission system.
+
+For example:
+
+```text
+Staff
+ ├── Store Assistant Role
+ ├── Store Officer Role
+ └── Store Manager Role
+```
+
+All three are Staff, but their dashboards and actions can be completely different because their Roles have different permissions.
+
+---
+
+# 5. One Login Portal
+
+There should be one central login page for the school management system.
+
+The page will show five choices:
+
+```text
+┌────────────┐  ┌────────────┐
+│   ADMIN    │  │  TEACHER   │
+└────────────┘  └────────────┘
+
+┌────────────┐  ┌────────────┐
+│   STAFF    │  │  ACCOUNTS  │
+└────────────┘  └────────────┘
+
+┌─────────────────────────────┐
+│       OTHER MEMBER          │
+└─────────────────────────────┘
+```
+
+The user selects the appropriate login type first.
+
+Then the relevant form appears:
+
+```text
+Member ID
+Password
+
+[ Login ]
+[ Forgot Password ]
+```
+
+## Login type validation
+
+A Teacher login must accept only a valid Teacher member.
+
+A Staff login must accept only a valid Staff member.
+
+An Accounts login must accept only an Accounts member.
+
+An Other login must accept only an Other member.
+
+Therefore:
+
+```text
+Teacher panel + ACID000001 = REJECT
+Accounts panel + TCID000001 = REJECT
+Staff panel + OTID000001 = REJECT
+```
+
+A correct password alone is not enough. The selected login category and the member's actual Member Type must agree.
+
+Admin remains a separate administrative identity even though the login entry point is shared.
+
+---
+
+# 6. Existing Role Management Is the Main System
+
+**Important: Role Management already exists in the Admin Panel. Do not build a second Role system.**
+
+The existing Role Management becomes the single source of truth.
+
+## Create Role
+
+Admin opens:
+
+```text
+Admin → Role Management → Create Role
+```
+
+Then:
+
+```text
+Role Name
+Description
+
+Permissions
+☐ Profile View
+☐ Profile Edit
+☐ Inventory View
+☐ Item Search
+☐ SR Create
+☐ SR Approve
+☐ Result Entry
+☐ Attendance Entry
+☐ Accounts View
+☐ Reports
+...
+
+[ Save Role ]
+```
+
+Whatever Admin checks becomes part of that Role.
+
+Whatever Admin leaves unchecked is not available to members assigned to that Role.
+
+## Edit Role
+
+Admin can later:
+
+```text
+Role Management
+   ↓
+Edit Role
+   ↓
+Check / Uncheck permissions
+   ↓
+Save
+```
+
+The assigned members automatically inherit the updated Role permissions.
+
+No manual permission editing should be necessary on every member unless a future individual-override feature is deliberately introduced.
+
+---
+
+# 7. Permission System: The Central Brain
+
+Permissions are the actual controls used to build dashboards and authorize actions.
+
+Permissions should be granular.
+
+For example, these are intentionally different:
+
+```text
+View
+Create
+Edit
+Delete
+Approve
+Reject
+Publish
+Process
+Issue
+Report
+```
+
+This allows one person to see something without allowing them to modify or approve it.
+
+## Current/core permission categories
+
+### A. Profile & Account
 
 - Dashboard
 - Profile View
@@ -98,41 +281,54 @@ Permissions must be granular enough to support real school workflows. `View`, `C
 - Notifications
 - Documents
 
-### Students & Academic
+### B. Students & Admission
 
 - Students View
 - Students Add
 - Students Edit
 - Students Delete
 - Student Admission
+- Student Profile Management
 - Classes
-- Subjects
 - Sections
+- Subjects
 - Academic Sessions
+
+### C. Attendance
+
 - Attendance View
 - Attendance Entry
 - Attendance Edit
+- Attendance Approval, if required
+- Attendance Reports
+
+### D. Results / Examination
+
 - Results View
 - Result Entry
 - Result Edit
+- Result Approval
 - Result Publish
-- Academic Reports
+- Examination Management
+- Result Reports
 
-### Teachers / Staff / Members
+### E. Teachers / Staff / Members
 
 - Teacher View
 - Teacher Add
 - Teacher Edit
+- Teacher Delete
 - Staff View
 - Staff Add
 - Staff Edit
+- Staff Delete
 - Member View
 - Member Add
 - Member Edit
 - Member Delete
 - Member Profile Management
 
-### Inventory / Store
+### F. Inventory / Store
 
 - Inventory View
 - Item Search
@@ -147,9 +343,11 @@ Permissions must be granular enough to support real school workflows. `View`, `C
 - Supplier View
 - Supplier Add/Edit
 
-### Store Requisition (SR)
+### G. Store Requisition / SR
 
-SR is a permission-controlled module, not a separate authentication system.
+SR is **not a separate login system**. It is a normal permission-controlled module.
+
+Permissions can include:
 
 - SR Create
 - SR View Own
@@ -162,7 +360,7 @@ SR is a permission-controlled module, not a separate authentication system.
 - SR Issue
 - SR Report
 
-### Accounts & Finance
+### H. Accounts / Finance
 
 - Accounts View
 - Payment Entry
@@ -172,10 +370,10 @@ SR is a permission-controlled module, not a separate authentication system.
 - Fees Collection
 - Expense Entry
 - Expense Approval
-- Accounts Report
-- Financial Report
+- Financial Reports
+- Accounts Reports
 
-### Website / Communication
+### I. Website / Communication
 
 - Notice View
 - Notice Create
@@ -188,7 +386,7 @@ SR is a permission-controlled module, not a separate authentication system.
 - Community Profiles
 - Contact Messages
 
-### Administration
+### J. Administration
 
 - User Management
 - Role Management
@@ -196,38 +394,206 @@ SR is a permission-controlled module, not a separate authentication system.
 - System Settings
 - Audit Logs
 - Reports
-- Backup/Restore where implemented
+- Backup/Restore when implemented
 
-### Future Growth Rule
+---
 
-When a new module/feature is added, its required permissions must be added to the same central permission catalog. Role Create/Edit must automatically expose the new permission as a selectable checkbox. Do not hardcode a closed permission list into individual dashboards.
+# 8. Future Permission Rule
 
-## 7. Individual Member Dashboard
+The permission list is **not permanently closed**.
 
-After login:
+When a future feature is added, it must add its own permissions to the same central permission catalog.
 
-`Login → Identify User → Member Type → Role → Permissions → Individual Dashboard`
+Example:
 
-The dashboard menu is generated from the logged-in user's effective permissions.
+If Library is added later:
 
-Examples:
+```text
+Library View
+Book Add
+Book Edit
+Book Delete
+Book Issue
+Book Return
+Library Report
+```
 
-- If `SR Create` is checked for the user's Role, the member sees Create SR.
-- If `SR Approve` is not checked, Approve SR must not be available.
-- If `Result Entry` is checked, Result Entry appears.
-- If `Accounts` is not checked, Accounts does not appear.
+Those permissions must then automatically become available in Role Create/Edit.
 
-The same permission checks must be enforced server-side.
+If Transport is added:
 
-A member must only access their own profile and data unless the Role grants broader access such as View All, Approve, Manage, or Report permissions.
+```text
+Transport View
+Vehicle Management
+Route Management
+Driver Management
+Transport Report
+```
 
-## 8. Profile
+Again, Role Management receives those permissions without creating a second role system.
 
-Every logged-in member gets a personal Profile area.
+The rule is:
 
-Profile should show permitted personal information such as:
+```text
+New Module
+   ↓
+New Permission(s)
+   ↓
+Permission Catalog
+   ↓
+Role Create/Edit checkbox
+   ↓
+Role
+   ↓
+Member Dashboard
+```
 
-- Profile photo
+---
+
+# 9. Member Creation
+
+When Admin creates a Teacher, Staff, Accounts or Other member, the system should maintain one coherent identity flow.
+
+Conceptually:
+
+```text
+Create Member
+    ↓
+Member Type
+    ↓
+Member ID
+    ↓
+Password / Authentication credential
+    ↓
+Profile
+    ↓
+Role
+    ↓
+Permissions inherited from Role
+```
+
+Example:
+
+```text
+Name: Tanzina Tarin
+Member Type: Teacher
+Member ID: TCID000003
+Role: Teacher
+Password: ********
+```
+
+The password must never be displayed later as plain text.
+
+Editing a member must update the existing login/profile record instead of accidentally generating another login account.
+
+---
+
+# 10. Individual Member Dashboard
+
+After successful login:
+
+```text
+Login
+  ↓
+Identify authenticated user
+  ↓
+Find Member
+  ↓
+Find Member Type
+  ↓
+Find Role
+  ↓
+Load Role Permissions
+  ↓
+Build Individual Dashboard
+```
+
+Every member gets their **own dashboard context**.
+
+It must not be mixed with:
+
+- another member's dashboard
+- Admin Dashboard
+- another role's dashboard
+
+## Dynamic menu example
+
+If a Role has:
+
+```text
+☑ Profile View
+☑ Item Search
+☑ Inventory View
+☑ SR Create
+☑ SR View Own
+☐ SR Approve
+☐ Accounts View
+```
+
+the dashboard can show:
+
+```text
+My Profile
+Inventory
+Item Search
+Create SR
+My SR
+```
+
+It must not show:
+
+```text
+Approve SR
+Accounts
+```
+
+---
+
+# 11. Dashboard Security
+
+Menu hiding alone is NOT security.
+
+A member who does not have permission must also be blocked from:
+
+- direct URLs
+- server actions
+- RPC calls
+- API requests
+- database operations
+
+The security chain must be:
+
+```text
+Authenticated Identity
+       ↓
+Member
+       ↓
+Role
+       ↓
+Permission
+       ↓
+Resource ownership/scope
+       ↓
+Allow / Deny
+```
+
+Supabase RLS and secure RPC/server-side checks must enforce the same rules.
+
+Example:
+
+A member with only `SR View Own` must not be able to change a URL and read somebody else's SR.
+
+A member without `SR Approve` must not be able to call an approval RPC directly.
+
+---
+
+# 12. Personal Profile
+
+Every logged-in member gets a **My Profile** page.
+
+It can show:
+
+- Profile picture
 - Member ID
 - Name
 - Designation
@@ -235,33 +601,81 @@ Profile should show permitted personal information such as:
 - Phone
 - Email
 - WhatsApp
-- Joining Date
+- Joining date
 - Address
 - Role
 
-Members can change their password while logged in.
+Members can update allowed personal information according to their Role.
 
-Members must not see another member's private profile information unless their Role explicitly grants the required management permission.
+Members can change their own password from Profile.
 
-## 9. Forgot Password
+Sensitive authentication data must never be displayed.
 
-Provide Forgot Password in the unified login system.
+---
 
-Preferred recovery flow:
+# 13. Forgot Password
 
-`Member ID → Registered email/phone verification → OTP or secure reset link → New Password`
+Forgot Password will be available from the unified login page.
 
-Do not expose password hashes or existing passwords.
+Preferred flow:
 
-If SMS OTP is added later, integrate it without changing the core Role/Permission architecture.
+```text
+Forgot Password
+      ↓
+Member ID
+      ↓
+Registered Email / Phone verification
+      ↓
+OTP or secure reset link
+      ↓
+New Password
+      ↓
+Login
+```
 
-## 10. Store SR Workflow
+The system must never reveal the existing password.
 
-SR is one module controlled by Role permissions.
+If SMS OTP is added later, it becomes an authentication service under the same architecture, not a new login system.
 
-If a Role has `SR Create`, that member sees the SR option.
+---
 
-When creating an SR, member details are automatically loaded from the logged-in profile/member record:
+# 14. SR: How It Fits Into the Full System
+
+SR is one example of how permissions control a module.
+
+**Do not build SR as an isolated system.**
+
+If a Role has `SR Create`, the dashboard shows Create SR.
+
+If it does not, the option is absent and the backend also rejects SR creation.
+
+## SR Create flow
+
+```text
+Member Dashboard
+      ↓
+Create SR
+      ↓
+Member details auto-loaded from Profile
+      ↓
+Search Item Code
+      ↓
+Select Item
+      ↓
+Enter Quantity
+      ↓
+Add more items if required
+      ↓
+Add purpose/remarks/other information
+      ↓
+Submit SR
+```
+
+## Auto-filled requester information
+
+The member should not manually type their own identity.
+
+The system fills:
 
 - Member ID
 - Name
@@ -269,93 +683,203 @@ When creating an SR, member details are automatically loaded from the logged-in 
 - Department
 - Contact information where required
 
-The member must not manually alter the identity of the requester.
+This information comes from the authenticated profile/member record.
 
-### Item Selection
+## Item selection
 
-- Search by Item Code.
-- Select the matching item.
-- Show item information.
-- Enter requested quantity.
-- Add multiple items to one SR.
-- Add required item notes/remarks.
-- Validate available/requestable quantity according to the final inventory rules.
+Search by Item Code.
 
-### SR Information
+Example:
+
+```text
+Item Code: EL-000125
+       ↓
+Item Name
+Brand
+Model
+Unit
+Availability
+       ↓
+Quantity: 5
+       ↓
+Add Item
+```
+
+One SR can contain multiple items.
+
+## SR information
+
+Typical fields:
 
 - Auto-generated SR number
-- Request date
-- Requesting member
-- Department/class where applicable
-- Purpose/request details
-- Required date where applicable
+- Date
+- Requester
+- Department
+- Purpose
+- Required date
 - Remarks
 - Attachments where implemented
 
-### SR Status
+## SR workflow
 
-Example lifecycle:
+Example:
 
-`Draft → Submitted/Pending → Approved → Issued/Processed`
+```text
+Draft
+  ↓
+Submitted / Pending
+  ↓
+Approved
+  ↓
+Processed / Issued
+```
 
-or
+or:
 
-`Submitted → Rejected`
+```text
+Submitted
+  ↓
+Rejected
+```
 
-The exact transitions must be permission controlled.
+Each transition must be permission controlled.
 
-### SR visibility
+---
 
-- `SR View Own` → member sees only their own SRs.
-- `SR View All` → authorized role can see all relevant SRs.
-- `SR Approve` → authorized role can approve.
-- `SR Reject` → authorized role can reject.
-- `SR Process` / `SR Issue` → authorized store role can process/issue.
-- `SR Report` → authorized role can access SR reporting.
+# 15. SR Permission Examples
 
-Existing SR database structures should be reused and connected to the authenticated member identity rather than creating a duplicate SR system.
+### Store Assistant Role
 
-## 11. Dashboard Isolation & Security
+```text
+☑ Inventory View
+☑ Item Search
+☑ SR Create
+☑ SR View Own
+☐ SR View All
+☐ SR Approve
+☐ SR Reject
+☐ SR Issue
+```
 
-Every route and server operation must verify:
+### Store Officer Role
 
-`Authenticated Identity → Member/Role → Permission → Resource Ownership/Scope`
+```text
+☑ Inventory View
+☑ Item Search
+☑ SR Create
+☑ SR View Own
+☑ SR View All
+☑ SR Process
+☑ SR Issue
+☐ SR Approve
+```
 
-Examples:
+### Store Manager Role
 
-- A Teacher cannot open the Admin Dashboard by typing its URL.
-- A Staff member cannot open Accounts management without the required permission.
-- A member with only `SR View Own` cannot access another member's SR by changing an ID in the URL.
-- A member without `SR Approve` cannot call an approval operation directly.
-- Frontend hiding is not security. Supabase RLS/RPC/server authorization must enforce the same rules.
+```text
+☑ Inventory View
+☑ Item Search
+☑ SR Create
+☑ SR View Own
+☑ SR View All
+☑ SR Approve
+☑ SR Reject
+☑ SR Process
+☑ SR Issue
+☑ SR Report
+```
 
-## 12. Admin Dashboard
+This is why SR must remain part of the Role/Permission architecture.
 
-Admin remains separate from ordinary member dashboards.
+---
 
-Admin can manage:
+# 16. Other Modules Follow Exactly the Same Logic
 
+The same approach applies to every future or existing module.
+
+## Result
+
+If Role has:
+
+```text
+☑ Results View
+☑ Result Entry
+☐ Result Publish
+```
+
+the user can enter results but cannot publish them.
+
+## Attendance
+
+If Role has:
+
+```text
+☑ Attendance View
+☑ Attendance Entry
+☐ Attendance Edit
+```
+
+the user can enter attendance but cannot modify existing attendance.
+
+## Accounts
+
+If Role has:
+
+```text
+☑ Accounts View
+☑ Payment Entry
+☐ Payment Approval
+```
+
+the user can enter payments but cannot approve them.
+
+## Inventory
+
+If Role has:
+
+```text
+☑ Inventory View
+☑ Item Search
+☐ Item Edit
+☐ Stock Issue
+```
+
+the user can view/search but cannot modify or issue stock.
+
+This is the main logic for the entire project.
+
+---
+
+# 17. Admin Dashboard
+
+Admin has its own separate dashboard and management environment.
+
+Depending on Admin permissions, it may contain:
+
+- Dashboard
 - Members
-- Roles
-- Permissions
 - Students
 - Teachers
 - Staff
 - Accounts
 - Inventory
-- SR workflows
+- Roles
+- Permissions
 - Results
 - Attendance
 - Notices
+- SR Management
 - Reports
 - Settings
-- Other modules according to Admin permissions
+- Website management
 
-Admin permissions must also be enforced server-side.
+Admin Dashboard must never be rendered as a normal Member Dashboard.
 
-## 13. Future Module Expansion
+---
 
-Future modules may include, but are not limited to:
+# 18. Future Modules
+
+The architecture must be ready for future modules such as:
 
 - Library
 - Transport
@@ -363,148 +887,255 @@ Future modules may include, but are not limited to:
 - Fees
 - HR
 - Examination management
-- Parent portal
 - Student portal
+- Parent portal
 - Hostel
 - Leave management
 - Timetable
 - Certificates
 - Asset management
 - Procurement
-- Audit/reporting
+- Audit and advanced reporting
 
-Every new module follows the same pattern:
+For every future module:
 
-`Module → Permission(s) → Role checkbox → Member Role → Dashboard → Server/RLS enforcement`
+```text
+Module
+ ↓
+Permissions
+ ↓
+Role checkbox
+ ↓
+Role assignment
+ ↓
+Member Dashboard
+ ↓
+Backend/RLS authorization
+```
 
-No module may create its own independent login/role/permission mechanism.
+No future module should invent a separate login or permission architecture.
 
-## 14. Data & Security Rules
+---
 
-- Preserve existing production data.
-- Do not duplicate member identities unnecessarily.
-- Do not create a second password system when the authentication layer can handle credentials securely.
-- Keep Member ID human-readable and stable.
+# 19. Database / Security Direction
+
+The final system must preserve production data while improving the identity relationships.
+
+Important rules:
+
+- Do not duplicate authentication identities unnecessarily.
+- Do not expose password hashes.
+- Keep Member IDs stable.
 - Keep internal authentication IDs private/internal.
-- Password hashes must never be displayed to Admin or members.
-- Use RLS and secure RPC/server operations for authorization.
-- Audit sensitive actions such as role changes, approvals, stock issues, result publishing and account approvals where applicable.
+- Use secure RPC/server functions for sensitive operations.
+- Use RLS for data isolation.
+- Use storage policies for profile/document uploads.
+- Record audit information for sensitive operations where appropriate.
 
-## 15. Existing Website Rules Remain Locked
+Sensitive operations that should eventually have audit records include:
 
-- Do not change working desktop sections unless explicitly requested.
-- Mobile-only fixes stay within mobile breakpoints.
-- Hero section is locked unless explicitly requested.
-- Principal, About, Map/Official Links and other locked sections must not be changed accidentally.
-- Existing Community/People functionality must remain intact.
-- Existing theme system must be followed.
-- Do not generate or edit images when working on website code.
+- Role changes
+- Permission changes
+- Member account changes
+- Password/reset events where appropriate
+- SR approval/rejection
+- Stock issue
+- Result publishing
+- Financial approvals
 
-## 16. Implementation Order
+---
 
-### Phase A: Audit & Foundation
+# 20. Implementation Phases
 
-1. Audit existing authentication, profiles, member tables and Role Management.
-2. Audit current permission catalog and role-permission relationships.
-3. Map all existing member types to the current Role system.
-4. Map existing Admin authentication separately.
-5. Confirm existing SR and Inventory tables/RPCs.
-6. Identify any duplicate/legacy authentication flows.
+## Phase 1 — Audit Existing System
 
-### Phase B: Unified Authentication
+Before changing authentication:
 
-1. Build unified login entry point.
-2. Add Admin/Teacher/Staff/Accounts/Other login selection.
-3. Validate Member ID against the selected member type.
-4. Implement secure member session handling.
-5. Add Forgot Password.
-6. Add logged-in Change Password.
-7. Preserve Admin login compatibility.
+- Inspect existing Auth users.
+- Inspect profiles.
+- Inspect member tables.
+- Inspect existing Role Management.
+- Inspect current permissions.
+- Inspect role-permission relationships.
+- Inspect existing Inventory/SR structures.
+- Identify duplicate or legacy login paths.
+- Map current members to the final identity architecture.
 
-### Phase C: Role & Permission Integration
+**Goal:** understand the existing root before modifying it.
 
-1. Reuse existing Role Management.
-2. Expand central permission catalog.
-3. Categorize permissions in Role Create/Edit UI.
-4. Ensure future permissions appear automatically.
-5. Ensure role edits immediately affect effective access.
-6. Enforce permissions server-side/RLS.
+## Phase 2 — Authentication Foundation
 
-### Phase D: Individual Dashboards
+- Create unified login entry.
+- Add five login choices.
+- Validate Member ID against Member Type.
+- Connect member login to the existing authentication identity.
+- Preserve Admin authentication.
+- Ensure login sessions are isolated.
+- Implement logout.
 
-1. Create separate Member Dashboard shell.
-2. Build dynamic navigation from permissions.
-3. Add Profile.
-4. Add member-specific data access.
-5. Add permission/ownership guards to every route.
-6. Keep Admin Dashboard completely separate.
+## Phase 3 — Password Management
 
-### Phase E: Existing Modules Integration
+- Forgot Password.
+- Secure reset flow.
+- Logged-in Change Password.
+- Ensure no plain password exposure.
 
-Connect existing modules to the permission system:
+## Phase 4 — Role/Permission Integration
 
-- Academic
+- Reuse existing Role Management.
+- Audit and expand permission catalog.
+- Categorize permissions.
+- Make permission checkboxes dynamic.
+- Ensure Role Edit changes access immediately.
+- Ensure future modules can register permissions.
+
+## Phase 5 — Individual Member Dashboard
+
+- Create separate Member Dashboard shell.
+- Load user identity.
+- Load Member Type.
+- Load Role.
+- Load effective Permissions.
+- Generate menu dynamically.
+- Add My Profile.
+- Add password management.
+- Add route guards.
+
+## Phase 6 — Existing Module Integration
+
+Connect existing functionality to the permission engine:
+
+- Students
+- Teachers
+- Staff
 - Attendance
 - Results
-- Inventory
 - Accounts
+- Inventory
 - Notices
 - Community/People
 - Reports
-- Other existing modules
+- Other existing management functions
 
-### Phase F: SR Integration
+## Phase 7 — SR Integration
 
-1. Connect SR to logged-in member identity.
-2. Auto-fill requester details from profile/member record.
-3. Item Code search.
-4. Multi-item SR creation.
-5. Quantity and validation.
-6. SR status workflow.
-7. Own/all/approve/reject/process/issue permissions.
-8. SR reporting.
-9. Audit trail.
+- Connect SR to authenticated member identity.
+- Auto-fill requester profile.
+- Item Code search.
+- Item selection.
+- Quantity entry.
+- Multiple items.
+- SR number generation.
+- Submission.
+- Approval/rejection.
+- Processing/issue.
+- Own/all visibility.
+- Reports.
+- Audit trail.
 
-### Phase G: Security & QA
+## Phase 8 — Full Security Audit
 
-1. Test every Role permission.
-2. Test unauthorized direct URLs.
-3. Test direct RPC/API calls without permission.
-4. Test cross-member data access.
-5. Test password reset/change.
-6. Test member-type login restrictions.
-7. Test Admin/member isolation.
-8. Test RLS and storage policies.
-9. Run TypeScript/build checks.
-10. Test production deployment.
+Test every permission from both UI and backend.
 
-## 17. Definition of Done
+Test:
 
-The architecture is considered complete only when:
+- Wrong member type login.
+- Wrong password.
+- Disabled member.
+- Unauthorized URL.
+- Unauthorized RPC/API call.
+- Cross-member profile access.
+- Cross-member SR access.
+- Unauthorized approval.
+- Unauthorized inventory issue.
+- Unauthorized result publish.
+- Admin/member dashboard separation.
 
-- All five login categories work through the unified portal.
-- Member ID + password authentication works correctly.
-- Member type mismatch is rejected.
-- Role Management remains the single source of truth.
-- Role Create/Edit permission checkboxes work.
-- New permissions can be added without redesigning dashboards.
-- Every member gets an isolated dashboard.
-- Dashboard menus reflect effective permissions.
-- Backend/RLS prevents unauthorized actions.
-- Profile and password management work.
+## Phase 9 — Production QA
+
+- TypeScript check.
+- Production build.
+- Supabase migration verification.
+- RLS verification.
+- Storage policy verification.
+- Login smoke test.
+- Member dashboard smoke test.
+- Admin dashboard smoke test.
+- Mobile responsive test.
+- Desktop regression test.
+- Vercel deployment verification.
+
+---
+
+# 21. Definition of Done
+
+The architecture is considered complete when:
+
+- Admin, Teacher, Staff, Accounts and Other can use the unified login portal.
+- Member ID + Password authentication works.
+- Login category mismatch is rejected.
+- Authentication identity and member profile are correctly linked.
+- Existing Role Management remains the single source of truth.
+- Role Create/Edit checkboxes control permissions.
+- Members automatically inherit Role changes.
+- New future permissions can be added without redesigning dashboards.
+- Every member has an isolated dashboard.
+- Dashboard menus reflect Role permissions.
+- Direct unauthorized routes are blocked.
+- Backend/RLS prevents unauthorized operations.
+- Members can view their own profile.
+- Members can change their own password.
 - Forgot Password works securely.
-- SR is available only through the relevant Role permission.
-- SR automatically identifies the logged-in member.
-- Existing Inventory/Accounts/Results/Attendance and future modules use the same permission architecture.
-- Admin and Member dashboards remain completely separate.
-- Existing public website and locked UI sections remain intact.
+- SR appears only when the Role has the required SR permission.
+- SR automatically identifies the logged-in requester.
+- SR item search and quantity workflow works.
+- SR approval/rejection/process/issue follow permissions.
+- Inventory, Accounts, Results, Attendance and future modules use the same permission architecture.
+- Admin Dashboard remains separate from all Member Dashboards.
+- Existing public website remains intact.
 - Build/type checks pass.
 - Production deployment is verified.
 
-## 18. Change Control
+---
 
-This file is the locked architectural roadmap. Before implementing a major new management feature, check this document first.
+# 22. Change-Control Rule
 
-If a future requirement conflicts with this architecture, update this roadmap deliberately before changing the underlying authentication/role/permission root.
+This document is the **final architectural reference**.
 
-Do not silently replace the core authentication, role or permission architecture.
+Before making a major change to authentication, member identity, roles, permissions or dashboards:
+
+1. Read this document.
+2. Inspect the existing implementation.
+3. Determine whether the requested feature fits the existing architecture.
+4. Extend the architecture instead of creating a parallel system.
+5. If the root architecture genuinely needs to change, update this roadmap deliberately first.
+
+Do not silently replace the authentication, role or permission root.
+
+---
+
+# 23. Working Rule for Future Development
+
+When the user says a new feature should be available to some members, the first question is:
+
+> **Which Role Permission controls this feature?**
+
+Then implement:
+
+```text
+Feature
+ ↓
+Permission
+ ↓
+Role checkbox
+ ↓
+Member Role
+ ↓
+Dashboard visibility
+ ↓
+Route authorization
+ ↓
+Database/RLS authorization
+```
+
+That is the permanent logic for the C.T. Model School management system.
