@@ -1,0 +1,34 @@
+/* C.T. Model School | Desktop alignment correction
+ * Desktop-only geometry correction. Mobile remains untouched.
+ */
+@media (min-width:768px) {
+  /* Keep the quick-facts row visually aligned with the main desktop content. */
+  main:has(> header + #top) > #top + section + section + section > div {
+    width:calc(100% + 40px) !important;
+    max-width:none !important;
+    margin-left:-20px !important;
+    margin-right:-20px !important;
+  }
+
+  /* Restore the wider desktop about panels so text does not feel squeezed. */
+  main:has(> header + #top) #about > div {
+    width:calc(100% + 40px) !important;
+    max-width:none !important;
+    margin-left:-20px !important;
+    margin-right:-20px !important;
+  }
+
+  main:has(> header + #top) #about > div > div {
+    min-width:0;
+  }
+
+  main:has(> header + #top) #about h2,
+  main:has(> header + #top) #about p {
+    overflow-wrap:normal;
+    word-break:normal;
+  }
+
+  main:has(> header + #top) #about h2 {
+    letter-spacing:-0.025em;
+  }
+}
