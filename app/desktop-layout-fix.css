@@ -1,6 +1,6 @@
 /* C.T. Model School | Desktop alignment + polish
  * Desktop only. Hero image, header and footer geometry remain untouched.
- * Mobile remains untouched.
+ * Mobile remains visually unchanged.
  */
 @media (min-width: 768px) {
   /* Keep the desktop content frame consistent with the Quick Facts reference width. */
@@ -31,7 +31,7 @@
     box-sizing: border-box;
   }
 
-  /* Reduce vertical whitespace between desktop sections without touching mobile. */
+  /* Reduce vertical whitespace between desktop sections without changing mobile. */
   main:has(> header + #top) #about {
     padding-top: 32px !important;
     padding-bottom: 32px !important;
@@ -114,5 +114,12 @@
   main:has(> header + #top) section:has(article.group),
   main:has(> header + #top) #contact {
     box-sizing: border-box;
+  }
+}
+
+/* Keep the previous mobile home-card presentation: two cards visible. */
+@media (max-width: 767px) {
+  main:has(> header + #top) section:has(article.group) article.group:nth-child(n + 3) {
+    display: none !important;
   }
 }
