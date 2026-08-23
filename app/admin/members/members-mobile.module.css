@@ -63,7 +63,15 @@
     flex: 1 1 auto;
   }
 
-  .page :global(input, select, textarea) {
+  .page :global(input) {
+    max-width: 100%;
+  }
+
+  .page :global(select) {
+    max-width: 100%;
+  }
+
+  .page :global(textarea) {
     max-width: 100%;
   }
 }
