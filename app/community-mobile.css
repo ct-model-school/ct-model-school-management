@@ -1,151 +1,44 @@
 /* Mobile-only community section refinement. Desktop remains unchanged. */
 @media (max-width: 639px) {
-  section:has(article.group.relative.flex.min-h-full) {
-    --community-accent: var(--school-primary);
-  }
+  section:has(article.group.relative.flex.min-h-full) { --community-accent: var(--school-primary); }
+  section:has(article.group.relative.flex.min-h-full) p.text-xs.font-extrabold.uppercase { font-size:0 !important; letter-spacing:.2em; }
+  section:has(article.group.relative.flex.min-h-full) p.text-xs.font-extrabold.uppercase::after { content:"OUR COMMUNITY"; font-size:11px; font-weight:900; letter-spacing:.2em; color:var(--school-primary); }
+  section:has(article.group.relative.flex.min-h-full) h2 { background:linear-gradient(90deg,var(--school-primary),color-mix(in srgb,var(--school-primary) 65%,var(--school-primary-soft)),var(--school-primary)); background-size:180% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:community-title-shift 5s ease-in-out infinite; }
+  @keyframes community-title-shift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full { min-height:0 !important; height:auto !important; }
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) > div { width:82px !important; height:82px !important; max-width:82px !important; aspect-ratio:1/1 !important; border-radius:9999px !important; border-width:4px !important; border-color:color-mix(in srgb,var(--school-primary) 72%,var(--school-surface)) !important; background:var(--school-primary-soft) !important; box-shadow:0 0 0 5px color-mix(in srgb,var(--school-primary) 10%,transparent),0 7px 18px color-mix(in srgb,var(--school-primary) 18%,transparent) !important; }
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) { padding-top:6px !important; padding-bottom:0 !important; }
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) img { border-radius:9999px !important; object-position:center top !important; }
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) { padding-top:3px !important; padding-bottom:5px !important; }
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) h3 { margin-top:0 !important; font-size:13px !important; line-height:1.15 !important; }
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) > span { margin-top:2px !important; padding-top:2px !important; padding-bottom:2px !important; }
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) p { margin-top:3px !important; line-height:1.2 !important; }
+  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full details { margin-top:3px !important; }
 
-  section:has(article.group.relative.flex.min-h-full) p.text-xs.font-extrabold.uppercase {
-    font-size: 0 !important;
-    letter-spacing: .2em;
-  }
+  /* Home only: very compact cards. */
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full { min-height:0 !important; height:auto !important; }
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:first-child { height:3px !important; min-height:3px !important; }
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) { padding-top:1px !important; padding-bottom:0 !important; }
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) > div { width:60px !important; height:60px !important; max-width:60px !important; }
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) { padding-top:1px !important; padding-bottom:2px !important; }
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) h3 { font-size:12px !important; line-height:1.05 !important; }
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) > span { margin-top:1px !important; padding-top:1px !important; padding-bottom:1px !important; }
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) p { margin-top:1px !important; line-height:1.1 !important; }
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full details { margin-top:1px !important; }
+  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:last-child { height:10px !important; min-height:10px !important; }
 
-  section:has(article.group.relative.flex.min-h-full) p.text-xs.font-extrabold.uppercase::after {
-    content: "OUR COMMUNITY";
-    font-size: 11px;
-    font-weight: 900;
-    letter-spacing: .2em;
-    color: var(--school-primary);
-  }
+  /* Mobile header. Theme colors only, desktop untouched. */
+  main > header { background:linear-gradient(135deg,color-mix(in srgb,var(--school-surface) 92%,var(--school-primary)),var(--school-surface)) !important; border-bottom:3px solid var(--school-primary) !important; box-shadow:0 5px 18px color-mix(in srgb,var(--school-primary) 16%,transparent) !important; }
+  main > header > div { padding-top:8px !important; padding-bottom:8px !important; }
+  main > header a[href="#top"] > span:last-child > span { background:linear-gradient(90deg,var(--school-primary),color-mix(in srgb,var(--school-primary) 60%,var(--school-primary-soft))); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  main > header button { border-color:var(--school-primary-border) !important; color:var(--school-primary) !important; background:var(--school-primary-soft) !important; box-shadow:0 4px 12px color-mix(in srgb,var(--school-primary) 14%,transparent) !important; }
+  main > header nav { border-top-color:var(--school-primary-border) !important; background:var(--school-primary-soft) !important; }
+  main > header nav a:active,main > header nav a:hover { background:var(--school-surface); color:var(--school-primary); border-color:var(--school-primary-border); }
 
-  section:has(article.group.relative.flex.min-h-full) h2 {
-    background: linear-gradient(90deg, var(--school-primary), color-mix(in srgb, var(--school-primary) 65%, #b026d8), var(--school-primary));
-    background-size: 180% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: community-title-shift 5s ease-in-out infinite;
-  }
-
-  @keyframes community-title-shift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-
-  /* Compact cards on mobile. */
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full {
-    min-height: 0 !important;
-    height: auto !important;
-  }
-
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) > div {
-    width: 82px !important;
-    height: 82px !important;
-    max-width: 82px !important;
-    aspect-ratio: 1 / 1 !important;
-    border-radius: 9999px !important;
-    border-width: 4px !important;
-    border-color: color-mix(in srgb, var(--school-primary) 72%, var(--school-surface)) !important;
-    background: var(--school-primary-soft) !important;
-    box-shadow: 0 0 0 5px color-mix(in srgb, var(--school-primary) 10%, transparent), 0 7px 18px color-mix(in srgb, var(--school-primary) 18%, transparent) !important;
-  }
-
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) {
-    padding-top: 6px !important;
-    padding-bottom: 0 !important;
-  }
-
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) img {
-    border-radius: 9999px !important;
-    object-position: center top !important;
-  }
-
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) {
-    padding-top: 3px !important;
-    padding-bottom: 5px !important;
-  }
-
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) h3 {
-    margin-top: 0 !important;
-    font-size: 13px !important;
-    line-height: 1.15 !important;
-  }
-
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) > span {
-    margin-top: 2px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-  }
-
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) p {
-    margin-top: 3px !important;
-    line-height: 1.2 !important;
-  }
-
-  section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full details {
-    margin-top: 3px !important;
-  }
-
-  /* Home only: make the mobile cards noticeably shorter. /people is excluded by its main.px-4.py-10 wrapper. */
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full {
-    min-height: 0 !important;
-    height: auto !important;
-  }
-
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:first-child {
-    height: 3px !important;
-  }
-
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) {
-    padding-top: 3px !important;
-  }
-
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) > div {
-    width: 72px !important;
-    height: 72px !important;
-    max-width: 72px !important;
-  }
-
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) {
-    padding-top: 2px !important;
-    padding-bottom: 4px !important;
-  }
-
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) h3 {
-    font-size: 12.5px !important;
-    line-height: 1.1 !important;
-  }
-
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) > span {
-    margin-top: 2px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-  }
-
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) p {
-    margin-top: 2px !important;
-    line-height: 1.15 !important;
-  }
-
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full details {
-    margin-top: 2px !important;
-  }
-
-  /* Home card accents: top 3px, bottom 8px. */
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:last-child {
-    height: 8px !important;
-  }
-
-  /* Reduce Home card content height by approximately 10% while preserving the current layout. */
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) > div {
-    width: 65px !important;
-    height: 65px !important;
-    max-width: 65px !important;
-  }
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(2) {
-    padding-top: 2px !important;
-  }
-  main:not(.px-4.py-10) > section:has(article.group.relative.flex.min-h-full) article.group.relative.flex.min-h-full > div:nth-child(3) {
-    padding-top: 1px !important;
-    padding-bottom: 3px !important;
-  }
+  /* Mobile footer. Theme colors only, desktop untouched. */
+  main > footer { position:relative; overflow:hidden; background:linear-gradient(160deg,var(--school-surface),var(--school-primary-soft)) !important; border-top:3px solid var(--school-primary) !important; box-shadow:0 -5px 20px color-mix(in srgb,var(--school-primary) 12%,transparent) !important; }
+  main > footer::before { content:""; position:absolute; width:150px; height:150px; right:-55px; top:-65px; border-radius:9999px; background:color-mix(in srgb,var(--school-primary) 14%,transparent); pointer-events:none; }
+  main > footer::after { content:""; position:absolute; width:100px; height:100px; left:-45px; bottom:-45px; border-radius:9999px; background:color-mix(in srgb,var(--school-primary) 10%,transparent); pointer-events:none; }
+  main > footer a { color:var(--school-primary); }
+  main > footer a:hover { text-decoration:underline; text-underline-offset:3px; }
 }
