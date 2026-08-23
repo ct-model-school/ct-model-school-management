@@ -1,34 +1,93 @@
-/* C.T. Model School | Desktop alignment correction
- * Desktop-only geometry correction. Mobile remains untouched.
+/* C.T. Model School | Desktop alignment + polish
+ * Desktop only. Hero image, header and footer geometry remain untouched.
+ * Mobile remains untouched.
  */
-@media (min-width:768px) {
-  /* Keep the quick-facts row visually aligned with the main desktop content. */
+@media (min-width: 768px) {
+  /* Keep editable sections aligned to their existing desktop content frame. */
+  main:has(> header + #top) > #top + section + section + section > div,
+  main:has(> header + #top) #about > div,
+  main:has(> header + #top) #principal > div,
+  main:has(> header + #top) section:has(article.group) > div,
+  main:has(> header + #top) #contact > div {
+    width: 100% !important;
+    max-width: none !important;
+    margin-inline: auto !important;
+    box-sizing: border-box;
+  }
+
+  /* Quick Facts: undo the previous +40px expansion that pushed the row outside the reference frame. */
+  main:has(> header + #top) > #top + section + section + section {
+    overflow: visible;
+  }
   main:has(> header + #top) > #top + section + section + section > div {
-    width:calc(100% + 40px) !important;
-    max-width:none !important;
-    margin-left:-20px !important;
-    margin-right:-20px !important;
+    padding-inline: 0 !important;
+  }
+  main:has(> header + #top) > #top + section + section + section > div > div {
+    min-width: 0;
+    box-sizing: border-box;
   }
 
-  /* Restore the wider desktop about panels so text does not feel squeezed. */
+  /* About: balanced desktop proportions, no squeezed text. */
   main:has(> header + #top) #about > div {
-    width:calc(100% + 40px) !important;
-    max-width:none !important;
-    margin-left:-20px !important;
-    margin-right:-20px !important;
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    align-items: stretch;
+    gap: 24px;
   }
-
   main:has(> header + #top) #about > div > div {
-    min-width:0;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
-
   main:has(> header + #top) #about h2,
   main:has(> header + #top) #about p {
-    overflow-wrap:normal;
-    word-break:normal;
+    max-width: none;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+  main:has(> header + #top) #about h2 {
+    letter-spacing: -0.025em;
   }
 
-  main:has(> header + #top) #about h2 {
-    letter-spacing:-0.025em;
+  /* Principal: preserve the desktop structure while preventing narrow text columns. */
+  main:has(> header + #top) #principal > div > div {
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  main:has(> header + #top) #principal blockquote {
+    min-width: 0;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  /* Home community panels: four cards per row on desktop. */
+  main:has(> header + #top) section:has(article.group) div:has(> article.group) {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    align-items: stretch;
+  }
+  main:has(> header + #top) section:has(article.group) article.group {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Keep compact community cards readable after moving from 2 to 4 columns. */
+  main:has(> header + #top) section:has(article.group) article.group > div:nth-child(2) > div {
+    width: 88px;
+    max-width: 88px;
+  }
+  main:has(> header + #top) section:has(article.group) article.group h3 {
+    overflow-wrap: anywhere;
+  }
+
+  /* Consistent sizing behavior for the editable desktop sections. */
+  main:has(> header + #top) > #top + section + section + section,
+  main:has(> header + #top) #about,
+  main:has(> header + #top) #principal,
+  main:has(> header + #top) section:has(article.group),
+  main:has(> header + #top) #contact {
+    box-sizing: border-box;
   }
 }
