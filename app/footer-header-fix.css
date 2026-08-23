@@ -1,0 +1,17 @@
+/* Final mobile layout fix: keep the public header pinned and remove the
+   viewport-sized blank area that can remain below the footer. */
+@media (max-width: 767px) {
+  main:has(> header + #top) {
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  main:has(> header + #top) > header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9999 !important;
+    transform: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
