@@ -5,6 +5,7 @@ import "./store-inventory-mobile.css";
 import "./mobile-responsive.css";
 import "./hero-fix.css";
 import "./contact-enhancements.css";
+import "./community-mobile.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import PublicPeopleNav from "@/app/components/PublicPeopleNav";
 
