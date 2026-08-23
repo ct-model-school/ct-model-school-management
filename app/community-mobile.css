@@ -35,4 +35,22 @@
     filter:blur(0) !important;
     transform:scale(1) !important;
   }
+
+  /* Contact mobile: keep the panel intact, make it 20% more compact, and fix heading contrast. */
+  section#contact > div > div:first-child {
+    transform:scale(.8) !important;
+    transform-origin:top center !important;
+    width:125% !important;
+    margin-left:-12.5% !important;
+    margin-bottom:-20% !important;
+  }
+  section#contact > div > div:first-child h2 {
+    color:var(--school-surface) !important;
+    -webkit-text-fill-color:var(--school-surface) !important;
+  }
+  section#contact > div > div:first-child h2 span,
+  section#contact > div > div:first-child h2 strong {
+    color:var(--school-surface) !important;
+    -webkit-text-fill-color:var(--school-surface) !important;
+  }
 }
