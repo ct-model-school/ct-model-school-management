@@ -154,12 +154,12 @@ main.px-4.py-10 article.group > div:nth-child(3) a.flex {
   height: 1.9rem;
 }
 
-/* Scholarship cards: move the complete visual content group down into the true vertical center. */
+/* Desktop: use the same balanced vertical position for every community card. */
 @media (min-width: 768px) {
-  main > section:has(a[href="/people#scholarship"]) article.group > div:nth-child(2),
-  main.px-4.py-10:has(a[href="/people#scholarship"]) article.group > div:nth-child(2),
-  main > section:has(a[href="/people#scholarship"]) article.group > div:nth-child(3),
-  main.px-4.py-10:has(a[href="/people#scholarship"]) article.group > div:nth-child(3) {
+  main > section:has(article) article.group > div:nth-child(2),
+  main.px-4.py-10 article.group > div:nth-child(2),
+  main > section:has(article) article.group > div:nth-child(3),
+  main.px-4.py-10 article.group > div:nth-child(3) {
     transform: translateY(32px);
   }
 
