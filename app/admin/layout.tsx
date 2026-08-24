@@ -5,7 +5,7 @@ import { getCurrentAdminPermissions } from "@/lib/adminPermissions";
 
 const primaryNavigation = [
   { href: "/admin", label: "Dashboard", permission: "dashboard" },
-  { href: "/admin/item-sr", label: "Item SR", adminOnly: true },
+  { href: "/admin/inventory", label: "Inventory", adminOnly: true },
   { href: "/admin/settings", label: "Settings", adminOnly: true },
   { href: "/admin/roles", label: "Role Management", adminOnly: true },
 ];
@@ -21,15 +21,10 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
   const requestHeaders = await headers();
   const pathname = requestHeaders.get("x-admin-pathname") || "";
 
-  const routePermission: Array<[string, string | string[]]> = [
-    ["/admin/students", "students"], ["/admin/parents", "parents"], ["/admin/people", "people"], ["/admin/teachers", "teachers"], ["/admin/accounts", "accounts"], ["/admin/inventory", "inventory"], ["/admin/store-members", "store_members"], ["/admin/notices", "notices"], ["/admin/results", "results"], ["/admin/members", ["teachers", "accounts", "store_members"]],
-  ];
-  const matchedRoute = routePermission.find(([prefix]) => pathname === prefix || pathname.startsWith(`${prefix}/`));
-  if (matchedRoute) { const required = Array.isArray(matchedRoute[1]) ? matchedRoute[1] : [matchedRoute[1]]; if (!required.some((key) => Boolean(permissions[key]))) redirect("/admin"); }
   if (pathname === "/admin" || pathname === "/admin/") { if (!permissions.dashboard) redirect("/admin/login"); }
   if (pathname === "/admin/settings" || pathname.startsWith("/admin/settings/")) { if (!adminOnly) redirect("/admin"); }
   if (pathname === "/admin/roles" || pathname.startsWith("/admin/roles/")) { if (!adminOnly) redirect("/admin"); }
-  if (pathname === "/admin/item-sr" || pathname.startsWith("/admin/item-sr/")) { if (!adminOnly) redirect("/admin"); }
+  if (pathname === "/admin/inventory" || pathname.startsWith("/admin/inventory/")) { if (!adminOnly) redirect("/admin"); }
 
   const roleLabel = roleName.replace(/_/g, " ");
   const visiblePrimary = primaryNavigation.filter((item) => {
