@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import ItemSrModule from "./item-sr";
 import MySrList from "./my-sr-list";
+import InventoryModule from "./inventory";
 
 type CurrentUser = { member_id: string; member_type: string; access_role: string; role_name: string; permissions: Record<string, boolean>; full_name: string; photo_url: string | null; email: string | null; phone: string | null; designation: string | null; department: string | null; subject: string | null };
-type ModuleKey = "dashboard" | "profile" | "item_sr" | "attendance" | "notices";
+type ModuleKey = "dashboard" | "profile" | "item_sr" | "attendance" | "inventory" | "notices";
 const modules: { key: ModuleKey; label: string }[] = [
-  { key: "dashboard", label: "Dashboard" }, { key: "profile", label: "Profile" }, { key: "item_sr", label: "Item SR" }, { key: "attendance", label: "Attendance" }, { key: "notices", label: "Notices" },
+  { key: "dashboard", label: "Dashboard" }, { key: "profile", label: "Profile" }, { key: "item_sr", label: "Item SR" }, { key: "attendance", label: "Attendance" }, { key: "inventory", label: "Inventory" }, { key: "notices", label: "Notices" },
 ];
 
 export default function MemberDashboardPage() {
@@ -28,7 +29,8 @@ export default function MemberDashboardPage() {
       {activeModule === "dashboard" && <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"><div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-5"><p className="text-xs font-bold text-[var(--school-muted)]">Member ID</p><p className="mt-2 text-lg font-black theme-primary">{user.member_id}</p></div><div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-5"><p className="text-xs font-bold text-[var(--school-muted)]">Designation</p><p className="mt-2 text-lg font-black text-[var(--school-text)]">{user.designation || "Teacher"}</p></div><div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-5"><p className="text-xs font-bold text-[var(--school-muted)]">Department</p><p className="mt-2 text-lg font-black text-[var(--school-text)]">{user.department || "-"}</p></div></div>}
       {activeModule === "profile" && <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[["Member ID",user.member_id],["Full Name",user.full_name],["Designation",user.designation||"-"],["Department",user.department||"-"],["Subject",user.subject||"-"],["Phone",user.phone||"-"],["Email",user.email||"-"]].map(([label,value])=><div key={label} className="rounded-2xl border border-[var(--school-border)] p-4"><p className="text-[10px] font-bold uppercase tracking-wider text-[var(--school-muted)]">{label}</p><p className="mt-1 break-words text-sm font-bold text-[var(--school-text)]">{value}</p></div>)}</div>}
       {activeModule === "item_sr" && <><ItemSrModule department={user.department} /><MySrList /></>}
-      {activeModule !== "dashboard" && activeModule !== "profile" && activeModule !== "item_sr" && <div className="mt-6 rounded-2xl border border-dashed border-[var(--school-border)] bg-[var(--school-primary-soft)] p-8 text-center"><h3 className="text-base font-black text-[var(--school-text)]">{activeLabel}</h3><p className="mt-2 text-sm text-[var(--school-muted)]">This section is ready for its module features.</p></div>}
+      {activeModule === "inventory" && <InventoryModule />}
+      {activeModule !== "dashboard" && activeModule !== "profile" && activeModule !== "item_sr" && activeModule !== "inventory" && <div className="mt-6 rounded-2xl border border-dashed border-[var(--school-border)] bg-[var(--school-primary-soft)] p-8 text-center"><h3 className="text-base font-black text-[var(--school-text)]">{activeLabel}</h3><p className="mt-2 text-sm text-[var(--school-muted)]">This section is ready for its module features.</p></div>}
     </section>
   </div></main>;
 }
