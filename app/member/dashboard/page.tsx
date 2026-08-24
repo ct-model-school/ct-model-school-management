@@ -7,6 +7,7 @@ import ItemSrModule from "./item-sr";
 import MySrList from "./my-sr-list";
 import InventoryModule from "./inventory";
 import AccountsModule from "./accounts";
+import MemberAccountsV2 from "./member-accounts-v2";
 
 type InventoryPermissions = { view: boolean; add: boolean; edit: boolean; remove: boolean; sr_approval: boolean };
 type ItemSrPermissions = { view: boolean; create: boolean; history: boolean };
@@ -98,7 +99,9 @@ export default function MemberDashboardPage() {
   const accounts = (user.permissions?.accounts && typeof user.permissions.accounts === "object" ? user.permissions.accounts : {}) as Record<string, boolean>;
   const itemSrAllowed = Boolean(itemSr.view || itemSr.create || itemSr.history);
   const inventoryAllowed = Boolean(inventory.view || inventory.add || inventory.edit || inventory.remove || inventory.sr_approval);
-  const accountsAllowed = Boolean(accounts.salary_payment || accounts.__all);
+  const accountsManagementAllowed = Boolean(accounts.salary_view || accounts.salary_approval || accounts.salary_payment);
+  const accountsAllowed = accountsManagementAllowed;
+  const salaryStatusAllowed = Boolean(accounts.salary_status);
 
   const canAccess = (key: ModuleKey) => {
     if (key === "inventory") return inventoryAllowed;
@@ -123,8 +126,8 @@ export default function MemberDashboardPage() {
     </header>
     <section className="mt-5 rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-7">
       <div className="flex flex-col gap-1 border-b border-[var(--school-border)] pb-5"><p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">{activeLabel}</p><h2 className="text-2xl font-black text-[var(--school-text)]">{effectiveActiveModule === "dashboard" ? `Welcome back, ${user.full_name}` : activeLabel}</h2></div>
-      {effectiveActiveModule === "dashboard" && <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"><div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-5"><p className="text-xs font-bold text-[var(--school-muted)]">Member ID</p><p className="mt-2 text-lg font-black theme-primary">{user.member_id}</p></div><div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-5"><p className="text-xs font-bold text-[var(--school-muted)]">Designation</p><p className="mt-2 text-lg font-black text-[var(--school-text)]">{user.designation || "-"}</p></div><div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-5"><p className="text-xs font-bold text-[var(--school-muted)]">Department</p><p className="mt-2 text-lg font-black text-[var(--school-text)]">{user.department || "-"}</p></div></div>}
-      {effectiveActiveModule === "profile" && <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[["Member ID", user.member_id], ["Full Name", user.full_name], ["Designation", user.designation || "-"], ["Department", user.department || "-"], ["Subject", user.subject || "-"], ["Phone", user.phone || "-"], ["Email", user.email || "-"]].map(([label, value]) => <div key={label} className="rounded-2xl border border-[var(--school-border)] p-4"><p className="text-[10px] font-bold uppercase tracking-wider text-[var(--school-muted)]">{label}</p><p className="mt-1 break-words text-sm font-bold text-[var(--school-text)]">{value}</p></div>)}</div>}
+      {effectiveActiveModule === "dashboard" && <><div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"><div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-5"><p className="text-xs font-bold text-[var(--school-muted)]">Member ID</p><p className="mt-2 text-lg font-black theme-primary">{user.member_id}</p></div><div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-5"><p className="text-xs font-bold text-[var(--school-muted)]">Designation</p><p className="mt-2 text-lg font-black text-[var(--school-text)]">{user.designation || "-"}</p></div><div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-5"><p className="text-xs font-bold text-[var(--school-muted)]">Department</p><p className="mt-2 text-lg font-black text-[var(--school-text)]">{user.department || "-"}</p></div></div>{salaryStatusAllowed && <MemberAccountsV2 compact personalOnly />}</>}
+      {effectiveActiveModule === "profile" && <><div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[["Member ID", user.member_id], ["Full Name", user.full_name], ["Designation", user.designation || "-"], ["Department", user.department || "-"], ["Subject", user.subject || "-"], ["Phone", user.phone || "-"], ["Email", user.email || "-"]].map(([label, value]) => <div key={label} className="rounded-2xl border border-[var(--school-border)] p-4"><p className="text-[10px] font-bold uppercase tracking-wider text-[var(--school-muted)]">{label}</p><p className="mt-1 break-words text-sm font-bold text-[var(--school-text)]">{value}</p></div>)}</div>{salaryStatusAllowed && <MemberAccountsV2 personalOnly />}</>}
       {effectiveActiveModule === "item_sr" && <><ItemSrModule department={user.department} permissions={itemSr} /><MySrList canView={Boolean(itemSr.history)} /></>}
       {effectiveActiveModule === "inventory" && <InventoryModule permissions={inventory} />}
       {effectiveActiveModule === "accounts" && <AccountsModule permissions={accounts} />}
