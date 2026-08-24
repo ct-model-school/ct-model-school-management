@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 
 type Item = { id: string; item_code: string; item_name: string; item_type: string | null; specification: string | null; model: string | null; unit: string; current_stock: number; stock_status: string };
 type SelectedItem = Item & { quantity: number; note: string };
-type Permissions = { view?: boolean; create?: boolean; history?: boolean; approve?: boolean; issue?: boolean };
+type Permissions = { view?: boolean; create?: boolean; history?: boolean };
 
 type SubmittedSr = { srNumber: string; className: string; department: string; details: string; itemCount: number; totalQty: number };
 const statusClass = (status: string) => status.toLowerCase().includes("out") ? "text-red-600 bg-red-50" : status.toLowerCase().includes("low") ? "text-amber-700 bg-amber-50" : "theme-primary bg-[var(--school-primary-soft)]";
