@@ -12,12 +12,13 @@ type Role = {
   is_active: boolean;
 };
 
-type PermissionKey = "dashboard" | "profile" | "item_sr" | "attendance" | "students" | "parents" | "people" | "teachers" | "accounts" | "store_members" | "inventory" | "notices" | "results";
+type PermissionKey = "dashboard" | "profile" | "item_sr" | "sr" | "attendance" | "students" | "parents" | "people" | "teachers" | "accounts" | "store_members" | "inventory" | "notices" | "results";
 
 const permissionModules: { key: PermissionKey; label: string; description: string }[] = [
   { key: "dashboard", label: "Dashboard", description: "View the member dashboard" },
   { key: "profile", label: "Profile", description: "View and manage the member profile" },
   { key: "item_sr", label: "Item SR", description: "Create and view inventory service requests" },
+  { key: "sr", label: "SR Approval", description: "Review, approve, reject and issue service requests" },
   { key: "attendance", label: "Attendance", description: "Access attendance features" },
   { key: "students", label: "Students", description: "Access student records and management" },
   { key: "parents", label: "Parents & Guardians", description: "Access parent and guardian records" },
