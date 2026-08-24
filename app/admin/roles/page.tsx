@@ -5,19 +5,143 @@ import { createClient } from "@/lib/supabase/client";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { accountsPermissionList } from "@/app/member/dashboard/accounts";
 
-type BoolMap=Record<string,boolean>; type Role={id:string;role_name:string;permissions:Record<string,unknown>;is_system:boolean;is_active:boolean}; type Inventory={view:boolean;add:boolean;edit:boolean;remove:boolean;sr_approval:boolean}; type ItemSr={view:boolean;create:boolean;history:boolean};
-const legacy=[["dashboard","Dashboard"],["profile","Profile"],["attendance","Attendance"],["students","Students"],["parents","Parents & Guardians"],["people","People & Achievements"],["teachers","Teachers & Staff"],["store_members","Store Members"],["notices","Notices"],["results","Results & Reports"]] as const;
-const inventoryList=[["view","View / Search Items"],["add","Add New Item"],["edit","Edit Item"],["remove","Remove Item"],["sr_approval","SR Approval"]] as const; const itemSrList=[["view","View / Search Items"],["create","Create SR"],["history","View Own SR History"]] as const;
-const empty=(keys:readonly string[]):BoolMap=>Object.fromEntries(keys.map(k=>[k,false])); const emptyInventory=():Inventory=>({view:false,add:false,edit:false,remove:false,sr_approval:false}); const emptyItemSr=():ItemSr=>({view:false,create:false,history:false});
-export default function AdminRolesPage(){
- const supabase=useMemo(()=>createClient(),[]); const [roles,setRoles]=useState<Role[]>([]); const [roleName,setRoleName]=useState(""); const [editingId,setEditingId]=useState<string|null>(null); const [inventory,setInventory]=useState<Inventory>(emptyInventory()); const [itemSr,setItemSr]=useState<ItemSr>(emptyItemSr()); const [accounts,setAccounts]=useState<BoolMap>(()=>empty(accountsPermissionList.map(x=>x.key))); const [other,setOther]=useState<BoolMap>(()=>empty(legacy.map(x=>x[0]))); const [loading,setLoading]=useState(true); const [saving,setSaving]=useState(false); const [message,setMessage]=useState(""); const [error,setError]=useState("");
- async function loadRoles(){setLoading(true);const {data,error}=await supabase.rpc("store_admin_list_member_roles");if(error)setError(error.message);else setRoles((data??[]) as Role[]);setLoading(false);} useEffect(()=>{void loadRoles();},[]);
- function reset(){setEditingId(null);setRoleName("");setInventory(emptyInventory());setItemSr(emptyItemSr());setAccounts(empty(accountsPermissionList.map(x=>x.key)));setOther(empty(legacy.map(x=>x[0])));}
- function editRole(role:Role){const inv=role.permissions?.inventory&&typeof role.permissions.inventory==="object"?role.permissions.inventory as Partial<Inventory>:{};const sr=role.permissions?.item_sr&&typeof role.permissions.item_sr==="object"?role.permissions.item_sr as Partial<ItemSr>:{};const acc=role.permissions?.accounts&&typeof role.permissions.accounts==="object"?role.permissions.accounts as BoolMap:{};setEditingId(role.id);setRoleName(role.role_name);setInventory({...emptyInventory(),...inv});setItemSr({...emptyItemSr(),...sr});setAccounts({...empty(accountsPermissionList.map(x=>x.key)),...acc});setOther(Object.fromEntries(legacy.map(([key])=>[key,Boolean(role.permissions?.[key])] )));setMessage("");setError("");window.scrollTo({top:0,behavior:"smooth"});}
- function toggleAll(value:boolean){setInventory({view:value,add:value,edit:value,remove:value,sr_approval:value});setItemSr({view:value,create:value,history:value});setAccounts(Object.fromEntries(accountsPermissionList.map(x=>[x.key,value])));setOther(Object.fromEntries(legacy.map(([key])=>[key,value])));}
- async function save(){setSaving(true);setError("");const permissions={...other,inventory,item_sr,accounts};const {error}=await supabase.rpc("store_admin_save_member_role",{p_id:editingId,p_role_name:roleName,p_permissions:permissions});if(error)setError(error.message);else{setMessage(editingId?"Role updated successfully.":"Role created successfully.");reset();await loadRoles();}setSaving(false);}
- async function remove(role:Role){if(role.is_system){setError("System roles cannot be removed.");return;}if(!window.confirm(`Remove role “${role.role_name}”?`))return;const {error}=await supabase.rpc("store_admin_remove_member_role",{p_id:role.id});if(error)setError(error.message);else{setMessage(`${role.role_name} removed.`);await loadRoles();}}
- const rows=(title:string,desc:string,entries:readonly (readonly [string,string])[],values:BoolMap,setValues:React.Dispatch<React.SetStateAction<BoolMap>>,count:string)=><div className="mt-5 rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-4"><div className="flex items-start justify-between gap-3"><div><p className="text-[10px] font-black uppercase tracking-[0.14em] theme-primary">Ready Category</p><h3 className="mt-1 text-base font-black">{title}</h3><p className="mt-0.5 text-xs text-[var(--school-muted)]">{desc}</p></div><span className="rounded-full border border-[var(--school-border)] bg-[var(--school-surface)] px-2.5 py-1 text-[10px] font-black">{count}</span></div><div className="mt-3 grid gap-2 sm:grid-cols-2">{entries.map(([key,label])=><label key={key} className="flex cursor-pointer items-center gap-3 rounded-xl border border-[var(--school-border)] bg-[var(--school-surface)] p-3"><input type="checkbox" checked={Boolean(values[key])} onChange={()=>setValues(current=>({...current,[key]:!current[key]}))} className="h-4 w-4"/><span className="min-w-0 flex-1 text-sm font-bold">{label}</span><span className={`rounded-full px-2 py-1 text-[10px] font-black ${values[key]?"theme-primary-bg":"border border-[var(--school-border)] text-[var(--school-muted)]"}`}>{values[key]?"ON":"OFF"}</span></label>)}</div></div>;
- const invMap=Object.fromEntries(inventoryList.map(([k])=>[k,inventory[k as keyof Inventory]])); const srMap=Object.fromEntries(itemSrList.map(([k])=>[k,itemSr[k as keyof ItemSr]]));
- return <AdminPageShell eyebrow="Access Control" title="Role Management" description="Every ready category is independent. Admin can enable or disable each permission for each role without duplicate access names.">{error?<p className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>:null}{message?<p className="mb-5 rounded-2xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] px-4 py-3 text-sm theme-primary">{message}</p>:null}<div className="grid gap-5 xl:grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)]"><section className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-6"><div className="flex items-start justify-between gap-3"><div><p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">Permission Builder</p><h2 className="mt-1 text-xl font-black">{editingId?"Edit Role":"Create New Role"}</h2><p className="mt-1 text-xs leading-5 text-[var(--school-muted)]">Inventory, Item SR and Accounts are separate categories. Turning one on never turns another on.</p></div>{editingId?<button type="button" onClick={reset} className="rounded-xl border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Cancel</button>:null}</div><label className="mt-5 block"><span className="label">Role Name *</span><input className="field w-full" value={roleName} onChange={e=>setRoleName(e.target.value)} placeholder="e.g. Accounts Manager"/></label><div className="mt-4 flex flex-wrap gap-2"><button type="button" onClick={()=>toggleAll(true)} className="rounded-xl border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Enable All</button><button type="button" onClick={()=>toggleAll(false)} className="rounded-xl border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Disable All</button></div>{rows("Inventory","Items, stock and SR processing.",inventoryList,invMap,(fn)=>setInventory(current=>({...current,...fn(current)})) as never,`${Object.values(inventory).filter(Boolean).length}/5`)}{rows("Item SR","Member-side Service Request permissions.",itemSrList,srMap,(fn)=>setItemSr(current=>({...current,...fn(current)})) as never,`${Object.values(itemSr).filter(Boolean).length}/3`)}{rows("Accounts","School financial operations. HR prepares and approves salary sheets; Accounts processes approved salary payments and records the financial transaction.",accountsPermissionList.map(x=>[x.key,x.title] as const),accounts,setAccounts,`${Object.values(accounts).filter(Boolean).length}/${accountsPermissionList.length}`)}{rows("Other Permissions","Existing non-category permissions remain independent.",legacy,other,setOther,`${Object.values(other).filter(Boolean).length}/${legacy.length}`)}<button type="button" disabled={saving||!roleName.trim()} onClick={()=>void save()} className="mt-5 w-full rounded-xl px-5 py-3.5 text-sm font-bold theme-primary-bg disabled:opacity-60">{saving?"Saving...":editingId?"Update Role":"Create Role"}</button></section><section className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-6"><p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">Role Library</p><h2 className="mt-1 text-xl font-black">Available Roles</h2><p className="mt-1 text-xs leading-5 text-[var(--school-muted)]">Accounts permissions are stored under one independent <code>accounts</code> permission object.</p><div className="mt-5 space-y-3">{loading?<p className="rounded-2xl border border-dashed border-[var(--school-border)] p-8 text-center text-sm text-[var(--school-muted)]">Loading roles...</p>:null}{!loading&&roles.map(role=>{const acc=role.permissions?.accounts&&typeof role.permissions.accounts==="object"?role.permissions.accounts as BoolMap:{};const count=accountsPermissionList.filter(x=>Boolean(acc[x.key])).length;return <article key={role.id} className="rounded-2xl border border-[var(--school-border)] p-4"><div className="flex items-start justify-between gap-3"><div><h3 className="text-sm font-black">{role.role_name}</h3><p className="mt-1 text-[10px] text-[var(--school-muted)]">Accounts {count}/{accountsPermissionList.length}</p></div><div className="flex gap-2"><button type="button" onClick={()=>editRole(role)} className="rounded-xl border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Edit</button>{!role.is_system?<button type="button" onClick={()=>void remove(role)} className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600">Remove</button>:null}</div></div>{count?<div className="mt-3 flex flex-wrap gap-1.5">{accountsPermissionList.filter(x=>Boolean(acc[x.key])).map(x=><span key={x.key} className="rounded-lg bg-[var(--school-primary-soft)] px-2 py-1 text-[10px] font-semibold theme-primary">{x.title}</span>)}</div>:null}</article>})}</div></section></div></AdminPageShell>;
+type BoolMap = Record<string, boolean>;
+type Role = { id: string; role_name: string; permissions: Record<string, unknown>; is_system: boolean; is_active: boolean };
+type Inventory = { view: boolean; add: boolean; edit: boolean; remove: boolean; sr_approval: boolean };
+type ItemSr = { view: boolean; create: boolean; history: boolean };
+
+const legacy = [["dashboard", "Dashboard"], ["profile", "Profile"], ["attendance", "Attendance"], ["students", "Students"], ["parents", "Parents & Guardians"], ["people", "People & Achievements"], ["teachers", "Teachers & Staff"], ["store_members", "Store Members"], ["notices", "Notices"], ["results", "Results & Reports"]] as const;
+const inventoryList = [["view", "View / Search Items"], ["add", "Add New Item"], ["edit", "Edit Item"], ["remove", "Remove Item"], ["sr_approval", "SR Approval"]] as const;
+const itemSrList = [["view", "View / Search Items"], ["create", "Create SR"], ["history", "View Own SR History"]] as const;
+const empty = (keys: readonly string[]): BoolMap => Object.fromEntries(keys.map(k => [k, false]));
+const emptyInventory = (): Inventory => ({ view: false, add: false, edit: false, remove: false, sr_approval: false });
+const emptyItemSr = (): ItemSr => ({ view: false, create: false, history: false });
+
+export default function AdminRolesPage() {
+  const supabase = useMemo(() => createClient(), []);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [roleName, setRoleName] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [inventory, setInventory] = useState<Inventory>(emptyInventory());
+  const [itemSr, setItemSr] = useState<ItemSr>(emptyItemSr());
+  const [accounts, setAccounts] = useState<BoolMap>(() => empty(accountsPermissionList.map(x => x.key)));
+  const [other, setOther] = useState<BoolMap>(() => empty(legacy.map(x => x[0])));
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  async function loadRoles() {
+    setLoading(true);
+    const { data, error } = await supabase.rpc("store_admin_list_member_roles");
+    if (error) setError(error.message); else setRoles((data ?? []) as Role[]);
+    setLoading(false);
+  }
+
+  useEffect(() => { void loadRoles(); }, []);
+
+  function reset() {
+    setEditingId(null);
+    setRoleName("");
+    setInventory(emptyInventory());
+    setItemSr(emptyItemSr());
+    setAccounts(empty(accountsPermissionList.map(x => x.key)));
+    setOther(empty(legacy.map(x => x[0])));
+  }
+
+  function editRole(role: Role) {
+    const inv = role.permissions?.inventory && typeof role.permissions.inventory === "object" ? role.permissions.inventory as Partial<Inventory> : {};
+    const sr = role.permissions?.item_sr && typeof role.permissions.item_sr === "object" ? role.permissions.item_sr as Partial<ItemSr> : {};
+    const acc = role.permissions?.accounts && typeof role.permissions.accounts === "object" ? role.permissions.accounts as BoolMap : {};
+    setEditingId(role.id);
+    setRoleName(role.role_name);
+    setInventory({ ...emptyInventory(), ...inv });
+    setItemSr({ ...emptyItemSr(), ...sr });
+    setAccounts({ ...empty(accountsPermissionList.map(x => x.key)), ...acc });
+    setOther(Object.fromEntries(legacy.map(([key]) => [key, Boolean(role.permissions?.[key])] )));
+    setMessage("");
+    setError("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function toggleAll(value: boolean) {
+    setInventory({ view: value, add: value, edit: value, remove: value, sr_approval: value });
+    setItemSr({ view: value, create: value, history: value });
+    setAccounts(Object.fromEntries(accountsPermissionList.map(x => [x.key, value])));
+    setOther(Object.fromEntries(legacy.map(([key]) => [key, value])));
+  }
+
+  async function save() {
+    setSaving(true);
+    setError("");
+    const permissions = { ...other, inventory, item_sr: itemSr, accounts };
+    const { error } = await supabase.rpc("store_admin_save_member_role", { p_id: editingId, p_role_name: roleName, p_permissions: permissions });
+    if (error) setError(error.message);
+    else {
+      setMessage(editingId ? "Role updated successfully." : "Role created successfully.");
+      reset();
+      await loadRoles();
+    }
+    setSaving(false);
+  }
+
+  async function remove(role: Role) {
+    if (role.is_system) { setError("System roles cannot be removed."); return; }
+    if (!window.confirm(`Remove role “${role.role_name}”?`)) return;
+    const { error } = await supabase.rpc("store_admin_remove_member_role", { p_id: role.id });
+    if (error) setError(error.message);
+    else { setMessage(`${role.role_name} removed.`); await loadRoles(); }
+  }
+
+  const rows = (
+    title: string,
+    desc: string,
+    entries: readonly (readonly [string, string])[],
+    values: BoolMap,
+    setValues: React.Dispatch<React.SetStateAction<BoolMap>>,
+    count: string,
+  ) => <div className="mt-5 rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-4">
+    <div className="flex items-start justify-between gap-3">
+      <div><p className="text-[10px] font-black uppercase tracking-[0.14em] theme-primary">Ready Category</p><h3 className="mt-1 text-base font-black">{title}</h3><p className="mt-0.5 text-xs text-[var(--school-muted)]">{desc}</p></div>
+      <span className="rounded-full border border-[var(--school-border)] bg-[var(--school-surface)] px-2.5 py-1 text-[10px] font-black">{count}</span>
+    </div>
+    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+      {entries.map(([key, label]) => <label key={key} className="flex cursor-pointer items-center gap-3 rounded-xl border border-[var(--school-border)] bg-[var(--school-surface)] p-3">
+        <input type="checkbox" checked={Boolean(values[key])} onChange={() => setValues(current => ({ ...current, [key]: !current[key] }))} className="h-4 w-4" />
+        <span className="min-w-0 flex-1 text-sm font-bold">{label}</span>
+        <span className={`rounded-full px-2 py-1 text-[10px] font-black ${values[key] ? "theme-primary-bg" : "border border-[var(--school-border)] text-[var(--school-muted)]"}`}>{values[key] ? "ON" : "OFF"}</span>
+      </label>)}
+    </div>
+  </div>;
+
+  const inventoryValues = Object.fromEntries(inventoryList.map(([key]) => [key, inventory[key as keyof Inventory]]));
+  const itemSrValues = Object.fromEntries(itemSrList.map(([key]) => [key, itemSr[key as keyof ItemSr]]));
+  const setInventoryMap: React.Dispatch<React.SetStateAction<BoolMap>> = updater => setInventory(current => {
+    const currentMap = Object.fromEntries(inventoryList.map(([key]) => [key, current[key as keyof Inventory]]));
+    const next = typeof updater === "function" ? updater(currentMap) : updater;
+    return { ...current, ...next };
+  });
+  const setItemSrMap: React.Dispatch<React.SetStateAction<BoolMap>> = updater => setItemSr(current => {
+    const currentMap = Object.fromEntries(itemSrList.map(([key]) => [key, current[key as keyof ItemSr]]));
+    const next = typeof updater === "function" ? updater(currentMap) : updater;
+    return { ...current, ...next };
+  });
+
+  return <AdminPageShell eyebrow="Access Control" title="Role Management" description="Every ready category is independent. Admin can enable or disable each permission for each role without duplicate access names.">
+    {error ? <p className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
+    {message ? <p className="mb-5 rounded-2xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] px-4 py-3 text-sm theme-primary">{message}</p> : null}
+    <div className="grid gap-5 xl:grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)]">
+      <section className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-6">
+        <div className="flex items-start justify-between gap-3"><div><p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">Permission Builder</p><h2 className="mt-1 text-xl font-black">{editingId ? "Edit Role" : "Create New Role"}</h2><p className="mt-1 text-xs leading-5 text-[var(--school-muted)]">Inventory, Item SR and Accounts are separate categories. Turning one on never turns another on.</p></div>{editingId ? <button type="button" onClick={reset} className="rounded-xl border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Cancel</button> : null}</div>
+        <label className="mt-5 block"><span className="label">Role Name *</span><input className="field w-full" value={roleName} onChange={e => setRoleName(e.target.value)} placeholder="e.g. Accounts Manager" /></label>
+        <div className="mt-4 flex flex-wrap gap-2"><button type="button" onClick={() => toggleAll(true)} className="rounded-xl border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Enable All</button><button type="button" onClick={() => toggleAll(false)} className="rounded-xl border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Disable All</button></div>
+        {rows("Inventory", "Items, stock and SR processing.", inventoryList, inventoryValues, setInventoryMap, `${Object.values(inventory).filter(Boolean).length}/5`)}
+        {rows("Item SR", "Member-side Service Request permissions.", itemSrList, itemSrValues, setItemSrMap, `${Object.values(itemSr).filter(Boolean).length}/3`)}
+        {rows("Accounts", "School financial operations. HR prepares and approves salary sheets; Accounts processes approved salary payments and records the financial transaction.", accountsPermissionList.map(x => [x.key, x.title] as const), accounts, setAccounts, `${Object.values(accounts).filter(Boolean).length}/${accountsPermissionList.length}`)}
+        {rows("Other Permissions", "Existing non-category permissions remain independent.", legacy, other, setOther, `${Object.values(other).filter(Boolean).length}/${legacy.length}`)}
+        <button type="button" disabled={saving || !roleName.trim()} onClick={() => void save()} className="mt-5 w-full rounded-xl px-5 py-3.5 text-sm font-bold theme-primary-bg disabled:opacity-60">{saving ? "Saving..." : editingId ? "Update Role" : "Create Role"}</button>
+      </section>
+      <section className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-6"><p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">Role Library</p><h2 className="mt-1 text-xl font-black">Available Roles</h2><p className="mt-1 text-xs leading-5 text-[var(--school-muted)]">Accounts permissions are stored under one independent <code>accounts</code> permission object.</p><div className="mt-5 space-y-3">{loading ? <p className="rounded-2xl border border-dashed border-[var(--school-border)] p-8 text-center text-sm text-[var(--school-muted)]">Loading roles...</p> : null}{!loading && roles.map(role => { const acc = role.permissions?.accounts && typeof role.permissions.accounts === "object" ? role.permissions.accounts as BoolMap : {}; const count = accountsPermissionList.filter(x => Boolean(acc[x.key])).length; return <article key={role.id} className="rounded-2xl border border-[var(--school-border)] p-4"><div className="flex items-start justify-between gap-3"><div><h3 className="text-sm font-black">{role.role_name}</h3><p className="mt-1 text-[10px] text-[var(--school-muted)]">Accounts {count}/{accountsPermissionList.length}</p></div><div className="flex gap-2"><button type="button" onClick={() => editRole(role)} className="rounded-xl border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Edit</button>{!role.is_system ? <button type="button" onClick={() => void remove(role)} className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600">Remove</button> : null}</div></div>{count ? <div className="mt-3 flex flex-wrap gap-1.5">{accountsPermissionList.filter(x => Boolean(acc[x.key])).map(x => <span key={x.key} className="rounded-lg bg-[var(--school-primary-soft)] px-2 py-1 text-[10px] font-semibold theme-primary">{x.title}</span>)}</div> : null}</article>; })}</div></section>
+    </div>
+  </AdminPageShell>;
 }
