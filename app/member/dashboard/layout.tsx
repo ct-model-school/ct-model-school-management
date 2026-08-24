@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useLayoutEffect, type ReactNode } from "react";
 
 const TOKEN_KEY = "ctms_store_token";
 
 export default function MemberDashboardLayout({ children }: { children: ReactNode }) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const originalGetItem = Storage.prototype.getItem;
     const originalRemoveItem = Storage.prototype.removeItem;
 
