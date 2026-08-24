@@ -1,17 +1,17 @@
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
-import AccountsWorkspace from "./accounts-workspace";
+import AccountsWorkspace from "./accounts-workspace-v2";
 
 export default function AccountsPage() {
   return (
     <AdminPageShell
       eyebrow="Finance & Operations"
       title="Accounts"
-      description="Complete school accounts workspace. HR prepares approved salary sheets; Accounts processes financial payments, vouchers, cash, bank and reporting."
+      description="Owner-level school accounts: collection, salary, vendor bills, cash, bank, receivable/payable, vouchers, reports and audit history."
       action={{ href: "/admin/roles", label: "Role Management" }}
     >
       <AccountsWorkspace />
       <div className="mt-5 rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] p-4 text-xs leading-5 text-[var(--school-muted)]">
-        <strong className="text-[var(--school-text)]">Workflow boundary:</strong> HR prepares and approves salary sheets. Accounts only processes payment against an approved salary sheet and records the financial transaction. Inventory owns stock and Item SR approval; Accounts owns the financial payment record.
+        <strong className="text-[var(--school-text)]">Control boundary:</strong> Accounts owns financial records and payments. HR remains responsible for preparing and approving salary sheets; Inventory remains responsible for stock and Item SR workflows. Accounts records the financial settlement without duplicating those source records.
       </div>
     </AdminPageShell>
   );
