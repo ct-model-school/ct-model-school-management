@@ -27,12 +27,7 @@ const LOGIN_TYPES: LoginType[] = [
   { id: "committee", label: "Committee", description: "Management committee access", prefix: "COMMITTEE", icon: "M", canRegister: true },
 ];
 
-const MEMBER_TABLES: Record<string, string> = {
-  teacher: "teacher_members",
-  staff: "staff_members",
-  accounts: "account_members",
-  other: "other_members",
-};
+const MEMBER_TYPES = new Set(["teacher", "staff", "accounts", "other"]);
 
 export default function LoginPortalPage() {
   const router = useRouter();
@@ -49,19 +44,14 @@ export default function LoginPortalPage() {
   useEffect(() => {
     let active = true;
     async function loadMemberOptions() {
-      if (!selected || selected.id === "admin" || !MEMBER_TABLES[selected.id]) {
+      if (!selected || !MEMBER_TYPES.has(selected.id)) {
         setMemberOptions([]);
         return;
       }
       setLoadingOptions(true);
       setMemberOptions([]);
       setMemberId("");
-      const table = MEMBER_TABLES[selected.id];
-      const { data, error: loadError } = await supabase
-        .from(table)
-        .select("member_id,full_name")
-        .eq("is_active", true)
-        .order("member_id", { ascending: true });
+      const { data, error: loadError } = await supabase.rpc("store_list_login_members", { p_member_type: selected.id });
       if (!active) return;
       if (loadError) setError(loadError.message);
       else setMemberOptions((data ?? []) as MemberOption[]);
@@ -103,7 +93,7 @@ export default function LoginPortalPage() {
       return;
     }
 
-    if (!MEMBER_TABLES[selected.id]) {
+    if (!MEMBER_TYPES.has(selected.id)) {
       setError("This account type is not connected yet.");
       setLoading(false);
       return;
