@@ -4,11 +4,12 @@ import { useState } from "react";
 import styles from "./loginportal.module.css";
 
 type LoginType = {
-  id: "admin" | "teacher" | "staff" | "accounts" | "other";
+  id: "admin" | "teacher" | "staff" | "accounts" | "other" | "parent" | "student" | "committee";
   label: string;
   description: string;
   prefix: string;
   icon: string;
+  canRegister?: boolean;
 };
 
 const LOGIN_TYPES: LoginType[] = [
@@ -17,6 +18,9 @@ const LOGIN_TYPES: LoginType[] = [
   { id: "staff", label: "Staff", description: "Staff & operations", prefix: "STID", icon: "S" },
   { id: "accounts", label: "Accounts", description: "Accounts & finance", prefix: "ACID", icon: "C" },
   { id: "other", label: "Other Member", description: "Other school members", prefix: "OTID", icon: "O" },
+  { id: "parent", label: "Parent", description: "Parent & guardian access", prefix: "PARENT", icon: "P", canRegister: true },
+  { id: "student", label: "Student", description: "Student access", prefix: "STUDENT", icon: "S", canRegister: true },
+  { id: "committee", label: "Committee", description: "Management committee access", prefix: "COMMITTEE", icon: "M", canRegister: true },
 ];
 
 export default function LoginPortalPage() {
@@ -116,7 +120,14 @@ export default function LoginPortalPage() {
                 </label>
 
                 <div className={styles.formActions}>
-                  <button type="button" className={styles.forgotButton}>Forgot Password?</button>
+                  <div className={styles.secondaryActions}>
+                    <button type="button" className={styles.forgotButton}>Forgot Password?</button>
+                    {selected.canRegister && (
+                      <a className={styles.registerButton} href={`/register?type=${selected.id}`}>
+                        Register
+                      </a>
+                    )}
+                  </div>
                   <button type="submit" className={styles.loginButton}>Login <span aria-hidden="true">→</span></button>
                 </div>
               </form>
