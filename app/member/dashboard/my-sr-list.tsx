@@ -1,0 +1,40 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+
+type MySR = { id: string; sr_number: string; class_name: string | null; department: string | null; request_details: string | null; status: string; admin_note: string | null; requested_at: string; items: { item_code: string; item_name: string; unit: string; requested_quantity: number; issued_quantity: number }[] };
+
+const statusClass = (status: string) => {
+  const value = status.toLowerCase();
+  return value.includes("reject") || value.includes("cancel") ? "text-red-700 bg-red-50" : value.includes("pending") ? "text-amber-700 bg-amber-50" : "theme-primary bg-[var(--school-primary-soft)]";
+};
+
+export default function MySrList() {
+  const supabase = createClient();
+  const [srs, setSrs] = useState<MySR[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  async function load() {
+    const token = window.localStorage.getItem("ctms_store_token");
+    if (!token) { setLoading(false); return; }
+    setLoading(true); setError("");
+    const { data, error: loadError } = await supabase.rpc("store_list_my_srs", { p_token: token });
+    if (loadError) setError(loadError.message);
+    else setSrs((data ?? []) as MySR[]);
+    setLoading(false);
+  }
+
+  useEffect(() => { void load(); }, []);
+
+  const formatDate = (value: string) => new Date(value).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+  return <section className="rounded-xl border border-[var(--school-border)] bg-[var(--school-surface)] p-3">
+    <div className="flex items-center justify-between gap-2">
+      <div><p className="text-[9px] font-black uppercase tracking-[0.14em] theme-primary">My Service Requests</p><p className="mt-0.5 text-[9px] text-[var(--school-muted)]">Your submitted SRs and current approval status.</p></div>
+      <div className="flex items-center gap-1.5"><span className="rounded-full bg-[var(--school-primary-soft)] px-2 py-1 text-[8px] font-black theme-primary">{srs.length} SR{srs.length === 1 ? "" : "s"}</span><button type="button" onClick={() => void load()} className="rounded-md border border-[var(--school-border)] px-2 py-1 text-[8px] font-bold">Refresh</button></div>
+    </div>
+    {loading ? <div className="mt-2 rounded-lg bg-[var(--school-primary-soft)] p-3 text-center text-[9px] text-[var(--school-muted)]">Loading your SRs...</div> : error ? <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] text-red-700">{error}</p> : !srs.length ? <div className="mt-2 rounded-lg border border-dashed border-[var(--school-border)] bg-[var(--school-primary-soft)] p-3 text-center text-[9px] text-[var(--school-muted)]">No service requests submitted yet.</div> : <div className="mt-2 space-y-1.5">{srs.map((sr) => <article key={sr.id} className="rounded-lg border border-[var(--school-border)] p-2.5"><div className="flex flex-wrap items-center justify-between gap-1.5"><div className="flex min-w-0 items-center gap-1.5"><span className="text-[9px] font-black theme-primary">{sr.sr_number}</span><span className={`rounded-full px-1.5 py-0.5 text-[8px] font-bold capitalize ${statusClass(sr.status)}`}>{sr.status.replace(/_/g, " ")}</span></div><span className="text-[8px] text-[var(--school-muted)]">{formatDate(sr.requested_at)}</span></div><div className="mt-1 flex flex-wrap gap-1">{(sr.items || []).map((item) => <span key={`${sr.id}-${item.item_code}`} className="rounded-md bg-[var(--school-primary-soft)] px-1.5 py-0.5 text-[8px] font-semibold theme-primary">{item.item_code} × {item.requested_quantity}</span>)}</div><div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[8px] text-[var(--school-muted)]"><span>Class: <b className="text-[var(--school-text)]">{sr.class_name || "-"}</b></span><span>Department: <b className="text-[var(--school-text)]">{sr.department || "-"}</b></span></div>{sr.request_details ? <p className="mt-1 truncate text-[8px] text-[var(--school-muted)]" title={sr.request_details}>{sr.request_details}</p> : null}{sr.admin_note ? <p className="mt-1 rounded-md bg-[var(--school-primary-soft)] px-2 py-1 text-[8px] theme-primary"><b>Admin:</b> {sr.admin_note}</p> : null}</article>)}</div>}
+  </section>;
+}
