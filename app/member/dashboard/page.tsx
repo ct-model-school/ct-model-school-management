@@ -19,20 +19,21 @@ type CurrentUser = {
   subject: string | null;
 };
 
-type Module = { key: string; label: string; description: string; icon: string };
+type ModuleKey = "dashboard" | "profile" | "item_sr" | "attendance" | "notices";
 
-const modules: Module[] = [
-  { key: "dashboard", label: "Dashboard", description: "Your role-based overview", icon: "⌂" },
-  { key: "profile", label: "Profile", description: "View your member profile", icon: "P" },
-  { key: "item_sr", label: "Item SR", description: "Create and view service requests", icon: "SR" },
-  { key: "attendance", label: "Attendance", description: "Access attendance features", icon: "A" },
-  { key: "notices", label: "Notices", description: "View school notices", icon: "N" },
+const modules: { key: ModuleKey; label: string }[] = [
+  { key: "dashboard", label: "Dashboard" },
+  { key: "profile", label: "Profile" },
+  { key: "item_sr", label: "Item SR" },
+  { key: "attendance", label: "Attendance" },
+  { key: "notices", label: "Notices" },
 ];
 
 export default function MemberDashboardPage() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const [user, setUser] = useState<CurrentUser | null>(null);
+  const [activeModule, setActiveModule] = useState<ModuleKey>("dashboard");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -67,62 +68,87 @@ export default function MemberDashboardPage() {
   }
 
   if (loading) {
-    return <main className="min-h-screen bg-[var(--school-background)] p-6"><div className="mx-auto max-w-5xl rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-10 text-center text-sm text-[var(--school-muted)]">Loading your dashboard...</div></main>;
+    return <main className="min-h-screen bg-[var(--school-background)] p-6"><div className="mx-auto max-w-6xl rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-10 text-center text-sm text-[var(--school-muted)]">Loading your dashboard...</div></main>;
   }
 
   if (!user) {
-    return <main className="min-h-screen bg-[var(--school-background)] p-6"><div className="mx-auto max-w-5xl rounded-3xl border border-red-200 bg-red-50 p-10 text-center text-sm text-red-700">{error || "Unable to load your account."}</div></main>;
+    return <main className="min-h-screen bg-[var(--school-background)] p-6"><div className="mx-auto max-w-6xl rounded-3xl border border-red-200 bg-red-50 p-10 text-center text-sm text-red-700">{error || "Unable to load your account."}</div></main>;
   }
 
-  const visibleModules = modules.filter((module) => Boolean(user.permissions?.[module.key]));
+  const canAccess = (key: ModuleKey) => Boolean(user.permissions?.[key]);
+  const availableModules = modules.filter((module) => canAccess(module.key));
+  const activeLabel = modules.find((module) => module.key === activeModule)?.label ?? "Dashboard";
+
+  function selectModule(key: ModuleKey) {
+    if (canAccess(key)) setActiveModule(key);
+  }
 
   return (
-    <main className="min-h-screen bg-[var(--school-background)] px-4 py-6 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[var(--school-background)] px-3 py-4 sm:px-5 sm:py-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-6 flex flex-col gap-4 rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
-          <div className="flex min-w-0 items-center gap-4">
-            <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[var(--school-primary-soft)] font-black theme-primary">
-              {user.photo_url ? <img src={user.photo_url} alt="" className="h-full w-full object-cover" /> : "CT"}
+        <header className="overflow-hidden rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] shadow-sm">
+          <div className="flex flex-col gap-4 px-5 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl bg-[var(--school-primary-soft)] font-black theme-primary">
+                {user.photo_url ? <img src={user.photo_url} alt="" className="h-full w-full object-cover" /> : "CT"}
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">C.T. Model School</p>
+                <h1 className="mt-0.5 truncate text-lg font-black text-[var(--school-text)] sm:text-xl">Welcome, {user.full_name}</h1>
+                <p className="mt-0.5 text-[11px] text-[var(--school-muted)]">{user.member_id}</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">C.T. Model School</p>
-              <h1 className="mt-1 truncate text-xl font-black text-[var(--school-text)] sm:text-2xl">Welcome, {user.full_name}</h1>
-              <p className="mt-1 text-xs text-[var(--school-muted)]">{user.member_id} • {user.member_type} • {user.role_name}</p>
-            </div>
+            <button type="button" onClick={() => void logout()} className="w-full rounded-xl border border-[var(--school-border)] px-4 py-2.5 text-xs font-bold text-[var(--school-text)] hover:bg-[var(--school-primary-soft)] lg:w-auto">Logout</button>
           </div>
-          <button type="button" onClick={() => void logout()} className="rounded-xl border border-[var(--school-border)] px-4 py-2.5 text-xs font-bold text-[var(--school-text)] hover:bg-[var(--school-primary-soft)]">Logout</button>
+
+          <nav className="flex gap-1 overflow-x-auto border-t border-[var(--school-border)] px-3 py-2 sm:px-5" aria-label="Member portal navigation">
+            {availableModules.map((module) => (
+              <button
+                key={module.key}
+                type="button"
+                onClick={() => selectModule(module.key)}
+                className={`shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold transition-colors ${activeModule === module.key ? "theme-primary-bg" : "text-[var(--school-muted)] hover:bg-[var(--school-primary-soft)] hover:text-[var(--school-text)]"}`}
+              >
+                {module.label}
+              </button>
+            ))}
+          </nav>
         </header>
 
-        <section className="mb-6 rounded-3xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] p-5 sm:p-6">
-          <p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">Role Access</p>
-          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div><h2 className="text-xl font-black text-[var(--school-text)]">{user.role_name}</h2><p className="mt-1 text-sm text-[var(--school-muted)]">Only the modules granted to this role are shown below.</p></div>
-            <span className="w-fit rounded-full border border-[var(--school-primary-border)] bg-[var(--school-surface)] px-3 py-1.5 text-xs font-bold theme-primary">{visibleModules.length} permitted</span>
+        <section className="mt-5 rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-7">
+          <div className="flex flex-col gap-1 border-b border-[var(--school-border)] pb-5">
+            <p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">{activeLabel}</p>
+            <h2 className="text-2xl font-black text-[var(--school-text)]">{activeModule === "dashboard" ? `Welcome back, ${user.full_name}` : activeLabel}</h2>
           </div>
-        </section>
 
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {visibleModules.map((module) => (
-            <article key={module.key} className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm transition-transform hover:-translate-y-0.5">
-              <div className="flex items-start gap-4">
-                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[var(--school-primary-soft)] text-xs font-black theme-primary">{module.icon}</div>
-                <div className="min-w-0 flex-1"><h3 className="text-base font-black text-[var(--school-text)]">{module.label}</h3><p className="mt-1 text-xs leading-5 text-[var(--school-muted)]">{module.description}</p></div>
-              </div>
-              <div className="mt-5 flex items-center justify-between"><span className="rounded-full bg-[var(--school-primary-soft)] px-2.5 py-1 text-[10px] font-black theme-primary">ACCESS GRANTED</span><span className="text-xs font-bold theme-primary">›</span></div>
-            </article>
-          ))}
-        </section>
+          {activeModule === "dashboard" && (
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-5"><p className="text-xs font-bold text-[var(--school-muted)]">Member ID</p><p className="mt-2 text-lg font-black theme-primary">{user.member_id}</p></div>
+              <div className="rounded-2xl border border-[var(--school-border)] p-5"><p className="text-xs font-bold text-[var(--school-muted)]">Designation</p><p className="mt-2 text-lg font-black text-[var(--school-text)]">{user.designation || "Teacher"}</p></div>
+              <div className="rounded-2xl border border-[var(--school-border)] p-5"><p className="text-xs font-bold text-[var(--school-muted)]">Department</p><p className="mt-2 text-lg font-black text-[var(--school-text)]">{user.department || "-"}</p></div>
+            </div>
+          )}
 
-        <section id="profile" className="mt-6 rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-6">
-          <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">Profile</p><h2 className="mt-1 text-lg font-black">Account information</h2></div><span className="rounded-full border border-[var(--school-border)] px-3 py-1 text-[10px] font-bold">{user.access_role}</span></div>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <div><p className="text-[10px] font-bold uppercase tracking-wider text-[var(--school-muted)]">Member ID</p><p className="mt-1 text-sm font-bold">{user.member_id}</p></div>
-            <div><p className="text-[10px] font-bold uppercase tracking-wider text-[var(--school-muted)]">Designation</p><p className="mt-1 text-sm font-bold">{user.designation || "-"}</p></div>
-            <div><p className="text-[10px] font-bold uppercase tracking-wider text-[var(--school-muted)]">Department</p><p className="mt-1 text-sm font-bold">{user.department || "-"}</p></div>
-            <div><p className="text-[10px] font-bold uppercase tracking-wider text-[var(--school-muted)]">Subject</p><p className="mt-1 text-sm font-bold">{user.subject || "-"}</p></div>
-            <div><p className="text-[10px] font-bold uppercase tracking-wider text-[var(--school-muted)]">Email</p><p className="mt-1 break-words text-sm font-bold">{user.email || "-"}</p></div>
-            <div><p className="text-[10px] font-bold uppercase tracking-wider text-[var(--school-muted)]">Phone</p><p className="mt-1 text-sm font-bold">{user.phone || "-"}</p></div>
-          </div>
+          {activeModule === "profile" && (
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                ["Member ID", user.member_id],
+                ["Full Name", user.full_name],
+                ["Designation", user.designation || "-"],
+                ["Department", user.department || "-"],
+                ["Subject", user.subject || "-"],
+                ["Phone", user.phone || "-"],
+                ["Email", user.email || "-"],
+              ].map(([label, value]) => <div key={label} className="rounded-2xl border border-[var(--school-border)] p-4"><p className="text-[10px] font-bold uppercase tracking-wider text-[var(--school-muted)]">{label}</p><p className="mt-1 break-words text-sm font-bold text-[var(--school-text)]">{value}</p></div>)}
+            </div>
+          )}
+
+          {activeModule !== "dashboard" && activeModule !== "profile" && (
+            <div className="mt-6 rounded-2xl border border-dashed border-[var(--school-border)] bg-[var(--school-primary-soft)] p-8 text-center">
+              <h3 className="text-base font-black text-[var(--school-text)]">{activeLabel}</h3>
+              <p className="mt-2 text-sm text-[var(--school-muted)]">This section is ready for its module features.</p>
+            </div>
+          )}
         </section>
       </div>
     </main>
