@@ -82,16 +82,16 @@ export default function LoginPortalNav() {
         min-height:30px;
         min-width:52px;
         padding:.4rem .68rem;
-        border:1px solid var(--school-primary-border);
+        border:1px solid transparent;
         border-radius:.55rem;
-        background:linear-gradient(180deg,var(--school-primary),var(--school-primary-hover,var(--school-primary)));
-        color:var(--school-on-primary,#fff) !important;
+        background:transparent;
+        color:var(--school-primary) !important;
         text-decoration:none !important;
         font-size:.68rem;
         font-weight:800;
         line-height:1;
         overflow:hidden;
-        box-shadow:0 4px 10px var(--school-primary-border);
+        box-shadow:none;
         transition:transform 180ms ease,box-shadow 180ms ease,filter 180ms ease;
       }
       .ctms-public-nav-button::before,
@@ -100,7 +100,7 @@ export default function LoginPortalNav() {
         position:absolute;
         inset:0;
         z-index:-1;
-        background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.18) 48%,transparent 76%);
+        background:linear-gradient(115deg,transparent 20%,var(--school-primary-soft) 48%,transparent 76%);
         transform:translateX(-120%);
         transition:transform 420ms ease;
       }
@@ -108,7 +108,7 @@ export default function LoginPortalNav() {
       .ctms-login-desktop-link:hover {
         transform:translateY(-2px);
         filter:brightness(1.04);
-        box-shadow:0 7px 16px var(--school-primary-border);
+        box-shadow:0 5px 12px var(--school-primary-border);
       }
       .ctms-public-nav-button:hover::before,
       .ctms-login-desktop-link:hover::before {
@@ -117,7 +117,7 @@ export default function LoginPortalNav() {
       .ctms-public-nav-button:active,
       .ctms-login-desktop-link:active {
         transform:translateY(0) scale(.98);
-        box-shadow:0 3px 8px var(--school-primary-border);
+        box-shadow:0 2px 6px var(--school-primary-border);
       }
       .ctms-public-nav-button:focus-visible,
       .ctms-login-desktop-link:focus-visible,
@@ -136,16 +136,16 @@ export default function LoginPortalNav() {
         width:100%;
         margin-top:.35rem;
         padding:.62rem .7rem;
-        border:1px solid var(--school-primary-border);
+        border:1px solid transparent;
         border-radius:.6rem;
-        background:linear-gradient(180deg,var(--school-primary),var(--school-primary-hover,var(--school-primary)));
-        color:var(--school-on-primary,#fff) !important;
+        background:transparent;
+        color:var(--school-primary) !important;
         text-decoration:none !important;
         font-size:.8rem;
         font-weight:800;
         line-height:1;
         overflow:hidden;
-        box-shadow:0 4px 10px var(--school-primary-border);
+        box-shadow:none;
         transition:transform 180ms ease,box-shadow 180ms ease,filter 180ms ease;
       }
       .ctms-public-nav-button-mobile::before,
@@ -154,7 +154,7 @@ export default function LoginPortalNav() {
         position:absolute;
         inset:0;
         z-index:-1;
-        background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.18) 48%,transparent 76%);
+        background:linear-gradient(115deg,transparent 20%,var(--school-primary-soft) 48%,transparent 76%);
         transform:translateX(-120%);
         transition:transform 420ms ease;
       }
@@ -162,7 +162,7 @@ export default function LoginPortalNav() {
       .ctms-login-mobile-link:hover {
         transform:translateY(-1px);
         filter:brightness(1.04);
-        box-shadow:0 7px 16px var(--school-primary-border);
+        box-shadow:0 5px 12px var(--school-primary-border);
       }
       .ctms-public-nav-button-mobile:hover::before,
       .ctms-login-mobile-link:hover::before {
@@ -171,7 +171,7 @@ export default function LoginPortalNav() {
       .ctms-public-nav-button-mobile:active,
       .ctms-login-mobile-link:active {
         transform:scale(.98);
-        box-shadow:0 3px 8px var(--school-primary-border);
+        box-shadow:0 2px 6px var(--school-primary-border);
       }
     `}</style>
   );
