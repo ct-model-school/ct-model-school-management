@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import styles from "./loginportal.module.css";
@@ -14,6 +14,8 @@ type LoginType = {
   canRegister?: boolean;
 };
 
+type MemberOption = { member_id: string; full_name: string };
+
 const LOGIN_TYPES: LoginType[] = [
   { id: "admin", label: "Admin", description: "School administration", prefix: "ADMIN", icon: "A" },
   { id: "teacher", label: "Teacher", description: "Teaching & academics", prefix: "TCID", icon: "T" },
@@ -25,15 +27,49 @@ const LOGIN_TYPES: LoginType[] = [
   { id: "committee", label: "Committee", description: "Management committee access", prefix: "COMMITTEE", icon: "M", canRegister: true },
 ];
 
+const MEMBER_TABLES: Record<string, string> = {
+  teacher: "teacher_members",
+  staff: "staff_members",
+  accounts: "account_members",
+  other: "other_members",
+};
+
 export default function LoginPortalPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [selected, setSelected] = useState<LoginType | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [memberId, setMemberId] = useState("");
   const [password, setPassword] = useState("");
+  const [memberOptions, setMemberOptions] = useState<MemberOption[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    async function loadMemberOptions() {
+      if (!selected || selected.id === "admin" || !MEMBER_TABLES[selected.id]) {
+        setMemberOptions([]);
+        return;
+      }
+      setLoadingOptions(true);
+      setMemberOptions([]);
+      setMemberId("");
+      const table = MEMBER_TABLES[selected.id];
+      const { data, error: loadError } = await supabase
+        .from(table)
+        .select("member_id,full_name")
+        .eq("is_active", true)
+        .order("member_id", { ascending: true });
+      if (!active) return;
+      if (loadError) setError(loadError.message);
+      else setMemberOptions((data ?? []) as MemberOption[]);
+      setLoadingOptions(false);
+    }
+    void loadMemberOptions();
+    return () => { active = false; };
+  }, [selected, supabase]);
 
   function selectLoginType(type: LoginType) {
     setSelected(type);
@@ -46,24 +82,37 @@ export default function LoginPortalPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
-
     if (!selected) return;
 
-    if (selected.id !== "admin") {
-      setError("This account type is not connected yet. Please use Admin for now.");
-      return;
-    }
-
     if (!memberId.trim() || !password) {
-      setError("Please enter your Admin ID / Username and password.");
+      setError(`Please enter your ${selected.id === "admin" ? "Admin ID / Username" : "Member ID"} and password.`);
       return;
     }
 
     setLoading(true);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: memberId.trim(),
-      password,
+    if (selected.id === "admin") {
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email: memberId.trim(), password });
+      if (signInError) {
+        setError(signInError.message);
+        setLoading(false);
+        return;
+      }
+      router.replace("/admin");
+      router.refresh();
+      return;
+    }
+
+    if (!MEMBER_TABLES[selected.id]) {
+      setError("This account type is not connected yet.");
+      setLoading(false);
+      return;
+    }
+
+    const { data, error: signInError } = await supabase.rpc("store_login", {
+      p_login_id: memberId.trim(),
+      p_password: password,
+      p_member_type: selected.id,
     });
 
     if (signInError) {
@@ -72,8 +121,15 @@ export default function LoginPortalPage() {
       return;
     }
 
-    router.replace("/admin");
-    router.refresh();
+    const result = data as { token?: string; member_type?: string } | null;
+    if (!result?.token) {
+      setError("Login succeeded but a secure session could not be created.");
+      setLoading(false);
+      return;
+    }
+
+    window.localStorage.setItem("ctms_store_token", result.token);
+    router.replace("/member/dashboard");
   }
 
   return (
@@ -120,8 +176,9 @@ export default function LoginPortalPage() {
                 ) : (
                   <div className={styles.selectWrap}>
                     <span className={styles.inputPrefix}>{selected.prefix}</span>
-                    <select name="memberId" defaultValue="" aria-label="Select your ID" disabled>
-                      <option value="" disabled>Select your ID</option>
+                    <select name="memberId" value={memberId} onChange={(event) => setMemberId(event.target.value)} aria-label="Select your ID" disabled={loadingOptions || !memberOptions.length} required>
+                      <option value="">{loadingOptions ? "Loading IDs..." : memberOptions.length ? "Select your ID" : "No active IDs available"}</option>
+                      {memberOptions.map((member) => <option key={member.member_id} value={member.member_id}>{member.member_id} • {member.full_name}</option>)}
                     </select>
                   </div>
                 )}
@@ -142,7 +199,7 @@ export default function LoginPortalPage() {
                   <button type="button" className={styles.forgotButton}>Forgot Password?</button>
                   {selected.canRegister && <a className={styles.registerButton} href={`/register?type=${selected.id}`}>Register</a>}
                 </div>
-                <button type="submit" className={styles.loginButton} disabled={loading}>{loading ? "Signing in..." : <>Login <span aria-hidden="true">→</span></>}</button>
+                <button type="submit" className={styles.loginButton} disabled={loading || loadingOptions}>{loading ? "Signing in..." : <>Login <span aria-hidden="true">→</span></>}</button>
               </div>
             </form>
           </> : <div className={styles.emptyState}><span className={styles.emptyIcon}>→</span><div><strong>Choose your account type</strong><p>Your Member ID and password fields will appear here.</p></div></div>}
