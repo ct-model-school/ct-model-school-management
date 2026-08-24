@@ -11,7 +11,7 @@ function addCommunityLink(nav: Element, mobile = false) {
   link.href = "/people";
   link.textContent = "Community";
   link.setAttribute(`data-${COMMUNITY_LINK}`, "true");
-  link.className = mobile ? "rounded-lg px-3 py-2 text-sm font-semibold" : "text-sm font-semibold";
+  link.className = mobile ? "ctms-public-nav-button-mobile" : "ctms-public-nav-button";
   if (mobile) nav.querySelector("div")?.appendChild(link); else nav.appendChild(link);
 }
 
@@ -123,6 +123,41 @@ export default function PublicPeopleNav() {
       {items.map((item) => <a key={item.label} href={item.href} className={item.active ? "ctms-mobile-bottom-nav-item active" : "ctms-mobile-bottom-nav-item"} aria-current={item.active ? "page" : undefined}><NavIcon type={item.type} /><span>{item.label}</span></a>)}
     </nav>
     <style>{`
+      .ctms-public-nav-button {
+        display:inline-flex !important;
+        align-items:center;
+        justify-content:center;
+        min-height:36px;
+        padding:.5rem .9rem;
+        border:1px solid var(--school-primary-border);
+        border-radius:.7rem;
+        background:var(--school-primary);
+        color:var(--school-on-primary,#fff) !important;
+        text-decoration:none !important;
+        font-size:.8rem;
+        font-weight:800;
+        line-height:1;
+        transition:transform 160ms ease,opacity 160ms ease,box-shadow 160ms ease;
+        box-shadow:0 5px 14px var(--school-primary-border);
+      }
+      .ctms-public-nav-button:hover {
+        transform:translateY(-1px);
+        opacity:.92;
+      }
+      .ctms-public-nav-button-mobile {
+        display:flex !important;
+        align-items:center;
+        justify-content:center;
+        width:100%;
+        margin-top:.35rem;
+        padding:.7rem .75rem;
+        border-radius:.65rem;
+        background:var(--school-primary);
+        color:var(--school-on-primary,#fff) !important;
+        text-decoration:none !important;
+        font-size:.875rem;
+        font-weight:800;
+      }
       .ctms-mobile-bottom-nav { display:none; }
       .ctms-home-community-cta { border-bottom:1px solid var(--school-border); background:var(--school-surface); padding:3.5rem 1rem; }
       .ctms-home-community-cta-inner { width:min(80rem,100%); margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:2rem; border:1px solid var(--school-border); border-radius:1.75rem; background:var(--school-surface); padding:2rem 2.25rem; box-shadow:0 4px 18px rgba(15,23,42,.05); }
