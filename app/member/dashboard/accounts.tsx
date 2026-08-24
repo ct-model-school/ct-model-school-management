@@ -1,10 +1,8 @@
 "use client";
-import MemberAccountsV2 from "./member-accounts-v2";
+import SalaryManager from "./salary-manager";
 
 type Permissions = Record<string, boolean>;
 
-// Member Accounts is intentionally limited to the salary workflow that is ready now.
-// Other Accounts workflows remain in the database and admin workspace for later sections.
 export const accountsPermissionList = [
   {
     key: "salary_payment",
@@ -14,9 +12,8 @@ export const accountsPermissionList = [
 ] as const;
 
 export default function AccountsModule({ permissions }: { permissions: Permissions; preview?: boolean }) {
-  const canViewSalary = Boolean(permissions.salary_payment || permissions.__all);
-
-  if (!canViewSalary) {
+  const token = typeof window !== "undefined" ? window.localStorage.getItem("ctms_store_token") : null;
+  if (!permissions.salary_payment && !permissions.__all) {
     return (
       <div className="mt-5 rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-6 text-center">
         <p className="text-sm font-black">Salary & Accounts access is not enabled</p>
@@ -24,6 +21,5 @@ export default function AccountsModule({ permissions }: { permissions: Permissio
       </div>
     );
   }
-
-  return <MemberAccountsV2 />;
+  return <SalaryManager token={token} />;
 }
