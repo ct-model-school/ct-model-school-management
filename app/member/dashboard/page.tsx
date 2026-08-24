@@ -8,7 +8,7 @@ import MySrList from "./my-sr-list";
 import InventoryModule from "./inventory";
 
 type InventoryPermissions = { view: boolean; add: boolean; edit: boolean; remove: boolean; sr_approval: boolean };
-type ItemSrPermissions = { view: boolean; create: boolean; history: boolean; approve: boolean; issue: boolean };
+type ItemSrPermissions = { view: boolean; create: boolean; history: boolean };
 type CurrentUser = { member_id: string; member_type: string; access_role: string; role_name: string; permissions: Record<string, unknown>; full_name: string; photo_url: string | null; email: string | null; phone: string | null; designation: string | null; department: string | null; subject: string | null };
 type ModuleKey = "dashboard" | "profile" | "item_sr" | "attendance" | "inventory" | "notices";
 const modules: { key: ModuleKey; label: string }[] = [{ key: "dashboard", label: "Dashboard" }, { key: "profile", label: "Profile" }, { key: "item_sr", label: "Item SR" }, { key: "attendance", label: "Attendance" }, { key: "inventory", label: "Inventory" }, { key: "notices", label: "Notices" }];
@@ -22,7 +22,7 @@ export default function MemberDashboardPage() {
   if (!user) return <main className="min-h-screen bg-[var(--school-background)] p-6"><div className="mx-auto max-w-6xl rounded-3xl border border-red-200 bg-red-50 p-10 text-center text-sm text-red-700">{error || "Unable to load your account."}</div></main>;
   const inventory = (user.permissions?.inventory && typeof user.permissions.inventory === "object" ? user.permissions.inventory : {}) as Partial<InventoryPermissions>;
   const itemSr = (user.permissions?.item_sr && typeof user.permissions.item_sr === "object" ? user.permissions.item_sr : {}) as Partial<ItemSrPermissions>;
-  const itemSrAllowed = Boolean(itemSr.view || itemSr.create || itemSr.history || itemSr.approve || itemSr.issue);
+  const itemSrAllowed = Boolean(itemSr.view || itemSr.create || itemSr.history);
   const inventoryAllowed = Boolean(inventory.view || inventory.add || inventory.edit || inventory.remove || inventory.sr_approval);
   const canAccess = (key: ModuleKey) => key === "inventory" ? inventoryAllowed : key === "item_sr" ? itemSrAllowed : Boolean(user.permissions?.[key]);
   const availableModules = modules.filter((module) => canAccess(module.key)); const effectiveActiveModule = canAccess(activeModule) ? activeModule : (availableModules[0]?.key ?? "dashboard"); const activeLabel = modules.find((module) => module.key === effectiveActiveModule)?.label ?? "Dashboard";
