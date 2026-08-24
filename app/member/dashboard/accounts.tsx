@@ -1,7 +1,7 @@
 "use client";
 import { useCallback,useEffect,useMemo,useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { AccountsEntryForm } from "./member-accounts";
+import { AccountsEntryForm } from "./member-accounts-entry";
 
 export const accountsPermissionList=[
  {key:"dashboard",title:"Accounts Dashboard",description:"Financial overview, balances, dues and alerts."},
