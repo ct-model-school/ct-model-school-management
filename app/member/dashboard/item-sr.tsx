@@ -10,7 +10,45 @@ type Permissions = { view?: boolean; create?: boolean; history?: boolean };
 type SubmittedSr = { srNumber: string; className: string; department: string; details: string; itemCount: number; totalQty: number };
 const statusClass = (status: string) => status.toLowerCase().includes("out") ? "text-red-600 bg-red-50" : status.toLowerCase().includes("low") ? "text-amber-700 bg-amber-50" : "theme-primary bg-[var(--school-primary-soft)]";
 
-export default function ItemSrModule({ department, permissions }: { department: string | null; permissions: Permissions }) {
+function ItemSrFormPreview() {
+  return <div className="mt-3 space-y-3">
+    <section className="rounded-xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="flex h-9 overflow-hidden rounded-lg border border-[var(--school-border)] bg-[var(--school-surface)]">
+            <span className="flex items-center border-r border-[var(--school-border)] bg-[var(--school-primary-soft)] px-2.5 text-[10px] font-black theme-primary">ITM-</span>
+            <input disabled placeholder="Search by item code or name..." className="min-w-0 flex-1 bg-transparent px-2.5 text-xs font-semibold outline-none" />
+            <button type="button" disabled className="px-3 text-[10px] font-black theme-primary-bg disabled:opacity-60">Search</button>
+          </div>
+        </div>
+        <button type="button" disabled className="shrink-0 rounded-lg border border-[var(--school-primary-border)] bg-[var(--school-surface)] px-3 py-2 text-[10px] font-black theme-primary disabled:opacity-70">Request Info</button>
+      </div>
+      <p className="mt-1 text-[9px] text-[var(--school-muted)]">Use numeric code, ITM-code, item name, type or specification.</p>
+      <div className="mt-2 rounded-lg border border-dashed border-[var(--school-border)] bg-[var(--school-surface)] p-3 text-center text-[10px] text-[var(--school-muted)]">Search results appear here</div>
+    </section>
+
+    <section className="rounded-xl border border-[var(--school-border)] p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div><p className="text-[10px] font-black uppercase tracking-[0.14em] theme-primary">Selected Items</p><p className="mt-0.5 text-[9px] text-[var(--school-muted)]">Selected items, quantity and optional note.</p></div>
+        <span className="rounded-full bg-[var(--school-primary-soft)] px-2 py-1 text-[8px] font-black theme-primary">0 items · Qty 0</span>
+      </div>
+      <div className="mt-2 rounded-lg border border-dashed border-[var(--school-border)] p-3 text-center text-[10px] text-[var(--school-muted)]">Selected item rows appear here</div>
+      <div className="mt-2 flex justify-end"><button type="button" disabled className="rounded-lg px-4 py-2 text-[9px] font-black theme-primary-bg disabled:opacity-60">Continue to Request →</button></div>
+    </section>
+
+    <section className="rounded-xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] p-3">
+      <div className="flex items-center justify-between gap-2"><div><p className="text-[9px] font-black uppercase tracking-[0.14em] theme-primary">Service Request</p><p className="mt-0.5 text-sm font-black">Request Information</p></div><span className="rounded-full bg-[var(--school-surface)] px-2 py-1 text-[9px] font-black theme-primary">Preview only</span></div>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        <label><span className="mb-1 block text-[9px] font-bold">Class / Section *</span><input disabled placeholder="Class 6-A" className="field h-9 w-full text-xs disabled:opacity-70" /></label>
+        <label><span className="mb-1 block text-[9px] font-bold">Department</span><input disabled placeholder="Member department" className="field h-9 w-full text-xs disabled:opacity-70" /></label>
+      </div>
+      <label className="mt-2 block"><span className="mb-1 block text-[9px] font-bold">Request Details *</span><textarea disabled rows={3} placeholder="What is the item needed for?" className="field w-full resize-none text-xs disabled:opacity-70" /></label>
+      <div className="mt-3 flex items-center justify-between gap-2 rounded-lg bg-[var(--school-surface)] px-3 py-2"><span className="text-[9px] font-bold theme-primary">Selected items · Total quantity</span><button type="button" disabled className="rounded-lg px-4 py-2 text-[9px] font-black theme-primary-bg disabled:opacity-60">Submit for Approval →</button></div>
+    </section>
+  </div>;
+}
+
+export default function ItemSrModule({ department, permissions, preview = false }: { department: string | null; permissions: Permissions; preview?: boolean }) {
   const supabase = createClient();
   const canSearch = Boolean(permissions.view || permissions.create);
   const canCreate = Boolean(permissions.create);
@@ -39,6 +77,7 @@ export default function ItemSrModule({ department, permissions }: { department: 
     setMessage(`SR ${data?.sr_number ?? ""} submitted successfully. Status: Pending Approval.`); setSelected([]); setItems([]); setQuery(""); setClassName(""); setDetails(""); setRequestOpen(false);
   }
 
+  if (preview) return <ItemSrFormPreview />;
   if (!canSearch) return <div className="mt-3 rounded-2xl border border-dashed border-[var(--school-border)] bg-[var(--school-primary-soft)] p-8 text-center"><p className="text-sm font-black">Item SR Access</p><p className="mt-1 text-xs text-[var(--school-muted)]">Your role does not have Item SR view or create permission.</p></div>;
   const latest = selected[selected.length - 1]; const totalQty = selected.reduce((sum, item) => sum + Number(item.quantity), 0);
 
