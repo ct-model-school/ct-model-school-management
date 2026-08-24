@@ -62,14 +62,20 @@ export default function LoginPortalPage() {
 
             <form onSubmit={(event) => event.preventDefault()} className={styles.form}>
               <label className={styles.field}>
-                <span>Member ID / Username</span>
-                <div className={styles.selectWrap}>
-                  <span className={styles.inputPrefix}>{selected.prefix}</span>
-                  <select name="memberId" defaultValue="" aria-label="Select Member ID or Username">
-                    <option value="" disabled>Select your Member ID</option>
-                    <option value="placeholder">Enter or select your ID</option>
-                  </select>
-                </div>
+                <span>{selected.id === "admin" ? "Admin ID / Username" : "Member ID / Username"}</span>
+                {selected.id === "admin" ? (
+                  <div className={styles.inputWrap}>
+                    <span className={styles.inputPrefix}>{selected.prefix}</span>
+                    <input name="memberId" type="text" placeholder="Enter your Admin ID" autoComplete="username" inputMode="text" />
+                  </div>
+                ) : (
+                  <div className={styles.selectWrap}>
+                    <span className={styles.inputPrefix}>{selected.prefix}</span>
+                    <select name="memberId" defaultValue="" aria-label="Select your ID">
+                      <option value="" disabled>Select your ID</option>
+                    </select>
+                  </div>
+                )}
               </label>
 
               <label className={styles.field}>
