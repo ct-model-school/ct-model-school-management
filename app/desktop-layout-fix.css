@@ -64,6 +64,10 @@
     width: 100%;
     box-sizing: border-box;
   }
+  main:has(> header + #top) #about > div > div:first-child {
+    padding-inline: clamp(16px, 2.2vw, 32px) !important;
+    box-sizing: border-box;
+  }
   main:has(> header + #top) #about h2,
   main:has(> header + #top) #about p {
     max-width: none;
@@ -71,7 +75,13 @@
     word-break: normal;
   }
   main:has(> header + #top) #about h2 {
+    font-size: clamp(1.45rem, 2.05vw, 2.15rem) !important;
+    line-height: 1.1 !important;
     letter-spacing: -0.025em;
+  }
+  main:has(> header + #top) #about p {
+    font-size: clamp(0.82rem, 0.88vw, 0.98rem) !important;
+    line-height: 1.6 !important;
   }
 
   /* Principal: preserve the desktop structure while preventing narrow text columns. */
