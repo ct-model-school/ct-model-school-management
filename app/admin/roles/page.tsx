@@ -57,7 +57,7 @@ export default function AdminRolesPage() {
     setRoleName(role.role_name);
     setInventory({ ...emptyInventory(), ...inv });
     setItemSr({ ...emptyItemSr(), ...sr });
-    setAccounts({ ...empty(accountsPermissionList.map(x => x.key)), ...acc });
+    setAccounts({ salary_payment: Boolean(acc.salary_payment) });
     setOther(Object.fromEntries(legacy.map(([key]) => [key, Boolean(role.permissions?.[key])] )));
     setMessage("");
     setError("");
@@ -67,14 +67,14 @@ export default function AdminRolesPage() {
   function toggleAll(value: boolean) {
     setInventory({ view: value, add: value, edit: value, remove: value, sr_approval: value });
     setItemSr({ view: value, create: value, history: value });
-    setAccounts(Object.fromEntries(accountsPermissionList.map(x => [x.key, value])));
+    setAccounts({ salary_payment: value });
     setOther(Object.fromEntries(legacy.map(([key]) => [key, value])));
   }
 
   async function save() {
     setSaving(true);
     setError("");
-    const permissions = { ...other, inventory, item_sr: itemSr, accounts };
+    const permissions = { ...other, inventory, item_sr: itemSr, accounts: { salary_payment: Boolean(accounts.salary_payment) } };
     const { error } = await supabase.rpc("store_admin_save_member_role", { p_id: editingId, p_role_name: roleName, p_permissions: permissions });
     if (error) setError(error.message);
     else {
@@ -137,11 +137,11 @@ export default function AdminRolesPage() {
         <div className="mt-4 flex flex-wrap gap-2"><button type="button" onClick={() => toggleAll(true)} className="rounded-xl border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Enable All</button><button type="button" onClick={() => toggleAll(false)} className="rounded-xl border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Disable All</button></div>
         {rows("Inventory", "Items, stock and SR processing.", inventoryList, inventoryValues, setInventoryMap, `${Object.values(inventory).filter(Boolean).length}/5`)}
         {rows("Item SR", "Member-side Service Request permissions.", itemSrList, itemSrValues, setItemSrMap, `${Object.values(itemSr).filter(Boolean).length}/3`)}
-        {rows("Accounts", "School financial operations. HR prepares and approves salary sheets; Accounts processes approved salary payments and records the financial transaction.", accountsPermissionList.map(x => [x.key, x.title] as const), accounts, setAccounts, `${Object.values(accounts).filter(Boolean).length}/${accountsPermissionList.length}`)}
+        {rows("Accounts", "Member-side Accounts access is limited to viewing HR-submitted salary sheets, salary payment status and outstanding salary due. Admin retains full Accounts control.", accountsPermissionList.map(x => [x.key, x.title] as const), accounts, setAccounts, `${Object.values(accounts).filter(Boolean).length}/1`)}
         {rows("Other Permissions", "Existing non-category permissions remain independent.", legacy, other, setOther, `${Object.values(other).filter(Boolean).length}/${legacy.length}`)}
         <button type="button" disabled={saving || !roleName.trim()} onClick={() => void save()} className="mt-5 w-full rounded-xl px-5 py-3.5 text-sm font-bold theme-primary-bg disabled:opacity-60">{saving ? "Saving..." : editingId ? "Update Role" : "Create Role"}</button>
       </section>
-      <section className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-6"><p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">Role Library</p><h2 className="mt-1 text-xl font-black">Available Roles</h2><p className="mt-1 text-xs leading-5 text-[var(--school-muted)]">Accounts permissions are stored under one independent <code>accounts</code> permission object.</p><div className="mt-5 space-y-3">{loading ? <p className="rounded-2xl border border-dashed border-[var(--school-border)] p-8 text-center text-sm text-[var(--school-muted)]">Loading roles...</p> : null}{!loading && roles.map(role => { const acc = role.permissions?.accounts && typeof role.permissions.accounts === "object" ? role.permissions.accounts as BoolMap : {}; const count = accountsPermissionList.filter(x => Boolean(acc[x.key])).length; return <article key={role.id} className="rounded-2xl border border-[var(--school-border)] p-4"><div className="flex items-start justify-between gap-3"><div><h3 className="text-sm font-black">{role.role_name}</h3><p className="mt-1 text-[10px] text-[var(--school-muted)]">Accounts {count}/{accountsPermissionList.length}</p></div><div className="flex gap-2"><button type="button" onClick={() => editRole(role)} className="rounded-xl border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Edit</button>{!role.is_system ? <button type="button" onClick={() => void remove(role)} className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600">Remove</button> : null}</div></div>{count ? <div className="mt-3 flex flex-wrap gap-1.5">{accountsPermissionList.filter(x => Boolean(acc[x.key])).map(x => <span key={x.key} className="rounded-lg bg-[var(--school-primary-soft)] px-2 py-1 text-[10px] font-semibold theme-primary">{x.title}</span>)}</div> : null}</article>; })}</div></section>
+      <section className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm sm:p-6"><p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">Role Library</p><h2 className="mt-1 text-xl font-black">Available Roles</h2><p className="mt-1 text-xs leading-5 text-[var(--school-muted)]">Member Accounts uses one permission only: Salary & Salary Due. Other Accounts permissions are no longer offered here.</p><div className="mt-5 space-y-3">{loading ? <p className="rounded-2xl border border-dashed border-[var(--school-border)] p-8 text-center text-sm text-[var(--school-muted)]">Loading roles...</p> : null}{!loading && roles.map(role => { const acc = role.permissions?.accounts && typeof role.permissions.accounts === "object" ? role.permissions.accounts as BoolMap : {}; const salaryEnabled = Boolean(acc.salary_payment); return <article key={role.id} className="rounded-2xl border border-[var(--school-border)] p-4"><div className="flex items-start justify-between gap-3"><div><h3 className="text-sm font-black">{role.role_name}</h3><p className="mt-1 text-[10px] text-[var(--school-muted)]">Salary & Salary Due {salaryEnabled ? "ON" : "OFF"}</p></div><div className="flex gap-2"><button type="button" onClick={() => editRole(role)} className="rounded-xl border border-[var(--school-border)] px-3 py-2 text-xs font-bold">Edit</button>{!role.is_system ? <button type="button" onClick={() => void remove(role)} className="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-600">Remove</button> : null}</div></div>{salaryEnabled ? <div className="mt-3"><span className="rounded-lg bg-[var(--school-primary-soft)] px-2 py-1 text-[10px] font-semibold theme-primary">Salary & Salary Due</span></div> : null}</article>; })}</div></section>
     </div>
   </AdminPageShell>;
 }
