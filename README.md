@@ -4,9 +4,7 @@
 
 ### Current Status
 
-The project is an integrated school website and management system for **C.T. Model School**. The public website, Community/People foundation, admin management modules, theme system, Supabase integration and Vercel deployment workflow are already in active development.
-
-<!-- Vercel deployment trigger: restored baseline 983d6196. No application code change. -->
+The project is an integrated school website and management system for **C.T. Model School**. The public website, Community/People foundation, Admin management modules, Student Admission/Registration workflow, theme system, Supabase integration and Vercel deployment workflow are in active development.
 
 ---
 
@@ -94,14 +92,57 @@ The project is an integrated school website and management system for **C.T. Mod
 - [x] Salary information
 - [x] Qualification information
 - [x] Grade and institution information
-- [ ] Salary payment workflow
-- [ ] Payment history
+- [x] Member-linked payment and due tracking
+- [x] Member ID lookup/autofill in Accounts entry
+- [ ] Salary payment workflow refinement
+- [ ] Payment history refinement
 - [ ] Financial reports
 - [ ] Monthly/annual summaries
 
 ---
 
-## Phase 6: Notices & School Information
+## Phase 6: Students & Admission / Registration
+
+### New Student Admission
+
+- [x] Public Student Admission Registration form
+- [x] Academic year and admission class
+- [x] Student information
+- [x] Parent/guardian information
+- [x] Address and contact information
+- [x] Application number generation
+- [x] Pending application storage
+- [x] Admin admission review
+- [x] Admin approve/reject workflow
+- [x] Student ID generation after approval
+- [x] Parent record creation and student-parent linking
+
+### Existing Student Registration
+
+- [x] Dedicated Existing Student Registration route
+- [x] Existing Student ID validation
+- [x] Academic year and class update request
+- [x] Parent/guardian contact update request
+- [x] Address/contact update request
+- [x] Admin review workflow
+- [x] Admin approve/reject workflow
+- [x] Approved updates modify the existing student record only
+- [x] Duplicate student creation prevented by the workflow
+
+### Admin Student Management
+
+- [x] Students module exposed in Admin navigation
+- [x] Students module exposed on Admin Dashboard
+- [x] New Student Admission Applications
+- [x] Existing Student Registration Requests
+- [x] Controlled approval-based student data flow
+- [ ] Student master list/search/filter refinement
+- [ ] Student profile management refinement
+- [ ] Academic session/class/section management
+
+---
+
+## Phase 7: Notices & School Information
 
 - [x] Notice foundation
 - [x] Public notice display
@@ -112,10 +153,12 @@ The project is an integrated school website and management system for **C.T. Mod
 
 ---
 
-## Phase 7: Database & Security
+## Phase 8: Database & Security
 
 - [x] Supabase integration
 - [x] People database foundation
+- [x] Student admission registration RPC foundation
+- [x] Existing student registration RPC foundation
 - [x] Admin RPC foundation
 - [x] Storage bucket/policy foundation
 - [ ] Verify all production migrations
@@ -126,7 +169,7 @@ The project is an integrated school website and management system for **C.T. Mod
 
 ---
 
-## Phase 8: Responsive UI
+## Phase 9: Responsive UI
 
 ### Desktop
 - [x] Centered public content rail
@@ -147,30 +190,24 @@ The project is an integrated school website and management system for **C.T. Mod
 
 ---
 
-## Phase 9: Production Deployment
+## Phase 10: Production Deployment
 
 - [x] GitHub `main` branch connected to Vercel
 - [x] Production project exists on Vercel
 - [x] Successful production deployments verified previously
 - [ ] Confirm GitHub push → Vercel automatic deployment
-- [ ] Verify latest responsive hero commit reaches production
 - [ ] Run production build verification
 - [ ] Verify production environment variables
 - [ ] Verify Supabase production connection
 - [ ] Final smoke test of public website
 - [ ] Final smoke test of Admin panel
-
-### Deployment Test
-
-A harmless deployment-trigger commit has been pushed to `main` to verify whether the GitHub → Vercel automatic deployment integration is currently responding to new pushes.
-
-**Test commit:** `31c89dfa11a30c79bb353aaf1e4c4e4a43b7cee5`
-
-Do not change application functionality just to trigger deployment. Use a harmless documentation/test commit when deployment connectivity needs to be checked.
+- [ ] Final smoke test of Student Admission
+- [ ] Final smoke test of Existing Student Registration
+- [ ] Final smoke test of Admin Student approvals
 
 ---
 
-## Phase 10: Final QA
+## Phase 11: Final QA
 
 1. Run `npm run build`.
 2. Check TypeScript errors.
@@ -183,8 +220,14 @@ Do not change application functionality just to trigger deployment. Use a harmle
 9. Check file uploads and storage paths.
 10. Check role/permission behavior.
 11. Check Supabase data persistence.
-12. Check production deployment.
-13. Verify public and Admin routes after deployment.
+12. Submit a New Student Admission test application.
+13. Approve and reject admission test applications from Admin.
+14. Submit an Existing Student Registration test request.
+15. Approve and reject existing-student requests from Admin.
+16. Verify no duplicate student is created by an existing-student update.
+17. Check Accounts Member ID lookup and calculation.
+18. Check production deployment.
+19. Verify public and Admin routes after deployment.
 
 ---
 
@@ -198,18 +241,21 @@ Do not change application functionality just to trigger deployment. Use a harmle
 6. Test the affected area before considering a feature complete.
 7. Preserve existing working desktop layouts when fixing mobile issues.
 8. Prefer the smallest safe change that solves the actual problem.
-9. After code changes, verify GitHub commit status and Vercel deployment status.
-10. Do the work first, then explain the result.
+9. Every new module or workflow must be exposed in Admin when administrative action is required.
+10. New permissions must use the existing central Role/Permission system, not a parallel permission system.
+11. After code changes, verify GitHub commit status and Vercel deployment status.
+12. Do the work first, then explain the result.
 
 ---
 
 ## Next Recommended Order
 
-**1.** Verify GitHub → Vercel automatic deployment  
+**1.** Verify Student Admission + Existing Student Registration in production  
 **2.** Finish mobile/desktop responsive regression testing  
-**3.** Verify Supabase production migrations and storage  
+**3.** Verify Supabase production migrations and RLS  
 **4.** Complete Notice enhancements  
-**5.** Complete Accounts/Finance workflow  
+**5.** Complete Accounts/Finance workflow and reports  
 **6.** Complete Inventory workflow/reporting  
-**7.** Final security/RLS review  
-**8.** Production smoke test and release checklist
+**7.** Complete Student master/search/profile refinement  
+**8.** Final security/RLS review  
+**9.** Production smoke test and release checklist
