@@ -6,6 +6,7 @@ import { getCurrentAdminPermissions } from "@/lib/adminPermissions";
 const primaryNavigation = [
   { href: "/admin", label: "Dashboard", permission: "dashboard" },
   { href: "/admin/inventory", label: "Inventory", adminOnly: true },
+  { href: "/admin/item-sr", label: "Item SR", adminOnly: true },
   { href: "/admin/settings", label: "Settings", adminOnly: true },
   { href: "/admin/roles", label: "Role Management", adminOnly: true },
 ];
@@ -25,6 +26,7 @@ export default async function AdminLayout({ children }: Readonly<{ children: Rea
   if (pathname === "/admin/settings" || pathname.startsWith("/admin/settings/")) { if (!adminOnly) redirect("/admin"); }
   if (pathname === "/admin/roles" || pathname.startsWith("/admin/roles/")) { if (!adminOnly) redirect("/admin"); }
   if (pathname === "/admin/inventory" || pathname.startsWith("/admin/inventory/")) { if (!adminOnly) redirect("/admin"); }
+  if (pathname === "/admin/item-sr" || pathname.startsWith("/admin/item-sr/")) { if (!adminOnly) redirect("/admin"); }
 
   const roleLabel = roleName.replace(/_/g, " ");
   const visiblePrimary = primaryNavigation.filter((item) => {
