@@ -1,16 +1,17 @@
 -- Inventory is the first finalized permission category.
 -- Keep one Inventory category with independent capabilities. Legacy top-level
--- inventory/sr booleans are normalized away so they cannot create duplicate access paths.
+-- inventory/sr booleans are removed so they cannot create duplicate access paths.
+-- Existing roles start with Inventory fully OFF; Admin can explicitly grant each capability.
 
 update public.member_roles
 set permissions =
   (permissions - 'inventory' - 'sr') || jsonb_build_object(
     'inventory', jsonb_build_object(
-      'view', coalesce((permissions->>'inventory')::boolean, false),
+      'view', false,
       'add', false,
       'edit', false,
       'remove', false,
-      'sr_approval', coalesce((permissions->>'sr')::boolean, false)
+      'sr_approval', false
     )
   )
 where permissions ? 'inventory' or permissions ? 'sr';
