@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useLayoutEffect, type ReactNode } from "react";
 
 const TOKEN_KEY = "ctms_store_token";
 
 export default function LoginPortalLayout({ children }: { children: ReactNode }) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const originalSetItem = Storage.prototype.setItem;
     const originalRemoveItem = Storage.prototype.removeItem;
 
