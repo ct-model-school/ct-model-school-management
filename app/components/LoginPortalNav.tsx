@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 
 const LOGIN_LINK = "ctms-login-portal-link";
+const NAV_BUTTON_CLASS = "ctms-public-nav-button";
+const NAV_BUTTON_MOBILE_CLASS = "ctms-public-nav-button-mobile";
 
 function addLoginLink(nav: Element, mobile = false) {
   if (nav.querySelector(`[data-${LOGIN_LINK}]`)) return;
@@ -18,6 +20,16 @@ function addLoginLink(nav: Element, mobile = false) {
   else nav.appendChild(link);
 }
 
+function styleExistingNavLinks(nav: Element, mobile = false) {
+  const className = mobile ? NAV_BUTTON_MOBILE_CLASS : NAV_BUTTON_CLASS;
+  nav.querySelectorAll<HTMLAnchorElement>("a").forEach((link) => {
+    const href = link.getAttribute("href") || "";
+    if (!href || href === "/loginportal") return;
+    if (href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("http")) return;
+    link.classList.add(className);
+  });
+}
+
 function syncLoginLink() {
   const pathname = window.location.pathname;
   if (pathname.startsWith("/admin") || pathname.startsWith("/management") || pathname.startsWith("/register")) return;
@@ -25,10 +37,16 @@ function syncLoginLink() {
   const headers = document.querySelectorAll("main > header");
   headers.forEach((header) => {
     const desktopNav = header.querySelector("nav.hidden");
-    if (desktopNav) addLoginLink(desktopNav, false);
+    if (desktopNav) {
+      styleExistingNavLinks(desktopNav, false);
+      addLoginLink(desktopNav, false);
+    }
 
     const mobileNav = Array.from(header.querySelectorAll("nav")).find((nav) => !nav.classList.contains("hidden"));
-    if (mobileNav?.querySelector("div")) addLoginLink(mobileNav, true);
+    if (mobileNav?.querySelector("div")) {
+      styleExistingNavLinks(mobileNav, true);
+      addLoginLink(mobileNav, true);
+    }
   });
 }
 
@@ -54,8 +72,9 @@ export default function LoginPortalNav() {
 
   return (
     <style>{`
+      .ctms-public-nav-button,
       .ctms-login-desktop-link {
-        display:inline-flex;
+        display:inline-flex !important;
         align-items:center;
         justify-content:center;
         min-height:36px;
@@ -71,10 +90,12 @@ export default function LoginPortalNav() {
         transition:transform 160ms ease,opacity 160ms ease,box-shadow 160ms ease;
         box-shadow:0 5px 14px var(--school-primary-border);
       }
+      .ctms-public-nav-button:hover,
       .ctms-login-desktop-link:hover {
         transform:translateY(-1px);
         opacity:.92;
       }
+      .ctms-public-nav-button-mobile,
       .ctms-login-mobile-link {
         display:flex !important;
         align-items:center;
@@ -82,12 +103,14 @@ export default function LoginPortalNav() {
         width:100%;
         margin-top:.35rem;
         padding:.7rem .75rem;
+        border:1px solid var(--school-primary-border);
         border-radius:.65rem;
         background:var(--school-primary);
         color:var(--school-on-primary,#fff) !important;
         text-decoration:none !important;
         font-size:.875rem;
         font-weight:800;
+        line-height:1;
       }
     `}</style>
   );
