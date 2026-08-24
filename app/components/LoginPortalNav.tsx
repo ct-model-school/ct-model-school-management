@@ -79,19 +79,19 @@ export default function LoginPortalNav() {
         display:inline-flex !important;
         align-items:center;
         justify-content:center;
-        min-height:36px;
-        min-width:64px;
-        padding:.5rem .9rem;
+        min-height:30px;
+        min-width:52px;
+        padding:.4rem .68rem;
         border:1px solid var(--school-primary-border);
-        border-radius:.7rem;
+        border-radius:.55rem;
         background:linear-gradient(180deg,var(--school-primary),var(--school-primary-hover,var(--school-primary)));
         color:var(--school-on-primary,#fff) !important;
         text-decoration:none !important;
-        font-size:.8rem;
+        font-size:.68rem;
         font-weight:800;
         line-height:1;
         overflow:hidden;
-        box-shadow:0 5px 14px var(--school-primary-border);
+        box-shadow:0 4px 10px var(--school-primary-border);
         transition:transform 180ms ease,box-shadow 180ms ease,filter 180ms ease;
       }
       .ctms-public-nav-button::before,
@@ -108,7 +108,7 @@ export default function LoginPortalNav() {
       .ctms-login-desktop-link:hover {
         transform:translateY(-2px);
         filter:brightness(1.04);
-        box-shadow:0 9px 22px var(--school-primary-border);
+        box-shadow:0 7px 16px var(--school-primary-border);
       }
       .ctms-public-nav-button:hover::before,
       .ctms-login-desktop-link:hover::before {
@@ -117,7 +117,7 @@ export default function LoginPortalNav() {
       .ctms-public-nav-button:active,
       .ctms-login-desktop-link:active {
         transform:translateY(0) scale(.98);
-        box-shadow:0 4px 10px var(--school-primary-border);
+        box-shadow:0 3px 8px var(--school-primary-border);
       }
       .ctms-public-nav-button:focus-visible,
       .ctms-login-desktop-link:focus-visible,
@@ -135,17 +135,17 @@ export default function LoginPortalNav() {
         justify-content:center;
         width:100%;
         margin-top:.35rem;
-        padding:.7rem .75rem;
+        padding:.62rem .7rem;
         border:1px solid var(--school-primary-border);
-        border-radius:.65rem;
+        border-radius:.6rem;
         background:linear-gradient(180deg,var(--school-primary),var(--school-primary-hover,var(--school-primary)));
         color:var(--school-on-primary,#fff) !important;
         text-decoration:none !important;
-        font-size:.875rem;
+        font-size:.8rem;
         font-weight:800;
         line-height:1;
         overflow:hidden;
-        box-shadow:0 5px 14px var(--school-primary-border);
+        box-shadow:0 4px 10px var(--school-primary-border);
         transition:transform 180ms ease,box-shadow 180ms ease,filter 180ms ease;
       }
       .ctms-public-nav-button-mobile::before,
@@ -162,7 +162,7 @@ export default function LoginPortalNav() {
       .ctms-login-mobile-link:hover {
         transform:translateY(-1px);
         filter:brightness(1.04);
-        box-shadow:0 8px 18px var(--school-primary-border);
+        box-shadow:0 7px 16px var(--school-primary-border);
       }
       .ctms-public-nav-button-mobile:hover::before,
       .ctms-login-mobile-link:hover::before {
@@ -170,20 +170,8 @@ export default function LoginPortalNav() {
       }
       .ctms-public-nav-button-mobile:active,
       .ctms-login-mobile-link:active {
-        transform:scale(.985);
-        box-shadow:0 4px 10px var(--school-primary-border);
-      }
-      @media (prefers-reduced-motion:reduce) {
-        .ctms-public-nav-button,
-        .ctms-login-desktop-link,
-        .ctms-public-nav-button-mobile,
-        .ctms-login-mobile-link,
-        .ctms-public-nav-button::before,
-        .ctms-login-desktop-link::before,
-        .ctms-public-nav-button-mobile::before,
-        .ctms-login-mobile-link::before {
-          transition:none !important;
-        }
+        transform:scale(.98);
+        box-shadow:0 3px 8px var(--school-primary-border);
       }
     `}</style>
   );
