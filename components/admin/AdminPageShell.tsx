@@ -10,13 +10,14 @@ type AdminPageShellProps = {
 
 const moduleLinks = [
   { href: "/admin", label: "Dashboard" },
+  { href: "/admin/inventory", label: "Inventory" },
+  { href: "/admin/item-sr", label: "Item SR" },
   { href: "/admin/students", label: "Students" },
   { href: "/admin/parents", label: "Parents" },
   { href: "/admin/people", label: "People & Achievements" },
   { href: "/admin/teachers", label: "Teachers & Staff" },
   { href: "/admin/accounts", label: "Accounts" },
   { href: "/admin/members", label: "Store Members" },
-  { href: "/admin/inventory", label: "Inventory" },
   { href: "/admin/notices", label: "Notices" },
   { href: "/admin/results", label: "Results" },
 ];
