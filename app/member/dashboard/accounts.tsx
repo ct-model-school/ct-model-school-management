@@ -1,35 +1,29 @@
 "use client";
-import { useCallback,useEffect,useMemo,useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { AccountsEntryForm } from "./member-accounts-entry";
+import MemberAccountsV2 from "./member-accounts-v2";
 
-export const accountsPermissionList=[
- {key:"dashboard",title:"Accounts Dashboard",description:"Financial overview, balances, dues and alerts."},
- {key:"student_fees",title:"Student Fees & Payments",description:"Member fee collection and payment history."},
- {key:"salary_payment",title:"Teacher & Staff Salary Payment",description:"Process salary payments and member-linked records."},
- {key:"other_member_payment",title:"Other Member Payments",description:"Honorarium and approved payments for members."},
- {key:"vendor_payment",title:"Vendor / Supplier Payments",description:"Supplier bills and settlements."},
- {key:"school_bills",title:"Utility & School Bills",description:"School utility and recurring bills."},
- {key:"income",title:"Income",description:"School income and receipts."},
- {key:"expense",title:"Expense",description:"Operational and other expenses."},
- {key:"cash",title:"Cash Management",description:"Cash in, cash out and balance."},
- {key:"bank",title:"Bank Management",description:"Bank transactions and balances."},
- {key:"vouchers",title:"Vouchers",description:"Voucher references and history."},
- {key:"journal_ledger",title:"Journal & Ledger",description:"Financial history."},
- {key:"receivable_payable",title:"Receivable / Payable",description:"Member dues and settlements."},
- {key:"budget",title:"Budget & Financial Planning",description:"Budget tracking."},
- {key:"reports",title:"Financial Reports",description:"Financial reports."},
- {key:"audit",title:"Financial Audit & History",description:"Financial audit trail."},
- {key:"settings",title:"Accounts Settings",description:"Accounts configuration."},
+type Permissions = Record<string, boolean>;
+
+// Member Accounts is intentionally limited to the salary workflow that is ready now.
+// Other Accounts workflows remain in the database and admin workspace for later sections.
+export const accountsPermissionList = [
+  {
+    key: "salary_payment",
+    title: "Salary & Salary Due",
+    description: "View HR-submitted salary sheets, payment status and outstanding salary due.",
+  },
 ] as const;
 
-type P=Record<string,boolean>;type E={id:string;voucher_no:string;entry_date:string;entry_type:string;category:string|null;party_id:string|null;party_name:string|null;total_amount:number;paid_amount:number;due_amount:number;due_date:string|null;payment_status:string;payment_method:string;status:string};
-const money=(n:number)=>new Intl.NumberFormat("en-BD",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0);const labels:Record<string,string>={income:"Income",expense:"Expense",student_fee:"Member Fee",salary:"Salary",vendor_payment:"Vendor Payment",school_bill:"School Bill",other_payment:"Other Member Payment"};
-export default function AccountsModule({permissions,preview=false}:{permissions:P;preview?:boolean}){
- const supabase=useMemo(()=>createClient(),[]);const [summary,setSummary]=useState<any>({income:0,expense:0,net:0,cash:0,bank:0});const [entries,setEntries]=useState<E[]>([]);const [search,setSearch]=useState("");const [filter,setFilter]=useState("");const [loading,setLoading]=useState(true);const [error,setError]=useState("");const token=typeof window!=="undefined"?window.localStorage.getItem("ctms_store_token"):null;
- const load=useCallback(async()=>{if(!token)return;setLoading(true);const [s,e]=await Promise.all([supabase.rpc("store_accounts_summary",{p_token:token}),supabase.rpc("store_accounts_list_entries",{p_token:token,p_type:filter||null,p_search:search||null})]);if(s.error||e.error)setError(s.error?.message||e.error?.message||"");else{setSummary(s.data||{});setEntries((e.data||[]) as E[])}setLoading(false)},[filter,search,supabase,token]);useEffect(()=>{void load()},[load]);
- const can=Boolean(permissions.dashboard||permissions.__all);if(!can)return <div className="mt-5 rounded-2xl border border-[var(--school-border)] p-6 text-center text-xs text-[var(--school-muted)]">Accounts access is not enabled.</div>;
- return <div className="mt-5 space-y-5"><div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-4"><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-[10px] font-black uppercase tracking-[0.15em] theme-primary">Accounts Control</p><h3 className="mt-1 text-lg font-black">{preview?"Accounts Workspace Preview":"Accounts Workspace"}</h3><p className="mt-1 text-xs leading-5 text-[var(--school-muted)]">Select any member or member ID, autofill the profile details, enter total payable and paid amount, set purpose and due date, then submit. The record is linked to that member's dashboard and profile.</p></div><AccountsEntryForm permissions={permissions}/></div></div>{error&&<div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">{error}</div>}
- <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{[["Income",summary.income],["Expense",summary.expense],["Net",summary.net],["Cash",summary.cash],["Bank",summary.bank]].map(([a,b])=><div key={a} className="rounded-2xl border border-[var(--school-border)] p-4"><p className="text-[10px] font-black uppercase tracking-wider text-[var(--school-muted)]">{a}</p><p className="mt-2 text-xl font-black theme-primary">৳ {money(Number(b))}</p></div>)}</div>
- <section className="rounded-2xl border border-[var(--school-border)] p-4"><div className="flex flex-col gap-2 sm:flex-row"><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search member ID, name, voucher or purpose..." className="min-w-0 flex-1 rounded-xl border border-[var(--school-border)] px-3 py-2.5 text-xs"/><select value={filter} onChange={e=>setFilter(e.target.value)} className="rounded-xl border border-[var(--school-border)] px-3 py-2.5 text-xs"><option value="">All entries</option>{Object.entries(labels).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></div><div className="mt-4 overflow-x-auto">{loading?<p className="p-5 text-xs text-[var(--school-muted)]">Loading transactions...</p>:<table className="w-full min-w-[1050px] text-left text-xs"><thead><tr className="border-b border-[var(--school-border)] text-[10px] uppercase tracking-wider text-[var(--school-muted)]"><th className="p-2">Voucher</th><th className="p-2">Member ID</th><th className="p-2">Member</th><th className="p-2">Purpose</th><th className="p-2">Total</th><th className="p-2">Paid</th><th className="p-2">Due</th><th className="p-2">Due Date</th><th className="p-2">Status</th></tr></thead><tbody>{entries.map(e=><tr key={e.id} className="border-b border-[var(--school-border)]"><td className="p-2 font-bold">{e.voucher_no}</td><td className="p-2 font-bold">{e.party_id||"-"}</td><td className="p-2">{e.party_name||"-"}</td><td className="p-2">{e.category||labels[e.entry_type]||e.entry_type}</td><td className="p-2">৳ {money(Number(e.total_amount||0))}</td><td className="p-2 theme-primary">৳ {money(Number(e.paid_amount||0))}</td><td className="p-2 font-bold text-amber-700">৳ {money(Number(e.due_amount||0))}</td><td className="p-2">{e.due_date||"-"}</td><td className="p-2 font-black uppercase">{e.payment_status}</td></tr>)}</tbody></table>}</div></section></div>;
+export default function AccountsModule({ permissions }: { permissions: Permissions; preview?: boolean }) {
+  const canViewSalary = Boolean(permissions.salary_payment || permissions.__all);
+
+  if (!canViewSalary) {
+    return (
+      <div className="mt-5 rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-6 text-center">
+        <p className="text-sm font-black">Salary & Accounts access is not enabled</p>
+        <p className="mt-1 text-xs text-[var(--school-muted)]">Your role does not currently have the salary payment permission.</p>
+      </div>
+    );
+  }
+
+  return <MemberAccountsV2 />;
 }
