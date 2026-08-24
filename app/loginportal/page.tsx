@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import styles from "./loginportal.module.css";
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 type LoginType = {
   id: "admin" | "teacher" | "staff" | "accounts" | "other" | "parent" | "student" | "committee";
@@ -24,8 +25,55 @@ const LOGIN_TYPES: LoginType[] = [
 ];
 
 export default function LoginPortalPage() {
+  const router = useRouter();
+  const supabase = createClient();
   const [selected, setSelected] = useState<LoginType | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [memberId, setMemberId] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  function selectLoginType(type: LoginType) {
+    setSelected(type);
+    setShowPassword(false);
+    setMemberId("");
+    setPassword("");
+    setError("");
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+
+    if (!selected) return;
+
+    if (selected.id !== "admin") {
+      setError("This account type is not connected yet. Please use Admin for now.");
+      return;
+    }
+
+    if (!memberId.trim() || !password) {
+      setError("Please enter your Admin ID / Username and password.");
+      return;
+    }
+
+    setLoading(true);
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: memberId.trim(),
+      password,
+    });
+
+    if (signInError) {
+      setError(signInError.message);
+      setLoading(false);
+      return;
+    }
+
+    router.replace("/admin");
+    router.refresh();
+  }
 
   return (
     <main className={styles.page}>
@@ -45,7 +93,7 @@ export default function LoginPortalPage() {
         <div className={styles.typeGrid}>
           {LOGIN_TYPES.map((type) => {
             const active = selected?.id === type.id;
-            return <button key={type.id} type="button" className={`${styles.typeCard} ${active ? styles.typeCardActive : ""}`} onClick={() => { setSelected(type); setShowPassword(false); }} aria-pressed={active}>
+            return <button key={type.id} type="button" className={`${styles.typeCard} ${active ? styles.typeCardActive : ""}`} onClick={() => selectLoginType(type)} aria-pressed={active}>
               <span className={styles.typeIcon}>{type.icon}</span>
               <span className={styles.typeContent}><strong>{type.label}</strong><small>{type.description}</small></span>
               <span className={styles.chevron} aria-hidden="true">›</span>
@@ -60,18 +108,18 @@ export default function LoginPortalPage() {
               <button type="button" className={styles.changeButton} onClick={() => setSelected(null)}>Change</button>
             </div>
 
-            <form onSubmit={(event) => event.preventDefault()} className={styles.form}>
+            <form onSubmit={handleSubmit} className={styles.form}>
               <label className={styles.field}>
                 <span>{selected.id === "admin" ? "Admin ID / Username" : "Member ID / Username"}</span>
                 {selected.id === "admin" ? (
                   <div className={styles.inputWrap}>
                     <span className={styles.inputPrefix}>{selected.prefix}</span>
-                    <input name="memberId" type="text" placeholder="Enter your Admin ID" autoComplete="username" inputMode="text" />
+                    <input name="memberId" type="text" value={memberId} onChange={(event) => setMemberId(event.target.value)} placeholder="Enter your Admin ID" autoComplete="username" inputMode="email" required />
                   </div>
                 ) : (
                   <div className={styles.selectWrap}>
                     <span className={styles.inputPrefix}>{selected.prefix}</span>
-                    <select name="memberId" defaultValue="" aria-label="Select your ID">
+                    <select name="memberId" defaultValue="" aria-label="Select your ID" disabled>
                       <option value="" disabled>Select your ID</option>
                     </select>
                   </div>
@@ -81,17 +129,19 @@ export default function LoginPortalPage() {
               <label className={styles.field}>
                 <span>Password</span>
                 <div className={styles.passwordWrap}>
-                  <input name="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" autoComplete="current-password" />
+                  <input name="password" type={showPassword ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" autoComplete="current-password" required />
                   <button type="button" className={styles.passwordToggle} onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? "Hide" : "Show"}</button>
                 </div>
               </label>
+
+              {error ? <div className={styles.errorMessage} role="alert">{error}</div> : null}
 
               <div className={styles.formActions}>
                 <div className={styles.secondaryActions}>
                   <button type="button" className={styles.forgotButton}>Forgot Password?</button>
                   {selected.canRegister && <a className={styles.registerButton} href={`/register?type=${selected.id}`}>Register</a>}
                 </div>
-                <button type="submit" className={styles.loginButton}>Login <span aria-hidden="true">→</span></button>
+                <button type="submit" className={styles.loginButton} disabled={loading}>{loading ? "Signing in..." : <>Login <span aria-hidden="true">→</span></>}</button>
               </div>
             </form>
           </> : <div className={styles.emptyState}><span className={styles.emptyIcon}>→</span><div><strong>Choose your account type</strong><p>Your Member ID and password fields will appear here.</p></div></div>}
