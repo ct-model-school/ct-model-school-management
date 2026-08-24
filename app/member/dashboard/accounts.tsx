@@ -3,6 +3,26 @@ import { useCallback,useEffect,useMemo,useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { AccountsEntryForm } from "./member-accounts";
 
+export const accountsPermissionList=[
+ {key:"dashboard",title:"Accounts Dashboard",description:"Financial overview, balances, dues and alerts."},
+ {key:"student_fees",title:"Student Fees & Payments",description:"Member fee collection and payment history."},
+ {key:"salary_payment",title:"Teacher & Staff Salary Payment",description:"Process salary payments and member-linked records."},
+ {key:"other_member_payment",title:"Other Member Payments",description:"Honorarium and approved payments for members."},
+ {key:"vendor_payment",title:"Vendor / Supplier Payments",description:"Supplier bills and settlements."},
+ {key:"school_bills",title:"Utility & School Bills",description:"School utility and recurring bills."},
+ {key:"income",title:"Income",description:"School income and receipts."},
+ {key:"expense",title:"Expense",description:"Operational and other expenses."},
+ {key:"cash",title:"Cash Management",description:"Cash in, cash out and balance."},
+ {key:"bank",title:"Bank Management",description:"Bank transactions and balances."},
+ {key:"vouchers",title:"Vouchers",description:"Voucher references and history."},
+ {key:"journal_ledger",title:"Journal & Ledger",description:"Financial history."},
+ {key:"receivable_payable",title:"Receivable / Payable",description:"Member dues and settlements."},
+ {key:"budget",title:"Budget & Financial Planning",description:"Budget tracking."},
+ {key:"reports",title:"Financial Reports",description:"Financial reports."},
+ {key:"audit",title:"Financial Audit & History",description:"Financial audit trail."},
+ {key:"settings",title:"Accounts Settings",description:"Accounts configuration."},
+] as const;
+
 type P=Record<string,boolean>;type E={id:string;voucher_no:string;entry_date:string;entry_type:string;category:string|null;party_id:string|null;party_name:string|null;total_amount:number;paid_amount:number;due_amount:number;due_date:string|null;payment_status:string;payment_method:string;status:string};
 const money=(n:number)=>new Intl.NumberFormat("en-BD",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0);const labels:Record<string,string>={income:"Income",expense:"Expense",student_fee:"Member Fee",salary:"Salary",vendor_payment:"Vendor Payment",school_bill:"School Bill",other_payment:"Other Member Payment"};
 export default function AccountsModule({permissions,preview=false}:{permissions:P;preview?:boolean}){
