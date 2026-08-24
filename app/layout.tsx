@@ -12,6 +12,7 @@ import "./desktop-theme.css";
 import "./desktop-layout-fix.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import PublicPeopleNav from "@/app/components/PublicPeopleNav";
+import LoginPortalNav from "@/app/components/LoginPortalNav";
 
 export const metadata: Metadata = {
   title: "C.T. Model School",
@@ -29,6 +30,7 @@ export default function RootLayout({
         <ThemeProvider>
           {children}
           <PublicPeopleNav />
+          <LoginPortalNav />
         </ThemeProvider>
       </body>
     </html>
