@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import styles from "./loginportal.module.css";
 
 type LoginType = {
   id: "admin" | "teacher" | "staff" | "accounts" | "other" | "parent" | "student" | "committee";
