@@ -20,7 +20,7 @@ const isAdminOnlyRole=(roleName:string)=>["admin","administrator","super_admin",
 export default async function AdminLayout({children}:{children:React.ReactNode}){
   const access=await getCurrentAdminPermissions(); if(!access)return children;
   const roleName=access.profile.role.name; const adminOnly=isAdminOnlyRole(roleName); const permissions=access.permissions; const requestHeaders=await headers(); const pathname=requestHeaders.get("x-admin-pathname")||"";
-  const procurement=permissions.procurement||{}; const inventory=permissions.inventory||{}; const accounts=permissions.accounts||{}; const itemSr=permissions.item_sr||{};
+  const procurement=(permissions.procurement||{}) as Record<string,any>; const inventory=(permissions.inventory||{}) as Record<string,any>; const accounts=(permissions.accounts||{}) as Record<string,any>; const itemSr=(permissions.item_sr||{}) as Record<string,any>;
   const hasInventory=adminOnly||Boolean(inventory.view); const hasProcurement=adminOnly||Object.values(procurement).some(Boolean); const hasAccounts=adminOnly||Object.values(accounts).some(Boolean)||Boolean(procurement.po_accounts_submit||procurement.po_payment_approve||procurement.po_payment_paid||procurement.po_history); const hasItemSr=adminOnly||Object.values(itemSr).some(Boolean);
   const allow=(key:string)=>adminOnly||Boolean(permissions[key]);
   if(pathname==="/admin"||pathname==="/admin/"){if(!permissions.dashboard&&!adminOnly)redirect("/admin/login");}
