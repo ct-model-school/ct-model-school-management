@@ -1,0 +1,68 @@
+name: Fix SR print header and requester
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch SR print component
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('components/SrDetailModal.tsx')
+          text = path.read_text(encoding='utf-8')
+
+          text = text.replace(
+              'import { useEffect, useRef } from "react";\n',
+              'import { useEffect, useRef, useState } from "react";\nimport { createClient } from "@/lib/supabase/client";\n'
+          )
+
+          text = text.replace(
+              '  const printedRef = useRef(false);\n\n  useEffect(() => {\n    if (!open || !sr) {\n      printedRef.current = false;\n      return;\n    }\n    if (printedRef.current) return;\n    printedRef.current = true;\n\n    const previousTitle = document.title;\n    document.title = sr.sr_number;\n\n    const handleAfterPrint = () => {\n      document.title = previousTitle;\n      onClose();\n    };\n    window.addEventListener("afterprint", handleAfterPrint);\n\n    const timer = window.setTimeout(() => {\n      window.print();\n    }, 120);\n\n    return () => {\n      window.clearTimeout(timer);\n      window.removeEventListener("afterprint", handleAfterPrint);\n      document.title = previousTitle;\n    };\n  }, [open, sr, onClose]);',
+              '  const printedRef = useRef(false);\n  const [schoolLogo, setSchoolLogo] = useState("");\n\n  useEffect(() => {\n    if (!open || !sr) {\n      printedRef.current = false;\n      setSchoolLogo("");\n      return;\n    }\n    if (printedRef.current) return;\n    printedRef.current = true;\n\n    const previousTitle = document.title;\n    document.title = sr.sr_number;\n    let cancelled = false;\n    let printTimer: number | null = null;\n\n    const handleAfterPrint = () => {\n      document.title = previousTitle;\n      onClose();\n    };\n    window.addEventListener("afterprint", handleAfterPrint);\n\n    const loadAndPrint = async () => {\n      let logo = "";\n      try {\n        const { data } = await createClient()\n          .from("school_settings")\n          .select("logo_url")\n          .eq("id", 1)\n          .maybeSingle();\n        logo = typeof data?.logo_url === "string" ? data.logo_url.trim() : "";\n      } catch {}\n      if (cancelled) return;\n      setSchoolLogo(logo);\n      printTimer = window.setTimeout(() => {\n        if (!cancelled) window.print();\n      }, 180);\n    };\n\n    void loadAndPrint();\n\n    return () => {\n      cancelled = true;\n      if (printTimer !== null) window.clearTimeout(printTimer);\n      window.removeEventListener("afterprint", handleAfterPrint);\n      document.title = previousTitle;\n    };\n  }, [open, sr, onClose]);'
+          )
+
+          text = text.replace(
+              '        .sr-a4-header {\n          position: relative;',
+              '        .sr-a4-header {\n          position: relative;'
+          )
+
+          text = text.replace(
+              '        .sr-a4-school {',
+              '        .sr-a4-brand {\n          display: flex;\n          align-items: center;\n          justify-content: center;\n          gap: 10px;\n          min-height: 44px;\n        }\n\n        .sr-a4-logo {\n          width: 46px;\n          height: 46px;\n          object-fit: contain;\n          display: block;\n          flex: 0 0 46px;\n        }\n\n        .sr-a4-brand-copy {\n          min-width: 0;\n          text-align: center;\n        }\n\n        .sr-a4-school {'
+          )
+
+          old = '''          <header className="sr-a4-header">\n            <p className="sr-a4-school">C.T. Model School</p>\n            <h1 className="sr-a4-title">Item Service Request</h1>'''
+          new = '''          <header className="sr-a4-header">\n            <div className="sr-a4-brand">\n              {schoolLogo ? <img src={schoolLogo} alt="C.T. Model School logo" className="sr-a4-logo" /> : null}\n              <div className="sr-a4-brand-copy">\n                <p className="sr-a4-school">C.T. Model School</p>\n                <h1 className="sr-a4-title">Item Service Request</h1>\n              </div>\n            </div>'''
+          if old not in text:
+              raise SystemExit('Expected SR print header block not found')
+          text = text.replace(old, new)
+
+          text = text.replace(
+              '<span>{sr.requester_name || "-"}</span>\n              <small>ID: {sr.requester_login_id || "-"}</small>',
+              '<span>{sr.requester_name || "Requester"}</span>\n              <small>ID: {sr.requester_login_id || "-"}</small>'
+          )
+
+          text = text.replace(
+              '<span>{sr.approver_name || (sr.processed_by ? "Administrator" : "Pending Approval")}</span>\n              <small>ID: {sr.approver_id || (sr.processed_by ? "-" : "Pending")}</small>',
+              '<span>{sr.approver_name || (sr.processed_by ? "Administrator" : "Pending Approval")}</span>\n              <small>ID: {sr.approver_id || (sr.processed_by || sr.approver_name ? sr.processed_by || "-" : "Pending")}</small>'
+          )
+
+          path.write_text(text, encoding='utf-8')
+      - name: Commit patch and remove workflow
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add components/SrDetailModal.tsx
+          git rm .github/workflows/fix-sr-print-header.yml
+          git commit -m "Fix SR print logo and requester details"
+          git push
