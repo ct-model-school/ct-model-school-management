@@ -13,7 +13,7 @@ const statusClass = (status: string) => {
   return value.includes("out") ? "text-red-700 bg-red-50 border-red-100" : value.includes("low") ? "text-amber-700 bg-amber-50 border-amber-100" : "theme-primary bg-[var(--school-primary-soft)] border-[var(--school-primary-border)]";
 };
 
-function SearchBar({ disabled = false, query, setQuery, onSearch, searching = false, canCreate = true }: { disabled?: boolean; query?: string; setQuery?: (value: string) => void; onSearch?: () => void; searching?: boolean; canCreate?: boolean }) {
+function SearchBar({ disabled = false, query, setQuery, onSearch, searching = false }: { disabled?: boolean; query?: string; setQuery?: (value: string) => void; onSearch?: () => void; searching?: boolean }) {
   return (
     <div className="flex min-w-0 flex-1 overflow-hidden rounded-lg border border-[var(--school-border)] bg-[var(--school-surface)] shadow-sm">
       <span className="flex shrink-0 items-center border-r border-[var(--school-border)] bg-[var(--school-primary-soft)] px-2.5 text-[10px] font-black theme-primary">ITM-</span>
@@ -28,23 +28,20 @@ function ItemSrFormPreview() {
     <section className="rounded-xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <SearchBar disabled />
-        <button type="button" disabled className="shrink-0 rounded-lg border border-[var(--school-primary-border)] bg-[var(--school-surface)] px-3 py-2 text-[10px] font-black theme-primary disabled:opacity-70">Request Info</button>
       </div>
       <p className="mt-1.5 text-[10px] text-[var(--school-muted)]">Use numeric code, ITM-code, item name, type or specification.</p>
-      <div className="mt-2 rounded-lg border border-dashed border-[var(--school-border)] bg-[var(--school-surface)] p-3 text-center text-[10px] text-[var(--school-muted)]">Search results appear here</div>
     </section>
 
     <section className="rounded-xl border border-[var(--school-border)] p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div><p className="text-[10px] font-black uppercase tracking-[0.14em] theme-primary">Selected Items</p><p className="mt-0.5 text-[10px] text-[var(--school-muted)]">Selected items, quantity and optional note.</p></div>
+        <div><p className="text-[10px] font-black uppercase tracking-[0.14em] theme-primary">Selected Items</p><p className="mt-0.5 text-[10px] text-[var(--school-muted)]">Add items above, then set quantity and optional note.</p></div>
         <span className="rounded-full bg-[var(--school-primary-soft)] px-2.5 py-1 text-[9px] font-black theme-primary">0 items · Qty 0</span>
       </div>
-      <div className="mt-2 rounded-lg border border-dashed border-[var(--school-border)] p-3 text-center text-[10px] text-[var(--school-muted)]">Selected item rows appear here</div>
-      <div className="mt-2 flex justify-end"><button type="button" disabled className="rounded-lg px-4 py-2 text-[10px] font-black theme-primary-bg disabled:opacity-60">Continue to Request →</button></div>
+      <div className="mt-2 rounded-lg border border-dashed border-[var(--school-border)] p-3 text-center text-[10px] text-[var(--school-muted)]">No items selected yet</div>
     </section>
 
     <section className="rounded-xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] p-3">
-      <div className="flex items-center justify-between gap-2"><div><p className="text-[10px] font-black uppercase tracking-[0.14em] theme-primary">Service Request</p><p className="mt-0.5 text-sm font-black">Request Information</p></div><span className="rounded-full bg-[var(--school-surface)] px-2.5 py-1 text-[9px] font-black theme-primary">Preview only</span></div>
+      <div className="flex items-center justify-between gap-2"><div><p className="text-[10px] font-black uppercase tracking-[0.14em] theme-primary">Service Request</p><p className="mt-0.5 text-sm font-black">Request Information</p></div></div>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         <label><span className="mb-1 block text-[10px] font-bold">Class / Section *</span><input disabled placeholder="Class 6-A" className="field h-9 w-full text-[11px] disabled:opacity-70" /></label>
         <label><span className="mb-1 block text-[10px] font-bold">Department</span><input disabled placeholder="Member department" className="field h-9 w-full text-[11px] disabled:opacity-70" /></label>
@@ -64,7 +61,6 @@ export default function ItemSrModule({ department, permissions, preview = false 
   const [selected, setSelected] = useState<SelectedItem[]>([]);
   const [className, setClassName] = useState("");
   const [details, setDetails] = useState("");
-  const [requestOpen, setRequestOpen] = useState(false);
   const [searching, setSearching] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
@@ -103,8 +99,8 @@ export default function ItemSrModule({ department, permissions, preview = false 
 
   async function submitRequest() {
     setError(""); setMessage("");
-    if (!canCreate) { setRequestOpen(false); setError("You do not have Item SR create permission."); return; }
-    if (!selected.length) { setRequestOpen(false); setError("Select at least one item for the SR."); return; }
+    if (!canCreate) { setError("You do not have Item SR create permission."); return; }
+    if (!selected.length) { setError("Select at least one item for the SR."); return; }
     if (!className.trim()) { setError("Class / Section is required."); return; }
     if (!details.trim()) { setError("Request Details is required."); return; }
     const token = window.localStorage.getItem("ctms_store_token");
@@ -120,7 +116,7 @@ export default function ItemSrModule({ department, permissions, preview = false 
     const totalQty = snapshot.reduce((sum, item) => sum + Number(item.quantity), 0);
     setLastSr({ srNumber: data?.sr_number ?? "", className: submittedClass, department: submittedDepartment, details: submittedDetails, itemCount: snapshot.length, totalQty });
     setMessage(`SR ${data?.sr_number ?? ""} submitted successfully. Status: Pending Approval.`);
-    setSelected([]); setItems([]); setQuery(""); setClassName(""); setDetails(""); setRequestOpen(false);
+    setSelected([]); setItems([]); setQuery(""); setClassName(""); setDetails("");
   }
 
   if (preview) return <ItemSrFormPreview />;
@@ -132,7 +128,6 @@ export default function ItemSrModule({ department, permissions, preview = false 
     <section className="rounded-xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <SearchBar query={query} setQuery={setQuery} onSearch={() => void searchItem()} searching={searching} />
-        {canCreate ? <button type="button" onClick={() => setRequestOpen(true)} className="shrink-0 rounded-lg border border-[var(--school-primary-border)] bg-[var(--school-surface)] px-3 py-2 text-[10px] font-black theme-primary hover:bg-[var(--school-primary-soft)]">Request Info</button> : null}
       </div>
       <p className="mt-1.5 text-[10px] text-[var(--school-muted)]">Use numeric code, ITM-code, item name, type or specification.</p>
 
@@ -150,13 +145,13 @@ export default function ItemSrModule({ department, permissions, preview = false 
 
     {error ? <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-[10px] leading-5 text-red-700">{error}</p> : null}
 
-    {canCreate && selected.length ? <section className="rounded-xl border border-[var(--school-border)] p-3">
+    {canCreate ? <section className="rounded-xl border border-[var(--school-border)] p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div><p className="text-[10px] font-black uppercase tracking-[0.14em] theme-primary">Selected Items</p><p className="mt-0.5 text-[10px] text-[var(--school-muted)]">Set quantity and optional note.</p></div>
+        <div><p className="text-[10px] font-black uppercase tracking-[0.14em] theme-primary">Selected Items</p><p className="mt-0.5 text-[10px] text-[var(--school-muted)]">Add items from the search above, then set quantity and optional note.</p></div>
         <span className="rounded-full bg-[var(--school-primary-soft)] px-2.5 py-1 text-[9px] font-black theme-primary">{selected.length} items · Qty {totalQty}</span>
       </div>
 
-      <div className="mt-2 overflow-hidden rounded-lg border border-[var(--school-border)]">
+      {selected.length ? <div className="mt-2 overflow-hidden rounded-lg border border-[var(--school-border)]">
         <div className="hidden grid-cols-[minmax(0,1.4fr)_92px_minmax(130px,1fr)_auto] items-center gap-2 bg-[var(--school-primary-soft)] px-3 py-1.5 text-[9px] font-bold text-[var(--school-muted)] sm:grid">
           <span>Item</span><span>Quantity</span><span>Note</span><span></span>
         </div>
@@ -172,8 +167,17 @@ export default function ItemSrModule({ department, permissions, preview = false 
             <button type="button" onClick={() => setSelected((current) => current.filter((x) => x.id !== item.id))} className="justify-self-start rounded-md border border-red-200 px-2.5 py-1 text-[9px] font-bold text-red-600 hover:bg-red-50 sm:justify-self-end">Remove</button>
           </div>)}
         </div>
+      </div> : <div className="mt-2 rounded-lg border border-dashed border-[var(--school-border)] p-3 text-center text-[10px] text-[var(--school-muted)]">No items selected yet. Search and add at least one item to submit the SR.</div>}
+    </section> : null}
+
+    {canCreate ? <section className="rounded-xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] p-3">
+      <div className="flex items-center justify-between gap-2"><div><p className="text-[10px] font-black uppercase tracking-[0.14em] theme-primary">Service Request</p><p className="mt-0.5 text-sm font-black">Request Information</p></div><span className="rounded-full bg-[var(--school-surface)] px-2.5 py-1 text-[9px] font-black theme-primary">{selected.length} item(s) · Qty {totalQty}</span></div>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        <label><span className="mb-1 block text-[10px] font-bold">Class / Section *</span><input value={className} onChange={(e) => setClassName(e.target.value)} placeholder="Class 6-A" className="field h-9 w-full text-[11px]" /></label>
+        <label><span className="mb-1 block text-[10px] font-bold">Department</span><input value={department || ""} readOnly className="field h-9 w-full bg-[var(--school-primary-soft)] text-[11px]" /></label>
       </div>
-      <div className="mt-2 flex justify-end"><button type="button" onClick={() => setRequestOpen(true)} className="rounded-lg px-4 py-2 text-[10px] font-black theme-primary-bg">Continue to Request →</button></div>
+      <label className="mt-2 block"><span className="mb-1 block text-[10px] font-bold">Request Details *</span><textarea value={details} onChange={(e) => setDetails(e.target.value)} rows={3} placeholder="What is the item needed for?" className="field w-full resize-none text-[11px]" /></label>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-[var(--school-surface)] px-3 py-2.5"><span className="text-[10px] font-bold theme-primary">{selected.length} item(s) · Total Qty {totalQty}</span><button type="button" onClick={() => void submitRequest()} disabled={submitting || !selected.length} className="rounded-lg px-4 py-2 text-[10px] font-black theme-primary-bg disabled:opacity-50">{submitting ? "Submitting..." : "Submit for Approval →"}</button></div>
     </section> : null}
 
     {lastSr ? <section className="rounded-xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] p-3">
@@ -182,14 +186,5 @@ export default function ItemSrModule({ department, permissions, preview = false 
     </section> : null}
 
     {message ? <p className="rounded-lg border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] px-3 py-2.5 text-[10px] font-bold theme-primary">{message}</p> : null}
-
-    {requestOpen && canCreate ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-3" role="dialog" aria-modal="true">
-      <div className="w-full max-w-lg rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] p-4 shadow-2xl">
-        <div className="flex items-center justify-between gap-3"><div><p className="text-[10px] font-black uppercase tracking-[0.14em] theme-primary">Service Request</p><h3 className="mt-0.5 text-base font-black">Request Information</h3></div><button type="button" onClick={() => setRequestOpen(false)} className="rounded-lg border border-[var(--school-border)] px-2.5 py-1 text-xs font-bold">×</button></div>
-        <div className="mt-3 grid gap-2 sm:grid-cols-2"><label><span className="mb-1 block text-[10px] font-bold">Class / Section *</span><input value={className} onChange={(e) => setClassName(e.target.value)} placeholder="Class 6-A" className="field h-9 w-full text-[11px]" /></label><label><span className="mb-1 block text-[10px] font-bold">Department</span><input value={department || ""} readOnly className="field h-9 w-full bg-[var(--school-primary-soft)] text-[11px]" /></label></div>
-        <label className="mt-2 block"><span className="mb-1 block text-[10px] font-bold">Request Details *</span><textarea value={details} onChange={(e) => setDetails(e.target.value)} rows={3} placeholder="What is the item needed for?" className="field w-full resize-none text-[11px]" /></label>
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-[var(--school-primary-soft)] px-3 py-2.5"><span className="text-[10px] font-bold theme-primary">{selected.length} item(s) · Total Qty {totalQty}</span><button type="button" onClick={() => void submitRequest()} disabled={submitting || !selected.length} className="rounded-lg px-4 py-2 text-[10px] font-black theme-primary-bg disabled:opacity-50">{submitting ? "Submitting..." : "Submit for Approval →"}</button></div>
-      </div>
-    </div> : null}
   </div>;
 }
