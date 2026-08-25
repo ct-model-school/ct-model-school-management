@@ -107,7 +107,7 @@ function ItemSrFormPreview() {
   );
 }
 
-async function printSr(sr: SubmittedSr) {
+export async function printSr(sr: SubmittedSr) {
   const escapeHtml = (value: string) =>
     value.replace(/[&<>\"']/g, (char) => ({
       "&": "&amp;",
@@ -118,6 +118,7 @@ async function printSr(sr: SubmittedSr) {
     }[char] ?? char));
 
   let live: any = null;
+  let currentUser: any = null;
   let logoUrl = "";
   try {
     const token = window.localStorage.getItem("ctms_store_token");
@@ -127,6 +128,8 @@ async function printSr(sr: SubmittedSr) {
         p_sr_number: sr.srNumber,
       });
       live = data ?? null;
+      const { data: current } = await createClient().rpc("store_get_current_user_profile", { p_token: token });
+      currentUser = current ?? null;
     }
     const { data: settings } = await createClient()
       .from("school_settings")
@@ -150,9 +153,13 @@ async function printSr(sr: SubmittedSr) {
       <td>${escapeHtml(String(item.item_note ?? item.note ?? ""))}</td>
     </tr>`).join("");
 
-  const requesterName = String(live?.requester_name || "Requester").trim();
-  const requesterId = String(live?.requester_login_id || live?.requester_member_id || "-").trim();
+  const requesterName = String(live?.requester_name || currentUser?.full_name || "Requester").trim();
+  const requesterId = String(live?.requester_login_id || live?.requester_member_id || currentUser?.member_id || "-").trim();
   const requestedAt = live?.requested_at ? new Date(live.requested_at) : new Date();
+  const rootStyles = getComputedStyle(document.documentElement);
+  const themePrimary = rootStyles.getPropertyValue("--school-primary").trim() || "#145b3b";
+  const themePrimarySoft = rootStyles.getPropertyValue("--school-primary-soft").trim() || "#eef6f1";
+  const themePrimaryBorder = rootStyles.getPropertyValue("--school-primary-border").trim() || "#b9d7c7";
   const approverName = String(live?.approver_name || (live?.processed_by ? "Administrator" : "Pending Approval")).trim();
   const approverId = String(live?.approver_id || live?.approver_role || (live?.processed_by ? "-" : "Pending")).trim();
   const approvedAt = live?.processed_at ? new Date(live.processed_at) : null;
@@ -179,38 +186,38 @@ async function printSr(sr: SubmittedSr) {
 html, body { width: 210mm; height: 297mm; margin: 0; padding: 0; background: #fff; }
 body { color: #172033; font-family: Arial, Helvetica, sans-serif; font-size: 10px; overflow: hidden; }
 .sheet { width: 210mm; height: 297mm; margin: 0; border: 1px solid #cfd6df; padding: 8mm; position: relative; overflow: hidden; page-break-after: avoid; break-inside: avoid; }
-.header { display: flex; align-items: center; gap: 11px; padding-bottom: 7px; border-bottom: 2px solid #1f6f4a; }
+.header { display: flex; align-items: center; gap: 11px; padding-bottom: 7px; border-bottom: 2px solid ${themePrimary}; }
 .logo, .logo-placeholder { width: 48px; height: 48px; object-fit: contain; display: block; flex: 0 0 48px; }
 .school { flex: 1; text-align: center; min-width: 0; }
-.school h1 { margin: 0; font-size: 19px; letter-spacing: .2px; color: #145b3b; }
+.school h1 { margin: 0; font-size: 19px; letter-spacing: .2px; color: ${themePrimary}; }
 .school p { margin: 2px 0 0; font-size: 9px; color: #5b6472; }
 .doc { width: 105px; text-align: right; flex: 0 0 105px; }
-.doc strong { display: block; font-size: 13px; color: #145b3b; }
+.doc strong { display: block; font-size: 13px; color: ${themePrimary}; }
 .doc span { font-size: 9px; color: #687181; }
 .title { text-align: center; margin: 7px 0 6px; }
-.title h2 { display: inline-block; margin: 0; padding: 4px 14px; border: 1px solid #b9d7c7; border-radius: 5px; font-size: 13px; letter-spacing: .8px; color: #145b3b; }
+.title h2 { display: inline-block; margin: 0; padding: 4px 14px; border: 1px solid ${themePrimaryBorder}; border-radius: 5px; font-size: 13px; letter-spacing: .8px; color: ${themePrimary}; }
 .meta { display: grid; grid-template-columns: 1.2fr 1fr 1fr; border: 1px solid #cfd6df; margin-bottom: 7px; }
 .meta div { padding: 5px 7px; border-right: 1px solid #cfd6df; }
 .meta div:last-child { border-right: 0; }
 .label { display: block; font-size: 7px; text-transform: uppercase; letter-spacing: .7px; color: #77808d; margin-bottom: 1px; }
 .value { font-size: 10px; font-weight: 700; }
 table { width: 100%; border-collapse: collapse; }
-th { background: #eef6f1; color: #28553f; font-size: 8px; text-transform: uppercase; letter-spacing: .3px; }
+th { background: ${themePrimarySoft}; color: ${themePrimary}; font-size: 8px; text-transform: uppercase; letter-spacing: .3px; }
 th, td { border: 1px solid #cfd6df; padding: 4px 4px; vertical-align: top; }
 .center { text-align: center; }
-.code { font-family: Consolas, monospace; font-weight: 700; color: #145b3b; white-space: nowrap; }
+.code { font-family: Consolas, monospace; font-weight: 700; color: ${themePrimary}; white-space: nowrap; }
 .muted { margin-top: 1px; font-size: 7px; color: #737c89; line-height: 1.2; }
 .summary { display: flex; justify-content: flex-end; margin-top: 5px; }
 .summary-box { border: 1px solid #cfd6df; padding: 5px 8px; min-width: 160px; }
-.summary-box strong { color: #145b3b; }
+.summary-box strong { color: ${themePrimary}; }
 .request { margin-top: 7px; border: 1px solid #cfd6df; }
-.request h3 { margin: 0; padding: 5px 7px; background: #eef6f1; color: #28553f; font-size: 8px; text-transform: uppercase; letter-spacing: .6px; }
+.request h3 { margin: 0; padding: 5px 7px; background: ${themePrimarySoft}; color: ${themePrimary}; font-size: 8px; text-transform: uppercase; letter-spacing: .6px; }
 .request p { margin: 0; padding: 6px 7px; line-height: 1.35; min-height: 38px; max-height: 50px; overflow: hidden; white-space: pre-wrap; }
-.status { display: inline-block; margin-top: 5px; padding: 3px 7px; border: 1px solid #b9d7c7; color: #145b3b; font-weight: 700; border-radius: 12px; }
+.status { display: inline-block; margin-top: 5px; padding: 3px 7px; border: 1px solid ${themePrimaryBorder}; color: ${themePrimary}; font-weight: 700; border-radius: 12px; }
 .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 28px; }
 .sig { text-align: center; padding-top: 18px; border-top: 1px solid #59616d; font-size: 8px; color: #606a77; }
 .sig .name { display: block; margin-top: 3px; font-size: 9px; font-weight: 700; color: #172033; }
-.sig .id { display: block; margin-top: 2px; font-size: 8px; font-weight: 700; color: #145b3b; }
+.sig .id { display: block; margin-top: 2px; font-size: 8px; font-weight: 700; color: ${themePrimary}; }
 .sig .date { display: block; margin-top: 2px; font-size: 7px; color: #687181; }
 .footer { position: absolute; left: 8mm; right: 8mm; bottom: 5mm; display: flex; justify-content: space-between; border-top: 1px solid #e0e4e9; padding-top: 4px; font-size: 7px; color: #7b8490; }
 </style></head><body>

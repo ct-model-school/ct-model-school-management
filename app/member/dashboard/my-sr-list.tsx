@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import SrDetailModal from "@/components/SrDetailModal";
+import { printSr } from "./item-sr";
 
 type MySRItem = { item_id: string; item_code: string; item_name: string; item_type?: string | null; specification?: string | null; brand?: string | null; model?: string | null; unit: string; details?: string | null; note?: string | null; current_stock?: number | null; requested_quantity: number; issued_quantity: number; remaining_quantity?: number | null; item_note?: string | null };
 type MySR = { id: string; sr_number: string; class_name: string | null; department: string | null; request_details: string | null; status: string; admin_note: string | null; requested_at: string; processed_at?: string | null; items: MySRItem[] };
@@ -15,7 +15,6 @@ const statusClass = (status: string) => {
 export default function MySrList({ canView }: { canView: boolean }) {
   const supabase = createClient();
   const [srs, setSrs] = useState<MySR[]>([]);
-  const [selectedSr, setSelectedSr] = useState<MySR | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -47,7 +46,7 @@ export default function MySrList({ canView }: { canView: boolean }) {
         {loading ? <div className="mt-3 rounded-lg bg-[var(--school-primary-soft)] p-3 text-center text-[10px] text-[var(--school-muted)]">Loading your SRs...</div> : error ? <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-[10px] text-red-700">{error}</p> : !srs.length ? <div className="mt-3 rounded-lg border border-dashed border-[var(--school-border)] bg-[var(--school-primary-soft)] p-4 text-center text-[10px] text-[var(--school-muted)]">No service requests submitted yet.</div> : (
           <div className="mt-3 space-y-1.5">
             {srs.map((sr) => (
-              <article key={sr.id} role="button" tabIndex={0} onClick={() => setSelectedSr(sr)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setSelectedSr(sr); }} className="cursor-pointer rounded-lg border border-[var(--school-border)] bg-[var(--school-surface)] px-3 py-2.5 transition-colors hover:border-[var(--school-primary-border)] hover:bg-[var(--school-primary-soft)]/35 focus:outline-none focus:ring-2 focus:ring-[var(--school-primary-border)]">
+              <article key={sr.id} role="button" tabIndex={0} onClick={() => void printSr({ srNumber: sr.sr_number, className: sr.class_name || "-", department: sr.department || "-", details: sr.request_details || "", itemCount: sr.items.length, totalQty: sr.items.reduce((sum, item) => sum + Number(item.requested_quantity || 0), 0), items: sr.items.map((item) => ({ id: item.item_id, item_code: item.item_code, item_name: item.item_name, item_type: item.item_type || null, specification: item.specification || null, model: item.model || null, unit: item.unit, current_stock: Number(item.current_stock || 0), stock_status: "", quantity: Number(item.requested_quantity || 0), note: item.item_note || item.note || "" })) })} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); void printSr({ srNumber: sr.sr_number, className: sr.class_name || "-", department: sr.department || "-", details: sr.request_details || "", itemCount: sr.items.length, totalQty: sr.items.reduce((sum, item) => sum + Number(item.requested_quantity || 0), 0), items: sr.items.map((item) => ({ id: item.item_id, item_code: item.item_code, item_name: item.item_name, item_type: item.item_type || null, specification: item.specification || null, model: item.model || null, unit: item.unit, current_stock: Number(item.current_stock || 0), stock_status: "", quantity: Number(item.requested_quantity || 0), note: item.item_note || item.note || "" })) }); } }} className="cursor-pointer rounded-lg border border-[var(--school-border)] bg-[var(--school-surface)] px-3 py-2.5 transition-colors hover:border-[var(--school-primary-border)] hover:bg-[var(--school-primary-soft)]/35 focus:outline-none focus:ring-2 focus:ring-[var(--school-primary-border)]">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[10px] leading-5">
                   <div className="flex shrink-0 items-center gap-1.5"><span className="font-black theme-primary">{sr.sr_number}</span><span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold capitalize leading-4 ${statusClass(sr.status)}`}>{sr.status.replace(/_/g, " ")}</span></div>
                   <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1 text-[9px] text-[var(--school-muted)]"><span className="inline-flex items-center gap-1 whitespace-nowrap"><span className="font-semibold text-[var(--school-text)]">Items</span><span>{(sr.items || []).map((item) => `${item.item_code} × ${item.requested_quantity}`).join(", ") || "-"}</span></span><span className="whitespace-nowrap"><b className="text-[var(--school-text)]">Class:</b> {sr.class_name || "-"}</span><span className="whitespace-nowrap"><b className="text-[var(--school-text)]">Department:</b> {sr.department || "-"}</span></div>
@@ -59,7 +58,6 @@ export default function MySrList({ canView }: { canView: boolean }) {
           </div>
         )}
       </section>
-      <SrDetailModal sr={selectedSr} open={Boolean(selectedSr)} onClose={() => setSelectedSr(null)} />
     </>
   );
 }
