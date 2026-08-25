@@ -1,0 +1,55 @@
+name: Fix SR actor print details
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch SR print actor fields
+        shell: python
+        run: |
+          from pathlib import Path
+
+          item = Path('app/member/dashboard/item-sr.tsx')
+          text = item.read_text(encoding='utf-8')
+          text = text.replace(
+              'const approverName = String(live?.approver_name || "C.T. Model School Administrator").trim();\n  const approverId = String(live?.approver_role || "SUPER_ADMIN").trim();',
+              'const approverName = String(live?.approver_name || (live?.processed_by ? "Administrator" : "Pending Approval")).trim();\n  const approverId = String(live?.approver_id || live?.approver_role || (live?.processed_by ? "-" : "Pending")).trim();'
+          )
+          item.write_text(text, encoding='utf-8')
+
+          modal = Path('components/SrDetailModal.tsx')
+          text = modal.read_text(encoding='utf-8')
+          text = text.replace(
+              '  processed_at?: string | null;\n  items: SrDetailItem[];',
+              '  processed_at?: string | null;\n  processed_by?: string | null;\n  approver_name?: string | null;\n  approver_id?: string | null;\n  approver_role?: string | null;\n  items: SrDetailItem[];'
+          )
+          old = '''          {sr.admin_note ? (\n            <section className="sr-a4-admin">\n              <strong>Admin Note:</strong>\n              <div>{sr.admin_note}</div>\n            </section>\n          ) : null}\n\n          <footer className="sr-a4-footer">\n            <span>Service Request: {sr.sr_number}</span>\n            <span>Generated: {formatDate(new Date().toISOString())}</span>\n          </footer>'''
+          new = '''          {sr.admin_note ? (\n            <section className="sr-a4-admin">\n              <strong>Admin Note:</strong>\n              <div>{sr.admin_note}</div>\n            </section>\n          ) : null}\n\n          <section className="sr-a4-signatures">\n            <div>\n              <strong>Prepared By</strong>\n              <span>{sr.requester_name || "-"}</span>\n              <small>ID: {sr.requester_login_id || "-"}</small>\n              <small>{formatDate(sr.requested_at)}</small>\n            </div>\n            <div>\n              <strong>Approved By</strong>\n              <span>{sr.approver_name || (sr.processed_by ? "Administrator" : "Pending Approval")}</span>\n              <small>ID: {sr.approver_id || (sr.processed_by ? "-" : "Pending")}</small>\n              <small>{sr.processed_at ? formatDate(sr.processed_at) : "Pending Approval"}</small>\n            </div>\n          </section>\n\n          <footer className="sr-a4-footer">\n            <span>Service Request: {sr.sr_number}</span>\n            <span>Generated: {formatDate(new Date().toISOString())}</span>\n          </footer>'''
+          if old not in text:
+              raise SystemExit('Expected SR footer block not found')
+          text = text.replace(old, new)
+          marker = '''        .sr-a4-footer {\n          display: flex;\n          justify-content: space-between;\n          margin-top: 8px;\n          font-size: 7px;\n        }'''
+          sig_css = marker + '''\n\n        .sr-a4-signatures {\n          display: grid;\n          grid-template-columns: 1fr 1fr;\n          gap: 34px;\n          margin-top: 18px;\n        }\n\n        .sr-a4-signatures > div {\n          min-height: 48px;\n          padding-top: 12px;\n          border-top: 1px solid #555;\n          text-align: center;\n          font-size: 7px;\n        }\n\n        .sr-a4-signatures strong,\n        .sr-a4-signatures span,\n        .sr-a4-signatures small {\n          display: block;\n        }\n\n        .sr-a4-signatures strong {\n          font-size: 7px;\n          text-transform: uppercase;\n        }\n\n        .sr-a4-signatures span {\n          margin-top: 3px;\n          font-size: 8px;\n          font-weight: 800;\n        }\n\n        .sr-a4-signatures small {\n          margin-top: 2px;\n          font-size: 6.5px;\n        }'''
+          if marker not in text:
+              raise SystemExit('Expected SR footer CSS marker not found')
+          text = text.replace(marker, sig_css)
+          modal.write_text(text, encoding='utf-8')
+
+      - name: Commit and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/member/dashboard/item-sr.tsx components/SrDetailModal.tsx
+          git rm .github/workflows/fix-sr-actor-print.yml
+          git commit -m "Fix SR requester and approver details in print"
+          git push
