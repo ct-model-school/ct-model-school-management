@@ -1,7 +1,7 @@
 "use client";
 import SalaryManager from "./salary-manager";
 import BillPaymentsWorkspace from "@/app/admin/accounts/bill-payments-workspace";
-import StudentIncomeWorkspace from "@/app/admin/accounts/student-income-workspace";
+import StudentFeeManager from "@/app/admin/accounts/student-fee-manager";
 
 type Permissions = Record<string, boolean>;
 
@@ -20,21 +20,20 @@ export const accountsPermissionList = [
   { key: "bill_cancel", title: "Cancel/Void Bill", description: "Cancel eligible bills without deleting their records." },
   { key: "bill_reports", title: "View Reports", description: "Access bill payment reporting when reporting views are enabled." },
   { key: "student_income_view", title: "View Student Income", description: "View student fee charges, collections, dues and income history." },
-  { key: "student_income_charge", title: "Create Student Fee Charge", description: "Add admission, tuition, exam, transport and other student fee charges." },
-  { key: "student_income_collect", title: "Collect Student Payment", description: "Record student fee payments and issue receipt references." },
+  { key: "student_income_charge", title: "Send Student Fee", description: "Send an individual fee charge to a Student ID and its linked Parent." },
+  { key: "student_income_collect", title: "Update Student Payment", description: "Update payment only against the specific fee that was paid." },
   { key: "student_income_edit", title: "Edit Student Income", description: "Edit eligible student fee income records when the workflow supports editing." },
   { key: "student_income_reports", title: "Student Income Reports", description: "Access student income and collection reporting." },
 ] as const;
 
 export default function AccountsModule({ permissions }: { permissions: Permissions; preview?: boolean }) {
-  const token = typeof window !== "undefined" ? window.localStorage.getItem("ctms_store_token") : null;
   const canManageSalary = Boolean(permissions.salary_view || permissions.salary_approval || permissions.salary_payment || permissions.__all);
   const canManageBills = Boolean(permissions.bill_view || permissions.bill_create || permissions.bill_edit || permissions.bill_approve || permissions.bill_payment || permissions.bill_history || permissions.bill_cancel || permissions.bill_reports || permissions.__all);
   const canManageStudentIncome = Boolean(permissions.student_income_view || permissions.student_income_charge || permissions.student_income_collect || permissions.student_income_edit || permissions.student_income_reports || permissions.__all);
   if (!canManageSalary && !canManageBills && !canManageStudentIncome) return <div className="mt-5 rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-6 text-center"><p className="text-sm font-black">Accounts access is not enabled</p><p className="mt-1 text-xs text-[var(--school-muted)]">Your role does not currently have salary, Bill Payments or Student Income permission.</p></div>;
   return <div className="space-y-5">
-    {canManageSalary && <SalaryManager token={token} permissions={permissions} />}
+    {canManageSalary && <SalaryManager token={null} permissions={permissions} />}
     {canManageBills && <BillPaymentsWorkspace permissions={permissions} />}
-    {canManageStudentIncome && <StudentIncomeWorkspace permissions={permissions} />}
+    {canManageStudentIncome && <StudentFeeManager permissions={permissions} />}
   </div>;
 }
