@@ -1,0 +1,96 @@
+"use client";
+
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+
+type User={member_id:string;member_record_id?:string;member_type:string;full_name:string;photo_url:string|null;email:string|null;phone:string|null;whatsapp?:string|null;designation?:string|null;department?:string|null;subject?:string|null;access_role?:string|null};
+
+type Props={user:User;onSaved:(next:User)=>void};
+
+const bucket="member-photos";
+
+function photoFolder(type:string){
+  if(type==="teacher")return "teachers";
+  if(type==="accounts")return "accounts";
+  if(type==="staff")return "staff";
+  if(type==="other")return "others";
+  if(type==="student")return "students";
+  return "parents";
+}
+
+export default function ProfileEditor({user,onSaved}:Props){
+  const supabase=useMemo(()=>createClient(),[]);
+  const isStudent=user.member_type==="student";
+  const [name,setName]=useState(user.full_name||"");
+  const [phone,setPhone]=useState(user.phone||"");
+  const [email,setEmail]=useState(user.email||"");
+  const [whatsapp,setWhatsapp]=useState(user.whatsapp||"");
+  const [nid,setNid]=useState("");
+  const [address,setAddress]=useState("");
+  const [password,setPassword]=useState("");
+  const [photo,setPhoto]=useState<File|null>(null);
+  const [preview,setPreview]=useState(user.photo_url||"");
+  const [saving,setSaving]=useState(false);
+  const [message,setMessage]=useState("");
+  const [error,setError]=useState("");
+
+  useEffect(()=>{
+    setName(user.full_name||"");setPhone(user.phone||"");setEmail(user.email||"");setWhatsapp(user.whatsapp||"");setPreview(user.photo_url||"");
+  },[user]);
+
+  function choosePhoto(file?:File){
+    if(!file)return;
+    if(!file.type.startsWith("image/")){setError("Profile picture must be an image.");return;}
+    if(file.size>50*1024*1024){setError("Profile picture must be 50 MB or smaller.");return;}
+    setError("");setPhoto(file);setPreview(URL.createObjectURL(file));
+  }
+
+  async function save(e:FormEvent){
+    e.preventDefault();setSaving(true);setMessage("");setError("");
+    try{
+      const token=window.localStorage.getItem("ctms_store_token");
+      if(!token)throw new Error("Session expired. Please login again.");
+      let photoUrl=user.photo_url||null;
+      if(photo){
+        const ext=photo.name.split(".").pop()?.toLowerCase()||"jpg";
+        const recordId=user.member_record_id||user.member_id;
+        const path=`${photoFolder(user.member_type)}/${recordId}/profile.${ext}`;
+        const {data,error:uploadError}=await supabase.storage.from(bucket).upload(path,photo,{upsert:true,cacheControl:"3600",contentType:photo.type});
+        if(uploadError)throw uploadError;
+        photoUrl=supabase.storage.from(bucket).getPublicUrl(data.path).data.publicUrl+`?v=${Date.now()}`;
+      }
+      const {data,error:saveError}=await supabase.rpc("store_update_my_profile",{p_token:token,p_full_name:name,p_phone:isStudent?null:phone,p_email:email,p_whatsapp:isStudent?null:whatsapp,p_nid:isStudent?null:nid,p_address:address||null,p_photo_url:photoUrl,p_password:password||null});
+      if(saveError)throw saveError;
+      const next={...user,...(data as User),photo_url:photoUrl};
+      setPassword("");setPhoto(null);setPreview(photoUrl||"");setAddress("");setNid("");setMessage("Profile updated successfully.");onSaved(next);
+    }catch(err){setError(err instanceof Error?err.message:"Profile could not be updated.");}
+    finally{setSaving(false);}
+  }
+
+  return <form onSubmit={save} className="mt-6 space-y-6">
+    <div className="flex flex-col gap-4 rounded-2xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] p-5 sm:flex-row sm:items-center">
+      <div className="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] text-2xl font-black theme-primary">{preview?<img src={preview} alt="Profile" className="h-full w-full object-cover"/>:user.full_name?.charAt(0)||"P"}</div>
+      <div className="min-w-0"><p className="text-sm font-black">Profile Picture</p><p className="mt-1 text-xs text-[var(--school-muted)]">Change your own profile picture. Maximum 50 MB.</p><label className="mt-3 inline-flex cursor-pointer rounded-xl border border-[var(--school-border)] bg-[var(--school-surface)] px-4 py-2.5 text-xs font-black hover:bg-[var(--school-primary-soft)]"><input type="file" accept="image/*" className="hidden" onChange={e=>choosePhoto(e.target.files?.[0])}/>{photo?"Choose another picture":"Change Picture"}</label></div>
+    </div>
+
+    {message&&<div className="rounded-2xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] px-4 py-3 text-sm font-bold theme-primary">{message}</div>}
+    {error&&<div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{error}</div>}
+
+    <div className="grid gap-4 sm:grid-cols-2">
+      <label className="block"><span className="text-xs font-black">Member ID</span><input value={user.member_id} readOnly className="mt-2 w-full rounded-xl border border-[var(--school-border)] bg-[var(--school-primary-soft)] px-3 py-3 text-sm font-bold"/></label>
+      <label className="block"><span className="text-xs font-black">Full Name</span><input value={name} onChange={e=>setName(e.target.value)} required className="mt-2 w-full rounded-xl border border-[var(--school-border)] px-3 py-3 text-sm"/></label>
+      {!isStudent&&<label className="block"><span className="text-xs font-black">Phone</span><input value={phone} onChange={e=>setPhone(e.target.value)} className="mt-2 w-full rounded-xl border border-[var(--school-border)] px-3 py-3 text-sm"/></label>}
+      <label className="block"><span className="text-xs font-black">Email</span><input type="email" value={email} onChange={e=>setEmail(e.target.value)} className="mt-2 w-full rounded-xl border border-[var(--school-border)] px-3 py-3 text-sm"/></label>
+      {!isStudent&&<label className="block"><span className="text-xs font-black">WhatsApp</span><input value={whatsapp} onChange={e=>setWhatsapp(e.target.value)} className="mt-2 w-full rounded-xl border border-[var(--school-border)] px-3 py-3 text-sm"/></label>}
+      {!isStudent&&<label className="block"><span className="text-xs font-black">NID</span><input value={nid} onChange={e=>setNid(e.target.value)} placeholder="Enter NID if you need to update it" className="mt-2 w-full rounded-xl border border-[var(--school-border)] px-3 py-3 text-sm"/></label>}
+      <label className="block sm:col-span-2"><span className="text-xs font-black">Address</span><textarea value={address} onChange={e=>setAddress(e.target.value)} rows={3} placeholder="Enter your address if you need to update it" className="mt-2 w-full rounded-xl border border-[var(--school-border)] px-3 py-3 text-sm"/></label>
+    </div>
+
+    <div className="rounded-2xl border border-[var(--school-border)] p-5">
+      <p className="text-sm font-black">Change Password</p><p className="mt-1 text-xs text-[var(--school-muted)]">Leave blank to keep your current password. Minimum 8 characters.</p>
+      <input type="password" value={password} onChange={e=>setPassword(e.target.value)} minLength={8} placeholder="New password" className="mt-3 w-full rounded-xl border border-[var(--school-border)] px-3 py-3 text-sm sm:max-w-md"/>
+    </div>
+
+    <div className="flex justify-end"><button type="submit" disabled={saving} className="rounded-xl theme-primary-bg px-5 py-3 text-sm font-black disabled:opacity-60">{saving?"Saving...":"Save Profile"}</button></div>
+  </form>;
+}
