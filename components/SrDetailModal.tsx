@@ -33,6 +33,10 @@ type SrDetail = {
   admin_note?: string | null;
   requested_at: string;
   processed_at?: string | null;
+  processed_by?: string | null;
+  approver_name?: string | null;
+  approver_id?: string | null;
+  approver_role?: string | null;
   items: SrDetailItem[];
 };
 
@@ -282,6 +286,43 @@ export default function SrDetailModal({
           font-size: 7px;
         }
 
+        .sr-a4-signatures {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 34px;
+          margin-top: 18px;
+        }
+
+        .sr-a4-signatures > div {
+          min-height: 48px;
+          padding-top: 12px;
+          border-top: 1px solid #555;
+          text-align: center;
+          font-size: 7px;
+        }
+
+        .sr-a4-signatures strong,
+        .sr-a4-signatures span,
+        .sr-a4-signatures small {
+          display: block;
+        }
+
+        .sr-a4-signatures strong {
+          font-size: 7px;
+          text-transform: uppercase;
+        }
+
+        .sr-a4-signatures span {
+          margin-top: 3px;
+          font-size: 8px;
+          font-weight: 800;
+        }
+
+        .sr-a4-signatures small {
+          margin-top: 2px;
+          font-size: 6.5px;
+        }
+
         tr { page-break-inside: avoid; break-inside: avoid; }
 
         @media screen {
@@ -408,6 +449,21 @@ export default function SrDetailModal({
               <div>{sr.admin_note}</div>
             </section>
           ) : null}
+
+          <section className="sr-a4-signatures">
+            <div>
+              <strong>Prepared By</strong>
+              <span>{sr.requester_name || "-"}</span>
+              <small>ID: {sr.requester_login_id || "-"}</small>
+              <small>{formatDate(sr.requested_at)}</small>
+            </div>
+            <div>
+              <strong>Approved By</strong>
+              <span>{sr.approver_name || (sr.processed_by ? "Administrator" : "Pending Approval")}</span>
+              <small>ID: {sr.approver_id || (sr.processed_by ? "-" : "Pending")}</small>
+              <small>{sr.processed_at ? formatDate(sr.processed_at) : "Pending Approval"}</small>
+            </div>
+          </section>
 
           <footer className="sr-a4-footer">
             <span>Service Request: {sr.sr_number}</span>

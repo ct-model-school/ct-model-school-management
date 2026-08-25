@@ -153,8 +153,8 @@ async function printSr(sr: SubmittedSr) {
   const requesterName = String(live?.requester_name || "Requester").trim();
   const requesterId = String(live?.requester_login_id || live?.requester_member_id || "-").trim();
   const requestedAt = live?.requested_at ? new Date(live.requested_at) : new Date();
-  const approverName = String(live?.approver_name || "C.T. Model School Administrator").trim();
-  const approverId = String(live?.approver_role || "SUPER_ADMIN").trim();
+  const approverName = String(live?.approver_name || (live?.processed_by ? "Administrator" : "Pending Approval")).trim();
+  const approverId = String(live?.approver_id || live?.approver_role || (live?.processed_by ? "-" : "Pending")).trim();
   const approvedAt = live?.processed_at ? new Date(live.processed_at) : null;
   const status = String(live?.status || "pending").toLowerCase();
   const statusLabel = status === "approved" || status === "partially_issued" || status === "issued"
