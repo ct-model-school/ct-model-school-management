@@ -215,10 +215,11 @@ th, td { border: 1px solid #cfd6df; padding: 4px 4px; vertical-align: top; }
 .request p { margin: 0; padding: 6px 7px; line-height: 1.35; min-height: 38px; max-height: 50px; overflow: hidden; white-space: pre-wrap; }
 .status { display: inline-block; margin-top: 5px; padding: 3px 7px; border: 1px solid ${themePrimaryBorder}; color: ${themePrimary}; font-weight: 700; border-radius: 12px; }
 .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 28px; }
-.sig { text-align: center; padding-top: 18px; border-top: 1px solid #59616d; font-size: 8px; color: #606a77; }
-.sig .name { display: block; margin-top: 3px; font-size: 9px; font-weight: 700; color: #172033; }
-.sig .id { display: block; margin-top: 2px; font-size: 8px; font-weight: 700; color: ${themePrimary}; }
-.sig .date { display: block; margin-top: 2px; font-size: 7px; color: #687181; }
+.sig { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 0; border-top: 0; font-size: 0; color: #606a77; }
+.sig .name { order: 1; display: block; margin-top: 0; font-size: 9px; line-height: 1.1; font-weight: 700; color: #172033; }
+.sig .id { order: 2; display: block; margin-top: 1px; font-size: 8px; line-height: 1.1; font-weight: 700; color: ${themePrimary}; }
+.sig .date { order: 3; display: block; margin-top: 1px; font-size: 7px; line-height: 1.1; color: #687181; }
+.sig::after { order: 4; content: attr(data-label); display: block; width: 100%; margin-top: 4px; padding-top: 4px; border-top: 1px solid #59616d; font-size: 8px; line-height: 1.1; color: #606a77; }
 .footer { position: absolute; left: 8mm; right: 8mm; bottom: 5mm; display: flex; justify-content: space-between; border-top: 1px solid #e0e4e9; padding-top: 4px; font-size: 7px; color: #7b8490; }
 </style></head><body>
 <div class="sheet">
@@ -238,8 +239,8 @@ th, td { border: 1px solid #cfd6df; padding: 4px 4px; vertical-align: top; }
   <div class="request"><h3>Request Details</h3><p>${escapeHtml(String(live?.request_details || sr.details))}</p></div>
   <span class="status">Status: ${escapeHtml(statusLabel)}</span>
   <div class="signatures">
-    <div class="sig">Prepared By<span class="name">${escapeHtml(requesterName)}</span><span class="id">ID: ${escapeHtml(requesterId)}</span><span class="date">${formatDate(requestedAt)}</span></div>
-    <div class="sig">Approved By<span class="name">${escapeHtml(approverName)}</span><span class="id">ID: ${escapeHtml(approverId)}</span><span class="date">${approvedAt ? formatDate(approvedAt) : "Pending Approval"}</span></div>
+    <div class="sig" data-label="Prepared By"><span class="name">${escapeHtml(requesterName)}</span><span class="id">ID: ${escapeHtml(requesterId)}</span><span class="date">${formatDate(requestedAt)}</span></div>
+    <div class="sig" data-label="Approved By"><span class="name">${escapeHtml(approverName)}</span><span class="id">ID: ${escapeHtml(approverId)}</span><span class="date">${approvedAt ? formatDate(approvedAt) : "Pending Approval"}</span></div>
   </div>
   <div class="footer"><span>C.T. Model School · Item SR</span><span>Page 1 of 1</span></div>
 </div>
