@@ -21,15 +21,13 @@ export default async function AdminLayout({children}:{children:React.ReactNode})
   const access=await getCurrentAdminPermissions(); if(!access)return children;
   const roleName=access.profile.role.name; const adminOnly=isAdminOnlyRole(roleName); const permissions=access.permissions; const requestHeaders=await headers(); const pathname=requestHeaders.get("x-admin-pathname")||"";
   const procurement=permissions.procurement||{}; const inventory=permissions.inventory||{}; const accounts=permissions.accounts||{}; const itemSr=permissions.item_sr||{};
-  const hasInventory=adminOnly||Boolean(inventory.view)||Object.values(procurement).some(Boolean);
-  const hasProcurement=adminOnly||Object.values(procurement).some(Boolean);
-  const hasAccounts=adminOnly||Object.values(accounts).some(Boolean)||Boolean(procurement.po_accounts_submit||procurement.po_payment_approve||procurement.po_payment_paid||procurement.po_history);
-  const hasItemSr=adminOnly||Object.values(itemSr).some(Boolean);
+  const hasInventory=adminOnly||Boolean(inventory.view); const hasProcurement=adminOnly||Object.values(procurement).some(Boolean); const hasAccounts=adminOnly||Object.values(accounts).some(Boolean)||Boolean(procurement.po_accounts_submit||procurement.po_payment_approve||procurement.po_payment_paid||procurement.po_history); const hasItemSr=adminOnly||Object.values(itemSr).some(Boolean);
   const allow=(key:string)=>adminOnly||Boolean(permissions[key]);
   if(pathname==="/admin"||pathname==="/admin/"){if(!permissions.dashboard&&!adminOnly)redirect("/admin/login");}
   if(pathname==="/admin/settings"||pathname.startsWith("/admin/settings/")){if(!adminOnly)redirect("/admin");}
   if(pathname==="/admin/roles"||pathname.startsWith("/admin/roles/")){if(!adminOnly)redirect("/admin");}
-  if(pathname==="/admin/inventory"||pathname.startsWith("/admin/inventory/")){if(!hasInventory)redirect("/admin");}
+  if(pathname==="/admin/inventory/procurement"||pathname.startsWith("/admin/inventory/procurement/")){if(!hasProcurement)redirect("/admin");}
+  else if(pathname==="/admin/inventory"||pathname.startsWith("/admin/inventory/")){if(!hasInventory)redirect("/admin");}
   if(pathname==="/admin/item-sr"||pathname.startsWith("/admin/item-sr/")){if(!hasItemSr)redirect("/admin");}
   if(pathname==="/admin/accounts"||pathname.startsWith("/admin/accounts/")){if(!hasAccounts)redirect("/admin");}
   if(pathname==="/admin/parents"||pathname.startsWith("/admin/parents/")){if(!adminOnly)redirect("/admin");}
