@@ -109,7 +109,13 @@ function ItemSrFormPreview() {
 
 function printSr(sr: SubmittedSr) {
   const escapeHtml = (value: string) =>
-    value.replace(/[&<>\"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\": "&quot;" }[char] ?? char));
+  value.replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[char] ?? char));
 
   const rows = sr.items.map((item, index) => `
     <tr>
