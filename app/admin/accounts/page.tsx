@@ -4,7 +4,7 @@ import AccountsWorkspace from "./accounts-workspace-v2";
 import BillPaymentsWorkspace from "./bill-payments-workspace";
 import StudentFeeManager from "./student-fee-manager";
 import FinancialOverview from "./financial-overview";
-import ProcurementWorkspaceV2 from "../inventory/procurement-workspace-v2";
+import ProcurementWorkspaceV3 from "../inventory/procurement-workspace-v3";
 
 export default async function AccountsPage() {
   const access = await getCurrentAdminPermissions();
@@ -21,7 +21,7 @@ export default async function AccountsPage() {
       <AccountsWorkspace />
       <StudentFeeManager adminMode />
       <BillPaymentsWorkspace adminMode />
-      <ProcurementWorkspaceV2 permissions={access?.permissions || {}} adminMode={adminMode} />
+      <ProcurementWorkspaceV3 permissions={access?.permissions || {}} adminMode={adminMode} />
     </AdminPageShell>
   );
 }
