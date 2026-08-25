@@ -70,7 +70,13 @@ export default function SrDetailModal({
     if (printedRef.current) return;
     printedRef.current = true;
 
-    const handleAfterPrint = () => onClose();
+    const previousTitle = document.title;
+    document.title = sr.sr_number;
+
+    const handleAfterPrint = () => {
+      document.title = previousTitle;
+      onClose();
+    };
     window.addEventListener("afterprint", handleAfterPrint);
 
     const timer = window.setTimeout(() => {
@@ -80,6 +86,7 @@ export default function SrDetailModal({
     return () => {
       window.clearTimeout(timer);
       window.removeEventListener("afterprint", handleAfterPrint);
+      document.title = previousTitle;
     };
   }, [open, sr, onClose]);
 
