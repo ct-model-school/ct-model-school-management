@@ -107,91 +107,142 @@ function ItemSrFormPreview() {
   );
 }
 
-function printSr(sr: SubmittedSr) {
+async function printSr(sr: SubmittedSr) {
   const escapeHtml = (value: string) =>
-  value.replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-  }[char] ?? char));
+    value.replace(/[&<>\"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '\"': "&quot;",
+      "'": "&#39;",
+    }[char] ?? char));
 
-  const rows = sr.items.map((item, index) => `
+  let live: any = null;
+  let logoUrl = "";
+  try {
+    const token = window.localStorage.getItem("ctms_store_token");
+    if (token) {
+      const { data } = await createClient().rpc("store_get_sr", {
+        p_token: token,
+        p_sr_number: sr.srNumber,
+      });
+      live = data ?? null;
+    }
+    const { data: settings } = await createClient()
+      .from("school_settings")
+      .select("logo_url")
+      .eq("id", 1)
+      .maybeSingle();
+    logoUrl = typeof settings?.logo_url === "string" ? settings.logo_url.trim() : "";
+  } catch {
+    live = null;
+    logoUrl = "";
+  }
+
+  const liveItems = Array.isArray(live?.items) ? live.items : sr.items;
+  const rows = liveItems.map((item: any, index: number) => `
     <tr>
       <td class="center">${index + 1}</td>
-      <td class="code">${escapeHtml(item.item_code)}</td>
-      <td><strong>${escapeHtml(item.item_name)}</strong><div class="muted">${escapeHtml(item.specification || item.model || item.item_type || "")}</div></td>
-      <td class="center">${item.quantity}</td>
-      <td class="center">${escapeHtml(item.unit)}</td>
-      <td>${escapeHtml(item.note || "")}</td>
+      <td class="code">${escapeHtml(String(item.item_code ?? ""))}</td>
+      <td><strong>${escapeHtml(String(item.item_name ?? ""))}</strong><div class="muted">${escapeHtml(String(item.specification || item.model || item.item_type || ""))}</div></td>
+      <td class="center">${Number(item.requested_quantity ?? item.quantity ?? 0)}</td>
+      <td class="center">${escapeHtml(String(item.unit ?? ""))}</td>
+      <td>${escapeHtml(String(item.item_note ?? item.note ?? ""))}</td>
     </tr>`).join("");
+
+  const requesterName = String(live?.requester_name || "Requester").trim();
+  const requesterId = String(live?.requester_login_id || live?.requester_member_id || "-").trim();
+  const requestedAt = live?.requested_at ? new Date(live.requested_at) : new Date();
+  const approverName = String(live?.approver_name || "C.T. Model School Administrator").trim();
+  const approverId = String(live?.approver_role || "SUPER_ADMIN").trim();
+  const approvedAt = live?.processed_at ? new Date(live.processed_at) : null;
+  const status = String(live?.status || "pending").toLowerCase();
+  const statusLabel = status === "approved" || status === "partially_issued" || status === "issued"
+    ? status.replace(/_/g, " ").replace(/^./, (c: string) => c.toUpperCase())
+    : "Pending Approval";
+  const formatDate = (date: Date | null) => date
+    ? new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false }).format(date)
+    : "Pending";
 
   const printWindow = window.open("", "_blank", "width=900,height=1100");
   if (!printWindow) return;
 
+  const logoMarkup = logoUrl
+    ? `<img class="logo" src="${escapeHtml(logoUrl)}" alt="C.T. Model School" />`
+    : `<div class="logo-placeholder" aria-hidden="true"></div>`;
+
   printWindow.document.write(`<!doctype html>
 <html><head><meta charset="utf-8" /><title>${escapeHtml(sr.srNumber)} - Service Request</title>
 <style>
-@page { size: A4 portrait; margin: 12mm; }
+@page { size: A4 portrait; margin: 0; }
 * { box-sizing: border-box; }
-body { margin: 0; color: #172033; font-family: Arial, Helvetica, sans-serif; font-size: 11px; background: #fff; }
-.sheet { width: 100%; min-height: 270mm; border: 1px solid #cfd6df; padding: 10mm; position: relative; }
-.header { display: flex; align-items: center; gap: 14px; padding-bottom: 9px; border-bottom: 2px solid #1f6f4a; }
-.logo { width: 68px; height: 68px; object-fit: contain; }
-.school { flex: 1; text-align: center; }
-.school h1 { margin: 0; font-size: 22px; letter-spacing: .2px; color: #145b3b; }
-.school p { margin: 3px 0 0; font-size: 10px; color: #5b6472; }
-.doc { width: 115px; text-align: right; }
-.doc strong { display: block; font-size: 16px; color: #145b3b; }
-.doc span { font-size: 10px; color: #687181; }
-.title { text-align: center; margin: 12px 0 9px; }
-.title h2 { display: inline-block; margin: 0; padding: 6px 18px; border: 1px solid #b9d7c7; border-radius: 5px; font-size: 15px; letter-spacing: 1px; color: #145b3b; }
-.meta { display: grid; grid-template-columns: 1.2fr 1fr 1fr; border: 1px solid #cfd6df; margin-bottom: 10px; }
-.meta div { padding: 7px 8px; border-right: 1px solid #cfd6df; }
+html, body { width: 210mm; height: 297mm; margin: 0; padding: 0; background: #fff; }
+body { color: #172033; font-family: Arial, Helvetica, sans-serif; font-size: 10px; overflow: hidden; }
+.sheet { width: 210mm; height: 297mm; margin: 0; border: 1px solid #cfd6df; padding: 8mm; position: relative; overflow: hidden; page-break-after: avoid; break-inside: avoid; }
+.header { display: flex; align-items: center; gap: 11px; padding-bottom: 7px; border-bottom: 2px solid #1f6f4a; }
+.logo, .logo-placeholder { width: 48px; height: 48px; object-fit: contain; display: block; flex: 0 0 48px; }
+.school { flex: 1; text-align: center; min-width: 0; }
+.school h1 { margin: 0; font-size: 19px; letter-spacing: .2px; color: #145b3b; }
+.school p { margin: 2px 0 0; font-size: 9px; color: #5b6472; }
+.doc { width: 105px; text-align: right; flex: 0 0 105px; }
+.doc strong { display: block; font-size: 13px; color: #145b3b; }
+.doc span { font-size: 9px; color: #687181; }
+.title { text-align: center; margin: 7px 0 6px; }
+.title h2 { display: inline-block; margin: 0; padding: 4px 14px; border: 1px solid #b9d7c7; border-radius: 5px; font-size: 13px; letter-spacing: .8px; color: #145b3b; }
+.meta { display: grid; grid-template-columns: 1.2fr 1fr 1fr; border: 1px solid #cfd6df; margin-bottom: 7px; }
+.meta div { padding: 5px 7px; border-right: 1px solid #cfd6df; }
 .meta div:last-child { border-right: 0; }
-.label { display: block; font-size: 8px; text-transform: uppercase; letter-spacing: .7px; color: #77808d; margin-bottom: 2px; }
-.value { font-size: 11px; font-weight: 700; }
+.label { display: block; font-size: 7px; text-transform: uppercase; letter-spacing: .7px; color: #77808d; margin-bottom: 1px; }
+.value { font-size: 10px; font-weight: 700; }
 table { width: 100%; border-collapse: collapse; }
-th { background: #eef6f1; color: #28553f; font-size: 9px; text-transform: uppercase; letter-spacing: .4px; }
-th, td { border: 1px solid #cfd6df; padding: 6px 5px; vertical-align: top; }
+th { background: #eef6f1; color: #28553f; font-size: 8px; text-transform: uppercase; letter-spacing: .3px; }
+th, td { border: 1px solid #cfd6df; padding: 4px 4px; vertical-align: top; }
 .center { text-align: center; }
 .code { font-family: Consolas, monospace; font-weight: 700; color: #145b3b; white-space: nowrap; }
-.muted { margin-top: 2px; font-size: 8px; color: #737c89; line-height: 1.3; }
-.summary { display: flex; justify-content: flex-end; margin-top: 7px; }
-.summary-box { border: 1px solid #cfd6df; padding: 7px 10px; min-width: 180px; }
+.muted { margin-top: 1px; font-size: 7px; color: #737c89; line-height: 1.2; }
+.summary { display: flex; justify-content: flex-end; margin-top: 5px; }
+.summary-box { border: 1px solid #cfd6df; padding: 5px 8px; min-width: 160px; }
 .summary-box strong { color: #145b3b; }
-.request { margin-top: 12px; border: 1px solid #cfd6df; }
-.request h3 { margin: 0; padding: 7px 9px; background: #eef6f1; color: #28553f; font-size: 10px; text-transform: uppercase; letter-spacing: .7px; }
-.request p { margin: 0; padding: 9px; line-height: 1.5; min-height: 48px; white-space: pre-wrap; }
-.status { display: inline-block; margin-top: 8px; padding: 4px 8px; border: 1px solid #b9d7c7; color: #145b3b; font-weight: 700; border-radius: 12px; }
-.signatures { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 34px; }
-.sig { text-align: center; padding-top: 26px; border-top: 1px solid #59616d; font-size: 9px; color: #606a77; }
-.footer { position: absolute; left: 10mm; right: 10mm; bottom: 7mm; display: flex; justify-content: space-between; border-top: 1px solid #e0e4e9; padding-top: 5px; font-size: 8px; color: #7b8490; }
-.no-print { display: none; }
+.request { margin-top: 7px; border: 1px solid #cfd6df; }
+.request h3 { margin: 0; padding: 5px 7px; background: #eef6f1; color: #28553f; font-size: 8px; text-transform: uppercase; letter-spacing: .6px; }
+.request p { margin: 0; padding: 6px 7px; line-height: 1.35; min-height: 38px; max-height: 50px; overflow: hidden; white-space: pre-wrap; }
+.status { display: inline-block; margin-top: 5px; padding: 3px 7px; border: 1px solid #b9d7c7; color: #145b3b; font-weight: 700; border-radius: 12px; }
+.signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 28px; }
+.sig { text-align: center; padding-top: 18px; border-top: 1px solid #59616d; font-size: 8px; color: #606a77; }
+.sig .name { display: block; margin-top: 3px; font-size: 9px; font-weight: 700; color: #172033; }
+.sig .id { display: block; margin-top: 2px; font-size: 8px; font-weight: 700; color: #145b3b; }
+.sig .date { display: block; margin-top: 2px; font-size: 7px; color: #687181; }
+.footer { position: absolute; left: 8mm; right: 8mm; bottom: 5mm; display: flex; justify-content: space-between; border-top: 1px solid #e0e4e9; padding-top: 4px; font-size: 7px; color: #7b8490; }
 </style></head><body>
 <div class="sheet">
   <div class="header">
-    <img class="logo" src="/logo.png" alt="C.T. Model School" />
+    ${logoMarkup}
     <div class="school"><h1>C.T. Model School</h1><p>Item Requisition &amp; Service Request</p></div>
     <div class="doc"><strong>SERVICE REQUEST</strong><span>${escapeHtml(sr.srNumber)}</span></div>
   </div>
   <div class="title"><h2>ITEM SERVICE REQUEST</h2></div>
   <div class="meta">
     <div><span class="label">SR Number</span><span class="value">${escapeHtml(sr.srNumber)}</span></div>
-    <div><span class="label">Class / Section</span><span class="value">${escapeHtml(sr.className)}</span></div>
-    <div><span class="label">Department</span><span class="value">${escapeHtml(sr.department || "-")}</span></div>
+    <div><span class="label">Class / Section</span><span class="value">${escapeHtml(String(live?.class_name || sr.className))}</span></div>
+    <div><span class="label">Department</span><span class="value">${escapeHtml(String(live?.department || sr.department || "-"))}</span></div>
   </div>
-  <table><thead><tr><th style="width:32px">SL</th><th style="width:82px">Item Code</th><th>Item Description</th><th style="width:58px">Qty</th><th style="width:48px">Unit</th><th style="width:115px">Note</th></tr></thead><tbody>${rows}</tbody></table>
-  <div class="summary"><div class="summary-box"><div>Requested Items: <strong>${sr.itemCount}</strong></div><div>Total Quantity: <strong>${sr.totalQty}</strong></div></div></div>
-  <div class="request"><h3>Request Details</h3><p>${escapeHtml(sr.details)}</p></div>
-  <span class="status">Status: Pending Approval</span>
-  <div class="signatures"><div class="sig">Requested By</div><div class="sig">Department / Class In-Charge</div><div class="sig">Store / Approval Authority</div></div>
-  <div class="footer"><span>C.T. Model School · Item SR</span><span>Generated electronically</span></div>
+  <table><thead><tr><th style="width:30px">SL</th><th style="width:78px">Item Code</th><th>Item Description</th><th style="width:50px">Qty</th><th style="width:44px">Unit</th><th style="width:105px">Note</th></tr></thead><tbody>${rows}</tbody></table>
+  <div class="summary"><div class="summary-box"><div>Requested Items: <strong>${liveItems.length}</strong></div><div>Total Quantity: <strong>${liveItems.reduce((sum: number, item: any) => sum + Number(item.requested_quantity ?? item.quantity ?? 0), 0)}</strong></div></div></div>
+  <div class="request"><h3>Request Details</h3><p>${escapeHtml(String(live?.request_details || sr.details))}</p></div>
+  <span class="status">Status: ${escapeHtml(statusLabel)}</span>
+  <div class="signatures">
+    <div class="sig">Prepared By<span class="name">${escapeHtml(requesterName)}</span><span class="id">ID: ${escapeHtml(requesterId)}</span><span class="date">${formatDate(requestedAt)}</span></div>
+    <div class="sig">Approved By<span class="name">${escapeHtml(approverName)}</span><span class="id">ID: ${escapeHtml(approverId)}</span><span class="date">${approvedAt ? formatDate(approvedAt) : "Pending Approval"}</span></div>
+  </div>
+  <div class="footer"><span>C.T. Model School · Item SR</span><span>Page 1 of 1</span></div>
 </div>
 <script>
-window.onload = function(){ setTimeout(function(){ window.print(); }, 250); };
-window.onafterprint = function(){ window.close(); };
+(function () {
+  function doPrint() { setTimeout(function () { window.print(); }, 150); }
+  var logo = document.querySelector('.logo');
+  if (logo && !logo.complete) { logo.onload = doPrint; logo.onerror = doPrint; } else { doPrint(); }
+  window.onafterprint = function () { window.close(); };
+})();
 </script></body></html>`);
   printWindow.document.close();
 }
@@ -374,7 +425,7 @@ export default function ItemSrModule({ department, permissions, preview = false 
         <section className="rounded-xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] p-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div><p className="text-[10px] font-black uppercase tracking-[0.14em] theme-primary">Last Service Request</p><p className="mt-0.5 text-sm font-black">{lastSr.srNumber}</p></div>
-            <div className="flex items-center gap-2"><span className="rounded-full bg-[var(--school-surface)] px-2.5 py-1 text-[9px] font-black theme-primary">Pending Approval</span><button type="button" onClick={() => printSr(lastSr)} className="rounded-lg border border-[var(--school-primary-border)] bg-[var(--school-surface)] px-3 py-1.5 text-[9px] font-black theme-primary hover:bg-[var(--school-primary-soft)]">Print SR</button></div>
+            <div className="flex items-center gap-2"><span className="rounded-full bg-[var(--school-surface)] px-2.5 py-1 text-[9px] font-black theme-primary">Pending Approval</span><button type="button" onClick={() => void printSr(lastSr)} className="rounded-lg border border-[var(--school-primary-border)] bg-[var(--school-surface)] px-3 py-1.5 text-[9px] font-black theme-primary hover:bg-[var(--school-primary-soft)]">Print SR</button></div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-1.5 text-[10px] sm:grid-cols-4"><div className="rounded-md bg-[var(--school-surface)] px-2.5 py-2">Class<p className="font-bold">{lastSr.className}</p></div><div className="rounded-md bg-[var(--school-surface)] px-2.5 py-2">Department<p className="font-bold">{lastSr.department || "-"}</p></div><div className="rounded-md bg-[var(--school-surface)] px-2.5 py-2">Items<p className="font-bold">{lastSr.itemCount} · Qty {lastSr.totalQty}</p></div><div className="rounded-md bg-[var(--school-surface)] px-2.5 py-2">Details<p className="truncate font-bold" title={lastSr.details}>{lastSr.details}</p></div></div>
         </section>
