@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 type SrDetailItem = {
   item_id: string;
@@ -65,10 +66,12 @@ export default function SrDetailModal({
   onClose: () => void;
 }) {
   const printedRef = useRef(false);
+  const [schoolLogo, setSchoolLogo] = useState("");
 
   useEffect(() => {
     if (!open || !sr) {
       printedRef.current = false;
+      setSchoolLogo("");
       return;
     }
     if (printedRef.current) return;
@@ -76,6 +79,8 @@ export default function SrDetailModal({
 
     const previousTitle = document.title;
     document.title = sr.sr_number;
+    let cancelled = false;
+    let printTimer: number | null = null;
 
     const handleAfterPrint = () => {
       document.title = previousTitle;
@@ -83,12 +88,28 @@ export default function SrDetailModal({
     };
     window.addEventListener("afterprint", handleAfterPrint);
 
-    const timer = window.setTimeout(() => {
-      window.print();
-    }, 120);
+    const loadAndPrint = async () => {
+      let logo = "";
+      try {
+        const { data } = await createClient()
+          .from("school_settings")
+          .select("logo_url")
+          .eq("id", 1)
+          .maybeSingle();
+        logo = typeof data?.logo_url === "string" ? data.logo_url.trim() : "";
+      } catch {}
+      if (cancelled) return;
+      setSchoolLogo(logo);
+      printTimer = window.setTimeout(() => {
+        if (!cancelled) window.print();
+      }, 180);
+    };
+
+    void loadAndPrint();
 
     return () => {
-      window.clearTimeout(timer);
+      cancelled = true;
+      if (printTimer !== null) window.clearTimeout(printTimer);
       window.removeEventListener("afterprint", handleAfterPrint);
       document.title = previousTitle;
     };
@@ -124,6 +145,27 @@ export default function SrDetailModal({
           border-bottom: 1.5px solid #17233b;
           padding: 0 0 7px;
           margin: 0 0 9px;
+        }
+
+        .sr-a4-brand {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          min-height: 44px;
+        }
+
+        .sr-a4-logo {
+          width: 46px;
+          height: 46px;
+          object-fit: contain;
+          display: block;
+          flex: 0 0 46px;
+        }
+
+        .sr-a4-brand-copy {
+          min-width: 0;
+          text-align: center;
         }
 
         .sr-a4-school {
@@ -371,8 +413,13 @@ export default function SrDetailModal({
       <div className="sr-direct-print">
         <main className="sr-a4">
           <header className="sr-a4-header">
-            <p className="sr-a4-school">C.T. Model School</p>
-            <h1 className="sr-a4-title">Item Service Request</h1>
+            <div className="sr-a4-brand">
+              {schoolLogo ? <img src={schoolLogo} alt="C.T. Model School logo" className="sr-a4-logo" /> : null}
+              <div className="sr-a4-brand-copy">
+                <p className="sr-a4-school">C.T. Model School</p>
+                <h1 className="sr-a4-title">Item Service Request</h1>
+              </div>
+            </div>
             <p className="sr-a4-number">{sr.sr_number}</p>
             <span className="sr-a4-status">{sr.status.replace(/_/g, " ")}</span>
           </header>
@@ -453,14 +500,14 @@ export default function SrDetailModal({
           <section className="sr-a4-signatures">
             <div>
               <strong>Prepared By</strong>
-              <span>{sr.requester_name || "-"}</span>
+              <span>{sr.requester_name || "Requester"}</span>
               <small>ID: {sr.requester_login_id || "-"}</small>
               <small>{formatDate(sr.requested_at)}</small>
             </div>
             <div>
               <strong>Approved By</strong>
               <span>{sr.approver_name || (sr.processed_by ? "Administrator" : "Pending Approval")}</span>
-              <small>ID: {sr.approver_id || (sr.processed_by ? "-" : "Pending")}</small>
+              <small>ID: {sr.approver_id || (sr.processed_by || sr.approver_name ? sr.processed_by || "-" : "Pending")}</small>
               <small>{sr.processed_at ? formatDate(sr.processed_at) : "Pending Approval"}</small>
             </div>
           </section>
