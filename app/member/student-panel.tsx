@@ -10,9 +10,9 @@ type Student={
 type Child={id:string;registration_no:string;source:string;student_id:string|null;student_name:string;class:string;section:string|null;status:string;created_at:string;student:Student|null};
 type Props={children:Child[]};
 
-function value(v:string|null|undefined){return v&&v.trim()?v:"Not provided";}
+function displayValue(v:string|null|undefined){return v&&v.trim()?v:"Not provided";}
 function date(v:string|null|undefined){return v?new Date(`${v}T00:00:00`).toLocaleDateString("en-GB"):"Not provided";}
-function Field({label,value:fieldValue}:{label:string;value:string|null|undefined}){return <div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-background)] p-4"><p className="text-[10px] font-bold uppercase tracking-wider text-[var(--school-muted)]">{label}</p><p className="mt-1 break-words text-sm font-bold text-[var(--school-text)]">{value(fieldValue)}</p></div>;}
+function Field({label,value:fieldValue}:{label:string;value:string|null|undefined}){return <div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-background)] p-4"><p className="text-[10px] font-bold uppercase tracking-wider text-[var(--school-muted)]">{label}</p><p className="mt-1 break-words text-sm font-bold text-[var(--school-text)]">{displayValue(fieldValue)}</p></div>;}
 
 export default function StudentPanel({children}:Props){
   if(!children.length)return <div className="rounded-2xl border border-dashed border-[var(--school-border)] p-8 text-center text-sm text-[var(--school-muted)]">No student is linked to this Parent account yet.</div>;
