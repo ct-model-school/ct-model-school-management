@@ -13,12 +13,13 @@ type AdminPageShellProps = {
 
 const moduleLinks = [
   { href: "/admin", label: "Dashboard", code: "01" },
-  { href: "/admin/parents", label: "Parents & Guardians", code: "02" },
-  { href: "/admin/hr", label: "Human Resources", code: "03" },
-  { href: "/admin/inventory", label: "Inventory", code: "04" },
-  { href: "/admin/item-sr", label: "Item Service Request", code: "05" },
-  { href: "/admin/accounts", label: "Accounts", code: "06" },
-  { href: "/admin/settings", label: "Access & Settings", code: "07" },
+  { href: "/admin/students", label: "Students", code: "02" },
+  { href: "/admin/parents", label: "Parents & Guardians", code: "03" },
+  { href: "/admin/hr", label: "Human Resources", code: "04" },
+  { href: "/admin/inventory", label: "Inventory", code: "05" },
+  { href: "/admin/item-sr", label: "Item Service Request", code: "06" },
+  { href: "/admin/accounts", label: "Accounts", code: "07" },
+  { href: "/admin/settings", label: "Access & Settings", code: "08" },
 ];
 
 const memberLabels: Record<string, { title: string; description: string }> = {
