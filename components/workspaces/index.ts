@@ -7,6 +7,7 @@ export { default as StudentFeeManager } from "@/app/admin/accounts/student-fee-m
 export { default as FinancialOverview } from "@/app/admin/accounts/financial-overview";
 export { default as HRPayrollWorkspace } from "@/app/admin/hr/HRPayrollWorkspace";
 export { default as ProcurementWorkspace } from "@/app/admin/inventory/procurement-workspace-v3";
+export { default as AdminItemSrForm } from "@/app/admin/item-sr/AdminItemSrForm";
 export { default as MemberAccountsWorkspace } from "@/app/member/dashboard/member-accounts-v2";
 export { default as MemberInventoryWorkspace } from "@/app/member/dashboard/inventory";
 export { default as MemberItemSrWorkspace } from "@/app/member/dashboard/item-sr";
