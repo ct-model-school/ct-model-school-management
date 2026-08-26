@@ -1,4 +1,5 @@
-/** Route reserved for a future, separately scoped implementation. */
+import InventoryStockMovementPage from "@/components/admin/InventoryStockMovementPage";
+
 export default function Page() {
-  return null;
+  return <InventoryStockMovementPage direction="OUT" />;
 }
