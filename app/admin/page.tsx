@@ -1,6 +1,6 @@
 import { getCurrentProfile } from "@/lib/auth";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import OwnerCommandCenter from "@/components/admin/OwnerCommandCenter";
+import OwnerCommandCenterRouter from "@/components/admin/OwnerCommandCenterRouter";
 
 const isSuperAdmin = (roleName: string) =>
   ["super_admin", "super admin"].includes(roleName.toLowerCase().replace(/_/g, " "));
@@ -18,16 +18,7 @@ type ActivityItem = {
 async function getRecentActivity(): Promise<ActivityItem[]> {
   const supabase = await createServerSupabaseClient();
 
-  const [
-    serviceRequests,
-    procurementRequests,
-    purchaseOrders,
-    bills,
-    payroll,
-    stockMovements,
-    parentRegistrations,
-    studentRegistrations,
-  ] = await Promise.all([
+  const [serviceRequests, procurementRequests, purchaseOrders, bills, payroll, stockMovements, parentRegistrations, studentRegistrations] = await Promise.all([
     supabase.from("store_service_requests").select("id, sr_number, status, requested_at, department, requester:store_users(member_id)").order("requested_at", { ascending: false }).limit(8),
     supabase.from("procurement_requests").select("id, pr_number, status, created_at, department, requester_name").order("created_at", { ascending: false }).limit(8),
     supabase.from("purchase_orders").select("id, po_number, status, created_at, supplier_name").order("created_at", { ascending: false }).limit(8),
@@ -39,7 +30,6 @@ async function getRecentActivity(): Promise<ActivityItem[]> {
   ]);
 
   const items: ActivityItem[] = [];
-
   for (const row of serviceRequests.data ?? []) items.push({ id: `sr-${row.id}`, module: "Item Service Request", action: "Service request updated", reference: row.sr_number, detail: row.department, status: row.status, createdAt: row.requested_at });
   for (const row of procurementRequests.data ?? []) items.push({ id: `pr-${row.id}`, module: "Procurement", action: "Purchase request created", reference: row.pr_number, detail: row.requester_name || row.department, status: row.status, createdAt: row.created_at });
   for (const row of purchaseOrders.data ?? []) items.push({ id: `po-${row.id}`, module: "Purchase Order", action: "Purchase order updated", reference: row.po_number, detail: row.supplier_name, status: row.status, createdAt: row.created_at });
@@ -58,7 +48,7 @@ export default async function AdminPage() {
 
   if (isSuperAdmin(profile.role.name)) {
     const activityItems = await getRecentActivity();
-    return <OwnerCommandCenter fullName={profile.full_name} email={profile.email} roleName={profile.role.name} activityItems={activityItems} />;
+    return <OwnerCommandCenterRouter fullName={profile.full_name} email={profile.email} roleName={profile.role.name} activityItems={activityItems} />;
   }
 
   const modules = [
@@ -71,27 +61,8 @@ export default async function AdminPage() {
 
   return (
     <div className="mx-auto max-w-7xl">
-      <header className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-6 shadow-sm md:p-8">
-        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] theme-primary">Administration</p>
-            <h1 className="mt-2 text-3xl font-bold text-[var(--school-text)]">Admin Dashboard</h1>
-            <p className="mt-2 text-sm text-[var(--school-muted)]">Welcome back, {profile.full_name || profile.email}.</p>
-          </div>
-          <span className="w-fit rounded-full px-4 py-2 text-xs font-bold capitalize theme-primary-bg">{profile.role.name.replace(/_/g, " ")}</span>
-        </div>
-      </header>
-      <section className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3" aria-label="Ready administration modules">
-        {modules.map(module => (
-          <a key={module.href} href={module.href} className="group block rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--school-primary-border)] hover:shadow-md md:p-8">
-            <div className="mb-5 h-2 w-16 rounded-full theme-primary-bg transition-all group-hover:w-24" />
-            <p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">Ready Module</p>
-            <h2 className="mt-2 text-2xl font-black text-[var(--school-text)]">{module.title}</h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--school-muted)]">{module.description}</p>
-            <span className="mt-6 inline-block text-xs font-bold theme-primary">Open {module.title} →</span>
-          </a>
-        ))}
-      </section>
+      <header className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-6 shadow-sm md:p-8"><div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.16em] theme-primary">Administration</p><h1 className="mt-2 text-3xl font-bold text-[var(--school-text)]">Admin Dashboard</h1><p className="mt-2 text-sm text-[var(--school-muted)]">Welcome back, {profile.full_name || profile.email}.</p></div><span className="w-fit rounded-full px-4 py-2 text-xs font-bold capitalize theme-primary-bg">{profile.role.name.replace(/_/g, " ")}</span></div></header>
+      <section className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3" aria-label="Ready administration modules">{modules.map(module => <a key={module.href} href={module.href} className="group block rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--school-primary-border)] hover:shadow-md md:p-8"><div className="mb-5 h-2 w-16 rounded-full theme-primary-bg transition-all group-hover:w-24" /><p className="text-[10px] font-black uppercase tracking-[0.16em] theme-primary">Ready Module</p><h2 className="mt-2 text-2xl font-black text-[var(--school-text)]">{module.title}</h2><p className="mt-2 text-sm leading-6 text-[var(--school-muted)]">{module.description}</p><span className="mt-6 inline-block text-xs font-bold theme-primary">Open {module.title} →</span></a>)}</section>
     </div>
   );
 }
