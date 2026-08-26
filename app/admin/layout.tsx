@@ -49,12 +49,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     if (!permissions.dashboard && !adminOnly) redirect("/admin/login");
   }
 
-  // During the staged Super Admin rollout, only the currently approved screen
-  // can be opened. Direct navigation to another admin module returns to Stage 01.
-  if (superAdmin && pathname !== "/admin" && pathname !== "/admin/") {
-    redirect("/admin");
-  }
-
+  // Super Admin owns the complete admin tree. Individual branches are protected
+  // by their normal permission checks below, but Super Admin must never be sent
+  // back to the dashboard simply because a leaf route is opened.
   if (pathname === "/admin/portals" || pathname.startsWith("/admin/portals/")) {
     if (!adminOnly) redirect("/admin");
   }
@@ -95,8 +92,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     return allow(item.permission || "");
   });
 
-  // Super Admin has its own complete UI shell in SuperAdminDashboard.
-  // Do not render another sidebar/header here, otherwise the two shells stack.
   if (superAdmin) {
     return (
       <div className="min-h-screen bg-[var(--school-background)] text-[var(--school-text)]">
