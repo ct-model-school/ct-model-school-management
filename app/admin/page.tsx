@@ -1,26 +1,92 @@
 import { getCurrentProfile } from "@/lib/auth";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import SuperAdminDashboard from "@/components/admin/SuperAdminDashboard";
 
 const isSuperAdmin = (roleName: string) =>
   ["super_admin", "super admin"].includes(roleName.toLowerCase().replace(/_/g, " "));
 
+type ActivityItem = {
+  id: string;
+  module: string;
+  action: string;
+  reference?: string | null;
+  detail?: string | null;
+  status?: string | null;
+  createdAt: string;
+};
+
+async function getRecentActivity(): Promise<ActivityItem[]> {
+  const supabase = await createServerSupabaseClient();
+
+  const [
+    serviceRequests,
+    procurementRequests,
+    purchaseOrders,
+    bills,
+    payroll,
+    stockMovements,
+    parentRegistrations,
+    studentRegistrations,
+  ] = await Promise.all([
+    supabase.from("store_service_requests").select("id, sr_number, status, requested_at, department, requester:store_users(member_id)").order("requested_at", { ascending: false }).limit(8),
+    supabase.from("procurement_requests").select("id, pr_number, status, created_at, department, requester_name").order("created_at", { ascending: false }).limit(8),
+    supabase.from("purchase_orders").select("id, po_number, status, created_at, supplier_name").order("created_at", { ascending: false }).limit(8),
+    supabase.from("accounts_bills").select("id, bill_no, status, created_at, bill_category, payee_name").order("created_at", { ascending: false }).limit(8),
+    supabase.from("hr_payroll_sheets").select("id, member_id, member_name, status, created_at, payroll_month").order("created_at", { ascending: false }).limit(8),
+    supabase.from("inventory_stock_movements").select("id, movement_type, quantity, reference_type, reference_id, created_at, note").order("created_at", { ascending: false }).limit(8),
+    supabase.from("parent_registration_requests").select("id, registration_no, full_name, status, created_at").order("created_at", { ascending: false }).limit(8),
+    supabase.from("student_registration_requests").select("id, application_no, student_name, status, created_at").order("created_at", { ascending: false }).limit(8),
+  ]);
+
+  const items: ActivityItem[] = [];
+
+  for (const row of serviceRequests.data ?? []) {
+    items.push({ id: `sr-${row.id}`, module: "Item Service Request", action: "Service request updated", reference: row.sr_number, detail: row.department, status: row.status, createdAt: row.requested_at });
+  }
+  for (const row of procurementRequests.data ?? []) {
+    items.push({ id: `pr-${row.id}`, module: "Procurement", action: "Purchase request created", reference: row.pr_number, detail: row.requester_name || row.department, status: row.status, createdAt: row.created_at });
+  }
+  for (const row of purchaseOrders.data ?? []) {
+    items.push({ id: `po-${row.id}`, module: "Purchase Order", action: "Purchase order updated", reference: row.po_number, detail: row.supplier_name, status: row.status, createdAt: row.created_at });
+  }
+  for (const row of bills.data ?? []) {
+    items.push({ id: `bill-${row.id}`, module: "Accounts", action: "Bill record updated", reference: row.bill_no, detail: row.payee_name || row.bill_category, status: row.status, createdAt: row.created_at });
+  }
+  for (const row of payroll.data ?? []) {
+    items.push({ id: `payroll-${row.id}`, module: "Human Resources", action: "Payroll sheet updated", reference: row.member_id, detail: `${row.member_name} · ${row.payroll_month}`, status: row.status, createdAt: row.created_at });
+  }
+  for (const row of stockMovements.data ?? []) {
+    items.push({ id: `stock-${row.id}`, module: "Inventory", action: `Stock ${row.movement_type}`, reference: row.reference_id, detail: `${row.quantity} quantity${row.note ? ` · ${row.note}` : ""}`, status: row.movement_type, createdAt: row.created_at });
+  }
+  for (const row of parentRegistrations.data ?? []) {
+    items.push({ id: `parent-${row.id}`, module: "Parents & Guardians", action: "Parent registration updated", reference: row.registration_no, detail: row.full_name, status: row.status, createdAt: row.created_at });
+  }
+  for (const row of studentRegistrations.data ?? []) {
+    items.push({ id: `student-${row.id}`, module: "Student Registration", action: "Student registration updated", reference: row.application_no, detail: row.student_name, status: row.status, createdAt: row.created_at });
+  }
+
+  return items
+    .filter((item) => item.createdAt)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 20);
+}
+
 export default async function AdminPage() {
   const profile = await getCurrentProfile();
   if (!profile) return null;
 
-  // Super Admin UI rollout starts here. No data/RPC/business logic is changed.
   if (isSuperAdmin(profile.role.name)) {
+    const activityItems = await getRecentActivity();
     return (
       <SuperAdminDashboard
         fullName={profile.full_name}
         email={profile.email}
         roleName={profile.role.name}
+        activityItems={activityItems}
       />
     );
   }
 
-  // Existing non-Super-Admin dashboard remains untouched until the staged
-  // Super Admin UI is approved and the next UI module is loaded.
   const modules = [
     { href: "/admin/parents", title: "Parents & Guardians", description: "Approve Parent accounts, issue Parent IDs, review child registrations and maintain Parent–Student binding." },
     { href: "/admin/inventory", title: "Inventory", description: "Manage items, stock, item information and Inventory-side SR approval and processing." },
