@@ -62,4 +62,5 @@ begin
 end;
 $$;
 
+revoke all on function public.store_admin_record_stock_movement(uuid,text,numeric,text) from public;
 grant execute on function public.store_admin_record_stock_movement(uuid,text,numeric,text) to authenticated;
