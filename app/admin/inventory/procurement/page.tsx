@@ -1,6 +1,6 @@
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 import { getCurrentAdminPermissions } from "@/lib/adminPermissions";
-import ProcurementWorkspaceV3 from "../procurement-workspace-v3";
+import { ProcurementWorkspace } from "@/components/workspaces";
 
 export default async function ProcurementPage() {
   const access = await getCurrentAdminPermissions();
@@ -13,7 +13,7 @@ export default async function ProcurementPage() {
       description="PR approval → PO generation → Accounts item pricing → Admin quantity and price approval → Accounts payment → Store stock-in."
       action={{ href: "/admin/inventory", label: "Back to Inventory" }}
     >
-      <ProcurementWorkspaceV3 permissions={access?.permissions || {}} adminMode={adminMode} />
+      <ProcurementWorkspace permissions={access?.permissions || {}} adminMode={adminMode} />
     </AdminPageShell>
   );
 }
