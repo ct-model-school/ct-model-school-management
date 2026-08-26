@@ -57,8 +57,20 @@ export default function SuperAdminDashboard({ fullName, email, roleName, activit
   const isPendingActions = selectedModule.id === "dashboard" && selectedSection === "Pending Actions";
   const pendingItems = activityItems.filter(isPending);
 
-  const handleModuleClick = (module: Module) => { setSelected(module.id); setOpenModule(module.id); setSelectedSection(module.sections[0]); };
-  const handleSectionClick = (module: Module, section: string) => { setSelected(module.id); setOpenModule(module.id); setSelectedSection(section); };
+  const handleModuleClick = (module: Module) => {
+    const isSameModule = selected === module.id;
+
+    setSelected(module.id);
+    setSelectedSection(module.sections[0]);
+    setOpenModule(isSameModule && openModule === module.id ? null : module.id);
+  };
+
+  const handleSectionClick = (module: Module, section: string) => {
+    setSelected(module.id);
+    setOpenModule(module.id);
+    setSelectedSection(section);
+  };
+
   const handleLogout = async () => {
     if (loggingOut) return;
     setLoggingOut(true);
