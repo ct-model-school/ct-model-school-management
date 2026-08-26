@@ -1,6 +1,6 @@
 import { getCurrentProfile } from "@/lib/auth";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import SuperAdminDashboard from "@/components/admin/SuperAdminDashboard";
+import OwnerCommandCenter from "@/components/admin/OwnerCommandCenter";
 
 const isSuperAdmin = (roleName: string) =>
   ["super_admin", "super admin"].includes(roleName.toLowerCase().replace(/_/g, " "));
@@ -40,35 +40,16 @@ async function getRecentActivity(): Promise<ActivityItem[]> {
 
   const items: ActivityItem[] = [];
 
-  for (const row of serviceRequests.data ?? []) {
-    items.push({ id: `sr-${row.id}`, module: "Item Service Request", action: "Service request updated", reference: row.sr_number, detail: row.department, status: row.status, createdAt: row.requested_at });
-  }
-  for (const row of procurementRequests.data ?? []) {
-    items.push({ id: `pr-${row.id}`, module: "Procurement", action: "Purchase request created", reference: row.pr_number, detail: row.requester_name || row.department, status: row.status, createdAt: row.created_at });
-  }
-  for (const row of purchaseOrders.data ?? []) {
-    items.push({ id: `po-${row.id}`, module: "Purchase Order", action: "Purchase order updated", reference: row.po_number, detail: row.supplier_name, status: row.status, createdAt: row.created_at });
-  }
-  for (const row of bills.data ?? []) {
-    items.push({ id: `bill-${row.id}`, module: "Accounts", action: "Bill record updated", reference: row.bill_no, detail: row.payee_name || row.bill_category, status: row.status, createdAt: row.created_at });
-  }
-  for (const row of payroll.data ?? []) {
-    items.push({ id: `payroll-${row.id}`, module: "Human Resources", action: "Payroll sheet updated", reference: row.member_id, detail: `${row.member_name} · ${row.payroll_month}`, status: row.status, createdAt: row.created_at });
-  }
-  for (const row of stockMovements.data ?? []) {
-    items.push({ id: `stock-${row.id}`, module: "Inventory", action: `Stock ${row.movement_type}`, reference: row.reference_id, detail: `${row.quantity} quantity${row.note ? ` · ${row.note}` : ""}`, status: row.movement_type, createdAt: row.created_at });
-  }
-  for (const row of parentRegistrations.data ?? []) {
-    items.push({ id: `parent-${row.id}`, module: "Parents & Guardians", action: "Parent registration updated", reference: row.registration_no, detail: row.full_name, status: row.status, createdAt: row.created_at });
-  }
-  for (const row of studentRegistrations.data ?? []) {
-    items.push({ id: `student-${row.id}`, module: "Student Registration", action: "Student registration updated", reference: row.application_no, detail: row.student_name, status: row.status, createdAt: row.created_at });
-  }
+  for (const row of serviceRequests.data ?? []) items.push({ id: `sr-${row.id}`, module: "Item Service Request", action: "Service request updated", reference: row.sr_number, detail: row.department, status: row.status, createdAt: row.requested_at });
+  for (const row of procurementRequests.data ?? []) items.push({ id: `pr-${row.id}`, module: "Procurement", action: "Purchase request created", reference: row.pr_number, detail: row.requester_name || row.department, status: row.status, createdAt: row.created_at });
+  for (const row of purchaseOrders.data ?? []) items.push({ id: `po-${row.id}`, module: "Purchase Order", action: "Purchase order updated", reference: row.po_number, detail: row.supplier_name, status: row.status, createdAt: row.created_at });
+  for (const row of bills.data ?? []) items.push({ id: `bill-${row.id}`, module: "Accounts", action: "Bill record updated", reference: row.bill_no, detail: row.payee_name || row.bill_category, status: row.status, createdAt: row.created_at });
+  for (const row of payroll.data ?? []) items.push({ id: `payroll-${row.id}`, module: "Human Resources", action: "Payroll sheet updated", reference: row.member_id, detail: `${row.member_name} · ${row.payroll_month}`, status: row.status, createdAt: row.created_at });
+  for (const row of stockMovements.data ?? []) items.push({ id: `stock-${row.id}`, module: "Inventory", action: `Stock ${row.movement_type}`, reference: row.reference_id, detail: `${row.quantity} quantity${row.note ? ` · ${row.note}` : ""}`, status: row.movement_type, createdAt: row.created_at });
+  for (const row of parentRegistrations.data ?? []) items.push({ id: `parent-${row.id}`, module: "Parents & Guardians", action: "Parent registration updated", reference: row.registration_no, detail: row.full_name, status: row.status, createdAt: row.created_at });
+  for (const row of studentRegistrations.data ?? []) items.push({ id: `student-${row.id}`, module: "Student Registration", action: "Student registration updated", reference: row.application_no, detail: row.student_name, status: row.status, createdAt: row.created_at });
 
-  return items
-    .filter((item) => item.createdAt)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 20);
+  return items.filter((item) => item.createdAt).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 20);
 }
 
 export default async function AdminPage() {
@@ -77,14 +58,7 @@ export default async function AdminPage() {
 
   if (isSuperAdmin(profile.role.name)) {
     const activityItems = await getRecentActivity();
-    return (
-      <SuperAdminDashboard
-        fullName={profile.full_name}
-        email={profile.email}
-        roleName={profile.role.name}
-        activityItems={activityItems}
-      />
-    );
+    return <OwnerCommandCenter fullName={profile.full_name} email={profile.email} roleName={profile.role.name} activityItems={activityItems} />;
   }
 
   const modules = [
