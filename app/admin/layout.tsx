@@ -48,6 +48,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (pathname === "/admin" || pathname === "/admin/") {
     if (!permissions.dashboard && !adminOnly) redirect("/admin/login");
   }
+
+  // During the staged Super Admin rollout, only the currently approved screen
+  // can be opened. Direct navigation to another admin module returns to Stage 01.
+  if (superAdmin && pathname !== "/admin" && pathname !== "/admin/") {
+    redirect("/admin");
+  }
+
   if (pathname === "/admin/portals" || pathname.startsWith("/admin/portals/")) {
     if (!adminOnly) redirect("/admin");
   }
@@ -88,8 +95,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     return allow(item.permission || "");
   });
 
-  // Super Admin is intentionally isolated while the new UI is approved one screen at a time.
-  // This changes presentation only. Existing route guards, permissions and data logic above stay intact.
   if (superAdmin) {
     return (
       <div className="min-h-screen bg-[var(--school-background)] text-[var(--school-text)]">
