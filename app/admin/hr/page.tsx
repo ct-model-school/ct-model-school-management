@@ -1,5 +1,5 @@
 import { getCurrentProfile } from "@/lib/auth";
-import HRPayrollWorkspace from "./HRPayrollWorkspace";
+import { HRPayrollWorkspace } from "@/components/workspaces";
 
 export default async function HRPage(){
  const profile=await getCurrentProfile();
