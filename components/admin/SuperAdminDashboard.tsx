@@ -2,258 +2,61 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { AdminPageShell } from "@/components/admin/AdminPageShell";
 
-type ActivityItem = {
-  id: string;
-  module: string;
-  action: string;
-  reference?: string | null;
-  detail?: string | null;
-  status?: string | null;
-  createdAt: string;
-};
-
-type TreeItem = {
-  label: string;
-  href?: string;
-  description?: string;
-  children?: TreeItem[];
-};
-
-type TreeModule = {
-  code: string;
-  title: string;
-  description: string;
-  items: TreeItem[];
-};
-
-const T = (label: string, href?: string, description?: string, children?: TreeItem[]): TreeItem => ({ label, href, description, children });
+type ActivityItem = { id: string; module: string; action: string; reference?: string | null; detail?: string | null; status?: string | null; createdAt: string };
+type TreeItem = { label: string; href: string; description?: string; children?: TreeItem[] };
+type TreeModule = { code: string; title: string; description: string; items: TreeItem[] };
+const T = (label: string, href: string, description?: string, children?: TreeItem[]): TreeItem => ({ label, href, description, children });
 
 const TREE: TreeModule[] = [
-  {
-    code: "01",
-    title: "Dashboard",
-    description: "School administration overview and live operational activity.",
-    items: [
-      T("Overview", "/admin"),
-      T("Pending Actions", "/admin"),
-      T("System Activity", "/admin"),
-    ],
-  },
-  {
-    code: "02",
-    title: "People",
-    description: "Existing school people records and identity management.",
-    items: [
-      T("Students", "/admin/students", "Use the existing Students Admin page exactly as it is."),
-      T("Parents & Guardians", "/admin/parents"),
-      T("Members", "/admin/members", undefined, [
-        T("Staff", "/admin/members?type=staff"),
-        T("Teachers", "/admin/members?type=teacher"),
-        T("Accounts", "/admin/members?type=accounts"),
-        T("Others", "/admin/members?type=other"),
-      ]),
-    ],
-  },
-  {
-    code: "03",
-    title: "Human Resources",
-    description: "Existing staff and teacher operations, attendance and salary workflow.",
-    items: [
-      T("Staff & Teachers", "/admin/hr"),
-      T("Attendance", "/admin/hr?section=attendance"),
-      T("Payroll", "/admin/hr?section=payroll"),
-      T("Monthly Salary Sheet", "/admin/hr?section=salary"),
-    ],
-  },
-  {
-    code: "04",
-    title: "Inventory & Procurement",
-    description: "Existing school store, item master, stock, issue, return and procurement workflow.",
-    items: [
-      T("Items", "/admin/inventory"),
-      T("Product Master", "/admin/inventory/products", undefined, [
-        T("Products", "/admin/inventory/products"),
-        T("Categories", "/admin/inventory/products/categories"),
-      ]),
-      T("Stock", "/admin/inventory", undefined, [
-        T("Stock In", "/admin/inventory/stock-in"),
-        T("Stock Out", "/admin/inventory/stock-out"),
-      ]),
-      T("Inventory Persons", "/admin/inventory/persons"),
-      T("Issue", "/admin/inventory/issue"),
-      T("Return", "/admin/inventory/returns"),
-      T("Handover", "/admin/inventory/handover"),
-      T("Takeover", "/admin/inventory/takeover"),
-      T("Procurement", "/admin/inventory/procurement", undefined, [
-        T("Purchase Request", "/admin/inventory/procurement?tab=pr"),
-        T("PR Approval", "/admin/inventory/procurement?tab=pr&action=approval"),
-        T("PR History", "/admin/inventory/procurement?tab=pr&action=history"),
-        T("Purchase Order", "/admin/inventory/procurement?tab=po"),
-        T("PO Price Entry", "/admin/inventory/procurement?tab=po&action=price"),
-        T("PO Approval", "/admin/inventory/procurement?tab=po&action=approval"),
-        T("PO History", "/admin/inventory/procurement?tab=po&action=history"),
-      ]),
-      T("Reports", "/admin/inventory/reports", undefined, [
-        T("Stock", "/admin/inventory/reports/stock"),
-        T("Issued", "/admin/inventory/reports/issued"),
-        T("Returned", "/admin/inventory/reports/returned"),
-        T("Outstanding", "/admin/inventory/reports/outstanding"),
-        T("Handover", "/admin/inventory/reports/handover"),
-        T("Takeover", "/admin/inventory/reports/takeover"),
-        T("History", "/admin/inventory/reports/history"),
-      ]),
-    ],
-  },
-  {
-    code: "05",
-    title: "Item Service Request",
-    description: "Existing Item SR workflow from request through approval, issue, print and history.",
-    items: [
-      T("Create SR", "/admin/item-sr?section=create"),
-      T("Approval", "/admin/item-sr?section=approval"),
-      T("Issue", "/admin/item-sr?section=issue"),
-      T("Print", "/admin/item-sr?section=print"),
-      T("History", "/admin/item-sr?section=history"),
-    ],
-  },
-  {
-    code: "06",
-    title: "Accounts",
-    description: "Existing school financial operations and accounting records.",
-    items: [
-      T("Dashboard", "/admin/accounts"),
-      T("Fees", "/admin/accounts/fees", undefined, [
-        T("Fee Structure", "/admin/accounts/fees/structure"),
-        T("Fee Collection", "/admin/accounts/fees/collection"),
-        T("Dues", "/admin/accounts/fees/dues"),
-      ]),
-      T("Income", "/admin/accounts/income"),
-      T("Expense", "/admin/accounts/expense"),
-      T("Bill Payments", "/admin/accounts?section=bill-payments"),
-      T("Salary", "/admin/accounts/salary", undefined, [
-        T("Salary Processing", "/admin/accounts/salary/payroll"),
-      ]),
-      T("Cash Book", "/admin/accounts/cashbook"),
-      T("Bank", "/admin/accounts/bank"),
-      T("Vouchers", "/admin/accounts/vouchers"),
-      T("Journal", "/admin/accounts/journal"),
-      T("Ledger", "/admin/accounts/ledger"),
-      T("Reports", "/admin/accounts/reports", undefined, [
-        T("Fee Collection", "/admin/accounts/reports/fee-collection"),
-        T("Financial Summary", "/admin/accounts/reports/financial-summary"),
-        T("Income & Expense", "/admin/accounts/reports/income-expense"),
-        T("Outstanding", "/admin/accounts/reports/outstanding"),
-        T("Salary", "/admin/accounts/reports/salary"),
-      ]),
-    ],
-  },
-  {
-    code: "07",
-    title: "Academic",
-    description: "Existing academic records, results and school notices.",
-    items: [
-      T("Students", "/admin/students"),
-      T("Results", "/admin/results", undefined, [
-        T("Result Entry", "/admin/results/entry"),
-        T("Reports", "/admin/results/reports"),
-      ]),
-      T("Notices", "/admin/notices"),
-    ],
-  },
-  {
-    code: "08",
-    title: "Access & Settings",
-    description: "Existing school permissions, portals and administrative settings.",
-    items: [
-      T("Roles & Permissions", "/admin/roles"),
-      T("PR & PO Permissions", "/admin/roles/procurement"),
-      T("Portal Management", "/admin/portals"),
-      T("School Settings", "/admin/settings"),
-    ],
-  },
+  { code: "01", title: "Dashboard", description: "Owner command center for overview, pending work and live system activity.", items: [T("Overview", "/admin?view=overview"), T("Pending Actions", "/admin?view=pending"), T("System Activity", "/admin?view=activity")] },
+  { code: "02", title: "People", description: "Students, parents and internal school members.", items: [T("Students", "/admin/students"), T("Parents & Guardians", "/admin/parents"), T("Members", "/admin/members", undefined, [T("Staff", "/admin/members?type=staff"), T("Teachers", "/admin/members?type=teacher"), T("Accounts", "/admin/members?type=accounts"), T("Others", "/admin/members?type=other")])] },
+  { code: "03", title: "Human Resources", description: "Staff and teacher operations, attendance and salary workflow.", items: [T("Staff & Teachers", "/admin/hr"), T("Attendance", "/admin/hr?section=attendance"), T("Payroll", "/admin/hr?section=payroll"), T("Monthly Salary Sheet", "/admin/hr?section=salary")] },
+  { code: "04", title: "Inventory & Procurement", description: "School store, stock movement, suppliers and procurement workflow.", items: [T("Items", "/admin/inventory"), T("Product Master", "/admin/inventory/products"), T("Stock", "/admin/inventory", undefined, [T("Stock In", "/admin/inventory/stock-in"), T("Stock Out", "/admin/inventory/stock-out")]), T("Suppliers", "/admin/inventory/suppliers"), T("Inventory Persons", "/admin/inventory/persons"), T("Issue", "/admin/inventory/issue"), T("Return", "/admin/inventory/return"), T("Handover", "/admin/inventory/handover"), T("Takeover", "/admin/inventory/takeover"), T("PR", "/admin/inventory/procurement?tab=pr", undefined, [T("Create", "/admin/inventory/procurement?tab=pr&action=create"), T("Approval", "/admin/inventory/procurement?tab=pr&action=approval"), T("History", "/admin/inventory/procurement?tab=pr&action=history")]), T("PO", "/admin/inventory/procurement?tab=po", undefined, [T("Generate", "/admin/inventory/procurement?tab=po&action=generate"), T("Price Entry", "/admin/inventory/procurement?tab=po&action=price"), T("Approval", "/admin/inventory/procurement?tab=po&action=approval"), T("Payment", "/admin/inventory/procurement?tab=po&action=payment"), T("Restock", "/admin/inventory/procurement?tab=po&action=restock"), T("History", "/admin/inventory/procurement?tab=po&action=history")])] },
+  { code: "05", title: "Service Requests", description: "Complete service-request lifecycle from creation through print and history.", items: [T("Create SR", "/admin/item-sr?section=create"), T("Approval", "/admin/item-sr?section=approval"), T("Issue", "/admin/item-sr?section=issue"), T("Print", "/admin/item-sr?section=print"), T("History", "/admin/item-sr?section=history")] },
+  { code: "06", title: "Accounts", description: "School finance, payments, books and reporting.", items: [T("Dashboard", "/admin/accounts"), T("Fees", "/admin/accounts/fees"), T("Income", "/admin/accounts/income"), T("Expense", "/admin/accounts/expense"), T("Bill Payments", "/admin/accounts?section=bill-payments"), T("PO Payments", "/admin/accounts?section=po-payments"), T("Cash", "/admin/accounts/cashbook"), T("Bank", "/admin/accounts/bank"), T("Journal", "/admin/accounts/journal"), T("Ledger", "/admin/accounts/ledger"), T("Reports", "/admin/accounts/reports")] },
+  { code: "07", title: "Academic", description: "Student academic records, results, notices and reports.", items: [T("Students", "/admin/students"), T("Results", "/admin/results"), T("Notices", "/admin/notices"), T("Reports", "/admin/results?section=reports")] },
+  { code: "08", title: "Access Control", description: "Roles, permissions, portal access and audit controls.", items: [T("Roles", "/admin/roles"), T("Permissions", "/admin/roles"), T("PR & PO Permissions", "/admin/roles/procurement"), T("Portal Management", "/admin/portals"), T("Audit", "/admin?view=activity")] },
 ];
 
-function countLeaves(items: TreeItem[]): number {
-  return items.reduce((total, item) => total + (item.children?.length ? countLeaves(item.children) : 1), 0);
-}
-
+function countLeaves(items: TreeItem[]): number { return items.reduce((total, item) => total + (item.children?.length ? countLeaves(item.children) : 1), 0); }
 const TOTAL_LEAVES = TREE.reduce((total, module) => total + countLeaves(module.items), 0);
 
 export default function SuperAdminDashboard({ fullName, email, activityItems = [] }: { fullName?: string | null; email?: string | null; roleName?: string; activityItems?: ActivityItem[] }) {
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState("");
+  const [view, setView] = useState(searchParams.get("view") || "overview");
   const name = fullName || email || "Administrator";
-  const pending = activityItems.filter((item) => ["pending", "awaiting_approval", "submitted", "under_review", "pending_approval"].includes((item.status || "").toLowerCase()));
+  const pending = useMemo(() => activityItems.filter((item) => ["pending", "awaiting_approval", "submitted", "under_review", "pending_approval"].includes((item.status || "").toLowerCase())), [activityItems]);
   const filtered = useMemo(() => filterTree(TREE, query), [query]);
+  const selectView = (next: string) => { setView(next); window.history.replaceState(null, "", `/admin?view=${next}`); };
 
-  return (
-    <AdminPageShell
-      eyebrow="Administration"
-      title="Admin Dashboard"
-      description="A complete school-management action tree built from the existing C.T. Model School Admin pages. No separate ERP/Oracle interface is used."
-    >
-      <section className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm md:p-7">
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[.18em] theme-primary">Super Admin / Owner</p>
-            <h2 className="mt-2 text-3xl font-black tracking-tight">Welcome, {name}</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--school-muted)]">The tree below is only a navigation layer. Each leaf opens the existing school-management page and its existing Supabase workflow.</p>
-          </div>
-          <div className="grid grid-cols-3 gap-2 sm:min-w-[360px]">
-            <Stat label="Modules" value={String(TREE.length)} />
-            <Stat label="Leaf Actions" value={String(TOTAL_LEAVES)} />
-            <Stat label="Pending" value={String(pending.length)} primary />
-          </div>
-        </div>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search existing modules and actions…" className="min-w-0 flex-1 rounded-xl border border-[var(--school-border)] bg-[var(--school-background)] px-4 py-3 text-xs font-semibold outline-none focus:border-[var(--school-primary-border)]" />
-          <Link href="/admin/students" className="rounded-xl px-4 py-3 text-xs font-black theme-primary-bg">Open Students</Link>
-        </div>
-      </section>
-
-      <section className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {filtered.map((module) => <ModuleCard key={module.code} module={module} />)}
-      </section>
-
-      <section className="mt-5 grid gap-5 lg:grid-cols-2">
-        <div className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm">
-          <p className="text-[10px] font-black uppercase tracking-[.16em] theme-primary">Pending Actions</p>
-          <h3 className="mt-1 text-lg font-black">{pending.length} records</h3>
-          {pending.length ? <div className="mt-4 space-y-2">{pending.slice(0, 5).map((item) => <div key={item.id} className="rounded-xl bg-[var(--school-background)] p-3"><p className="text-xs font-black">{item.action}</p><p className="mt-1 text-[9px] text-[var(--school-muted)]">{item.module} · {item.reference || "No reference"}</p></div>)}</div> : <p className="mt-3 text-xs text-[var(--school-muted)]">No pending records right now.</p>}
-        </div>
-        <div className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm">
-          <p className="text-[10px] font-black uppercase tracking-[.16em] theme-primary">System Activity</p>
-          <h3 className="mt-1 text-lg font-black">{activityItems.length} recent records</h3>
-          {activityItems.length ? <div className="mt-4 space-y-2">{activityItems.slice(0, 5).map((item) => <div key={item.id} className="rounded-xl bg-[var(--school-background)] p-3"><p className="text-xs font-black">{item.action}</p><p className="mt-1 text-[9px] text-[var(--school-muted)]">{item.module} · {item.reference || "No reference"}</p></div>)}</div> : <p className="mt-3 text-xs text-[var(--school-muted)]">No recent activity records found.</p>}
-        </div>
-      </section>
-    </AdminPageShell>
-  );
+  return <AdminPageShell eyebrow="Super Admin / Owner" title="C.T. Model School" description="Owner command center. Every completed branch opens a real school-management workflow backed by the existing system.">
+    <div className="grid gap-5 xl:grid-cols-[270px_minmax(0,1fr)]">
+      <aside className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-4 shadow-sm xl:sticky xl:top-5 xl:h-[calc(100vh-40px)] xl:overflow-y-auto">
+        <div className="rounded-2xl bg-[var(--school-primary-soft)] p-4"><p className="text-[9px] font-black uppercase tracking-[.18em] theme-primary">Owner Access</p><p className="mt-2 text-sm font-black">{name}</p><p className="mt-1 truncate text-[10px] text-[var(--school-muted)]">{email || "Super Admin"}</p></div>
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search modules, actions…" className="mt-4 w-full rounded-xl border border-[var(--school-border)] bg-[var(--school-background)] px-3 py-2.5 text-xs font-semibold outline-none focus:border-[var(--school-primary-border)]" />
+        <p className="mt-5 px-1 text-[9px] font-black uppercase tracking-[.16em] text-[var(--school-muted)]">School Product Map · {TOTAL_LEAVES} leaves</p>
+        <nav className="mt-2 space-y-2" aria-label="Super Admin tree">{filtered.map((module) => <TreeModuleRow key={module.code} module={module} />)}</nav>
+      </aside>
+      <div className="min-w-0">
+        <section className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm md:p-7"><div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between"><div><p className="text-[10px] font-black uppercase tracking-[.18em] theme-primary">Super Admin / Owner Command Center</p><h2 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">Welcome, {name}</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--school-muted)]">Overview, Pending Actions and System Activity are separate live views. No demo records are generated here.</p></div><div className="grid grid-cols-3 gap-2 sm:min-w-[360px]"><Stat label="Modules" value={String(TREE.length)} /><Stat label="Leaf Actions" value={String(TOTAL_LEAVES)} /><Stat label="Pending" value={String(pending.length)} primary /></div></div></section>
+        <div className="mt-5 grid grid-cols-3 gap-2 rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] p-2"><button onClick={() => selectView("overview")} className={`rounded-xl px-3 py-2.5 text-xs font-black ${view === "overview" ? "theme-primary-bg" : "text-[var(--school-muted)]"}`}>Overview</button><button onClick={() => selectView("pending")} className={`rounded-xl px-3 py-2.5 text-xs font-black ${view === "pending" ? "theme-primary-bg" : "text-[var(--school-muted)]"}`}>Pending Actions</button><button onClick={() => selectView("activity")} className={`rounded-xl px-3 py-2.5 text-xs font-black ${view === "activity" ? "theme-primary-bg" : "text-[var(--school-muted)]"}`}>System Activity</button></div>
+        {view === "pending" ? <PendingView items={pending} /> : view === "activity" ? <ActivityView items={activityItems} /> : <OverviewView modules={TREE} pending={pending.length} activity={activityItems.length} />}
+      </div>
+    </div>
+  </AdminPageShell>;
 }
 
-function filterTree(modules: TreeModule[], query: string): TreeModule[] {
-  const q = query.trim().toLowerCase();
-  if (!q) return modules;
-  const filterItems = (items: TreeItem[]): TreeItem[] => items.map((item) => {
-    const children = item.children ? filterItems(item.children) : [];
-    const match = `${item.label} ${item.description || ""}`.toLowerCase().includes(q);
-    return match || children.length ? { ...item, children: children.length ? children : item.children } : null;
-  }).filter(Boolean) as TreeItem[];
-  return modules.map((module) => ({ ...module, items: filterItems(module.items) })).filter((module) => module.items.length || module.title.toLowerCase().includes(q) || module.description.toLowerCase().includes(q));
-}
-
-function ModuleCard({ module }: { module: TreeModule }) {
-  return <section className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm"><div className="flex items-start justify-between gap-3"><div><p className="text-[9px] font-black uppercase tracking-[.16em] theme-primary">{module.code} · School Management</p><h3 className="mt-1 text-xl font-black">{module.title}</h3></div><span className="rounded-full bg-[var(--school-primary-soft)] px-2.5 py-1 text-[8px] font-black theme-primary">{countLeaves(module.items)} leaves</span></div><p className="mt-2 text-xs leading-5 text-[var(--school-muted)]">{module.description}</p><div className="mt-4 space-y-1.5">{module.items.map((item, index) => <TreeRow key={`${module.code}-${item.label}`} item={item} index={index + 1} />)}</div></section>;
-}
-
-function TreeRow({ item, index }: { item: TreeItem; index: number }) {
-  const [open, setOpen] = useState(true);
-  const branch = !!item.children?.length;
-  const content = <><span className="w-6 shrink-0 text-[8px] font-black text-[var(--school-muted)]">{String(index).padStart(2, "0")}</span><span className="truncate">{item.label}</span></>;
-  return <div><div className="flex items-center rounded-xl bg-[var(--school-background)]">{item.href && !branch ? <Link href={item.href} className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2.5 text-[10px] font-semibold text-[var(--school-text)] hover:theme-primary">{content}</Link> : <button type="button" onClick={() => setOpen((value) => !value)} className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2.5 text-left text-[10px] font-bold">{content}</button>}{branch ? <button type="button" onClick={() => setOpen((value) => !value)} className={`mr-2 rounded-md px-1.5 text-[10px] text-[var(--school-muted)] ${open ? "rotate-180" : ""}`} aria-label={`Toggle ${item.label}`}>⌄</button> : null}</div>{branch && open ? <div className="ml-4 border-l border-[var(--school-border)] pl-2 pt-1">{item.children!.map((child, childIndex) => <TreeRow key={`${item.label}-${child.label}`} item={child} index={childIndex + 1} />)}</div> : null}</div>;
-}
-
-function Stat({ label, value, primary = false }: { label: string; value: string; primary?: boolean }) {
-  return <div className="rounded-xl border border-[var(--school-border)] bg-[var(--school-background)] p-3"><p className="text-[8px] font-black uppercase tracking-[.1em] text-[var(--school-muted)]">{label}</p><p className={`mt-1 text-xl font-black ${primary ? "theme-primary" : ""}`}>{value}</p></div>;
-}
+function OverviewView({ modules, pending, activity }: { modules: TreeModule[]; pending: number; activity: number }) { return <><section className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">{modules.map((module) => <ModuleCard key={module.code} module={module} />)}</section><section className="mt-5 grid gap-5 md:grid-cols-2"><Link href="/admin?view=pending" className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm"><p className="text-[9px] font-black uppercase tracking-[.16em] theme-primary">Pending Actions</p><h3 className="mt-2 text-xl font-black">{pending} records</h3><p className="mt-1 text-xs text-[var(--school-muted)]">Open the live approval/action queue.</p></Link><Link href="/admin?view=activity" className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm"><p className="text-[9px] font-black uppercase tracking-[.16em] theme-primary">System Activity</p><h3 className="mt-2 text-xl font-black">{activity} recent records</h3><p className="mt-1 text-xs text-[var(--school-muted)]">Open the live cross-module activity feed.</p></Link></section></>; }
+function PendingView({ items }: { items: ActivityItem[] }) { return <section className="mt-5 rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm md:p-7"><p className="text-[10px] font-black uppercase tracking-[.16em] theme-primary">Live Records</p><div className="mt-1 flex items-end justify-between gap-3"><div><h3 className="text-2xl font-black">Pending Actions</h3><p className="mt-1 text-sm text-[var(--school-muted)]">Only records whose current status requires attention are shown.</p></div><span className="rounded-full bg-[var(--school-primary-soft)] px-3 py-1.5 text-xs font-black theme-primary">{items.length} pending</span></div>{items.length ? <div className="mt-5 overflow-x-auto rounded-2xl border border-[var(--school-border)]"><table className="min-w-[760px] w-full text-left text-xs"><thead className="bg-[var(--school-background)]"><tr><th className="px-4 py-3 font-black">Module</th><th className="px-4 py-3 font-black">Action</th><th className="px-4 py-3 font-black">Reference</th><th className="px-4 py-3 font-black">Status</th><th className="px-4 py-3 font-black">Time</th></tr></thead><tbody>{items.map((item) => <tr key={item.id} className="border-t border-[var(--school-border)]"><td className="px-4 py-3 font-bold">{item.module}</td><td className="px-4 py-3">{item.action}</td><td className="px-4 py-3">{item.reference || "—"}</td><td className="px-4 py-3"><span className="rounded-full bg-[var(--school-primary-soft)] px-2 py-1 font-bold theme-primary">{item.status || "Pending"}</span></td><td className="px-4 py-3 text-[var(--school-muted)]">{formatDate(item.createdAt)}</td></tr>)}</tbody></table></div> : <EmptyState title="No pending actions" text="All currently loaded records are completed or non-actionable." />}</section>; }
+function ActivityView({ items }: { items: ActivityItem[] }) { return <section className="mt-5 rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm md:p-7"><p className="text-[10px] font-black uppercase tracking-[.16em] theme-primary">Live Records</p><h3 className="mt-1 text-2xl font-black">System Activity</h3><p className="mt-1 text-sm text-[var(--school-muted)]">Recent activity collected from existing school-management records.</p>{items.length ? <div className="mt-5 space-y-2">{items.map((item) => <article key={item.id} className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-background)] p-4"><div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between"><div><p className="text-xs font-black">{item.action}</p><p className="mt-1 text-[10px] text-[var(--school-muted)]">{item.module} · {item.reference || "No reference"}{item.detail ? ` · ${item.detail}` : ""}</p></div><div className="flex items-center gap-2"><span className="rounded-full bg-[var(--school-surface)] px-2.5 py-1 text-[9px] font-bold">{item.status || "Recorded"}</span><span className="text-[9px] text-[var(--school-muted)]">{formatDate(item.createdAt)}</span></div></div></article>)}</div> : <EmptyState title="No recent activity" text="There are no recent records available to display." />}</section>; }
+function ModuleCard({ module }: { module: TreeModule }) { return <section className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 shadow-sm"><div className="flex items-start justify-between gap-3"><div><p className="text-[9px] font-black uppercase tracking-[.16em] theme-primary">{module.code} · School Management</p><h3 className="mt-1 text-xl font-black">{module.title}</h3></div><span className="rounded-full bg-[var(--school-primary-soft)] px-2.5 py-1 text-[8px] font-black theme-primary">{countLeaves(module.items)} leaves</span></div><p className="mt-2 text-xs leading-5 text-[var(--school-muted)]">{module.description}</p><div className="mt-4 space-y-1.5">{module.items.map((item, index) => <TreeRow key={`${module.code}-${item.label}`} item={item} index={index + 1} />)}</div></section>; }
+function TreeModuleRow({ module }: { module: TreeModule }) { const [open, setOpen] = useState(module.code === "01"); return <div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)]"><button type="button" onClick={() => setOpen((value) => !value)} className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left"><span><span className="mr-2 text-[8px] font-black text-[var(--school-muted)]">{module.code}</span><span className="text-[10px] font-black">{module.title}</span><span className="mt-0.5 block pl-5 text-[8px] text-[var(--school-muted)]">{countLeaves(module.items)} leaves</span></span><span className={`text-[10px] text-[var(--school-muted)] transition ${open ? "rotate-180" : ""}`}>⌄</span></button>{open ? <div className="border-t border-[var(--school-border)] px-2 pb-2 pt-1">{module.items.map((item, index) => <TreeRow key={item.label} item={item} index={index + 1} compact />)}</div> : null}</div>; }
+function TreeRow({ item, index, compact = false }: { item: TreeItem; index: number; compact?: boolean }) { const [open, setOpen] = useState(false); const branch = !!item.children?.length; return <div><div className="flex items-center rounded-xl bg-[var(--school-background)]"><Link href={item.href} className={`flex min-w-0 flex-1 items-center gap-2 truncate font-semibold hover:theme-primary ${compact ? "px-2.5 py-2 text-[9px]" : "px-3 py-2.5 text-[10px]"}`}><span className="w-6 shrink-0 text-[8px] font-black text-[var(--school-muted)]">{String(index).padStart(2, "0")}</span><span className="truncate">{item.label}</span></Link>{branch ? <button type="button" onClick={() => setOpen((value) => !value)} className={`mr-2 rounded-md px-1.5 text-[10px] text-[var(--school-muted)] ${open ? "rotate-180" : ""}`} aria-label={`Toggle ${item.label}`}>⌄</button> : null}</div>{branch && open ? <div className="ml-3 border-l border-[var(--school-border)] pl-2">{item.children!.map((child, childIndex) => <TreeRow key={child.label} item={child} index={childIndex + 1} compact={compact} />)}</div> : null}</div>; }
+function EmptyState({ title, text }: { title: string; text: string }) { return <div className="mt-5 rounded-2xl border border-dashed border-[var(--school-border)] p-10 text-center"><p className="text-sm font-black">{title}</p><p className="mt-1 text-xs text-[var(--school-muted)]">{text}</p></div>; }
+function Stat({ label, value, primary = false }: { label: string; value: string; primary?: boolean }) { return <div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-background)] p-3"><p className="text-[8px] font-black uppercase tracking-[.12em] text-[var(--school-muted)]">{label}</p><p className={`mt-1 text-lg font-black ${primary ? "theme-primary" : ""}`}>{value}</p></div>; }
+function formatDate(value: string) { const date = new Date(value); return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(date); }
+function filterTree(modules: TreeModule[], query: string): TreeModule[] { const q = query.trim().toLowerCase(); if (!q) return modules; const filterItems = (items: TreeItem[]): TreeItem[] => items.map((item) => { const children = item.children ? filterItems(item.children) : []; const match = `${item.label} ${item.description || ""}`.toLowerCase().includes(q); return match || children.length ? { ...item, children: children.length ? children : item.children } : null; }).filter(Boolean) as TreeItem[]; return modules.map((module) => ({ ...module, items: filterItems(module.items) })).filter((module) => module.items.length || module.title.toLowerCase().includes(q) || module.description.toLowerCase().includes(q)); }
