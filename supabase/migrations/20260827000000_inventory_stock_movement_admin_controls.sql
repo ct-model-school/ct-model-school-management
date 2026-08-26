@@ -1,9 +1,12 @@
-create policy if not exists "inventory_stock_movements_admin_select_policy"
+drop policy if exists "inventory_stock_movements_admin_select_policy" on public.inventory_stock_movements;
+drop policy if exists "inventory_stock_movements_admin_insert_policy" on public.inventory_stock_movements;
+
+create policy "inventory_stock_movements_admin_select_policy"
 on public.inventory_stock_movements
 for select
 using ((select store_is_admin()));
 
-create policy if not exists "inventory_stock_movements_admin_insert_policy"
+create policy "inventory_stock_movements_admin_insert_policy"
 on public.inventory_stock_movements
 for insert
 with check ((select store_is_admin()));
