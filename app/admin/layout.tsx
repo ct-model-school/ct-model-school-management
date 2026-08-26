@@ -95,48 +95,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     return allow(item.permission || "");
   });
 
+  // Super Admin has its own complete UI shell in SuperAdminDashboard.
+  // Do not render another sidebar/header here, otherwise the two shells stack.
   if (superAdmin) {
     return (
       <div className="min-h-screen bg-[var(--school-background)] text-[var(--school-text)]">
-        <div className="mx-auto flex min-h-screen max-w-[1600px]">
-          <aside className="hidden w-[250px] shrink-0 flex-col border-r border-[var(--school-border)] bg-[var(--school-surface)] lg:flex">
-            <div className="border-b border-[var(--school-border)] px-6 py-7">
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] theme-primary">C.T. Model School</p>
-              <p className="mt-2 text-sm font-black">Management System</p>
-              <p className="mt-1 text-[10px] font-semibold text-[var(--school-muted)]">Super Admin Control Center</p>
-            </div>
-            <nav className="flex-1 px-4 py-6" aria-label="Super Admin navigation">
-              <p className="px-3 text-[9px] font-black uppercase tracking-[0.18em] text-[var(--school-muted)]">Current UI</p>
-              <Link href="/admin" className="mt-2 flex items-center gap-3 rounded-2xl bg-[var(--school-primary-soft)] px-3 py-3 text-xs font-black theme-primary ring-1 ring-[var(--school-primary-border)]">
-                <span className="grid h-7 w-7 place-items-center rounded-xl bg-[var(--school-surface)] text-[9px] font-black">01</span>
-                Dashboard
-              </Link>
-              <div className="mt-6 rounded-2xl border border-dashed border-[var(--school-border)] p-4">
-                <p className="text-[9px] font-black uppercase tracking-wider theme-primary">Staged rollout</p>
-                <p className="mt-2 text-[10px] leading-5 text-[var(--school-muted)]">Only the approved screen is exposed. The next module is added after your review.</p>
-              </div>
-            </nav>
-            <div className="border-t border-[var(--school-border)] p-4">
-              <div className="rounded-2xl bg-[var(--school-primary-soft)] p-4">
-                <p className="truncate text-sm font-black">{access.profile.full_name || access.profile.email}</p>
-                <p className="mt-1 text-[10px] font-bold capitalize theme-primary">{roleLabel}</p>
-              </div>
-            </div>
-          </aside>
-
-          <div className="min-w-0 flex-1">
-            <header className="sticky top-0 z-20 border-b border-[var(--school-border)] bg-[var(--school-surface)]/95 px-4 py-3 backdrop-blur lg:hidden">
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-black">C.T. Model School</p>
-                  <p className="mt-0.5 text-[10px] font-bold capitalize theme-primary">Super Admin · Stage 01</p>
-                </div>
-                <Link href="/admin" className="shrink-0 rounded-xl bg-[var(--school-primary-soft)] px-3 py-2 text-[10px] font-black theme-primary">Dashboard</Link>
-              </div>
-            </header>
-            <main className="min-w-0 p-4 sm:p-6 lg:p-9">{children}</main>
-          </div>
-        </div>
+        <main className="min-w-0 p-4 sm:p-6 lg:p-9">{children}</main>
       </div>
     );
   }
