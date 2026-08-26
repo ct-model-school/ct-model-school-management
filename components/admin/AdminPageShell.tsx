@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 type AdminPageShellProps = {
   eyebrow: string;
@@ -18,7 +21,42 @@ const moduleLinks = [
   { href: "/admin/roles", label: "Role Management" },
 ];
 
+const memberLabels: Record<string, { title: string; description: string }> = {
+  staff: { title: "Staff", description: "Create and manage Staff members only." },
+  teacher: { title: "Teachers", description: "Create and manage Teacher members only." },
+  accounts: { title: "Accounts", description: "Create and manage Accounts members only." },
+  other: { title: "Other Members", description: "Create and manage Other members only." },
+};
+
 export function AdminPageShell({ eyebrow, title, description, children, action }: AdminPageShellProps) {
+  const [memberType, setMemberType] = useState("staff");
+  const isMemberPage = title === "Staff, Teachers, Accounts & Others";
+
+  useEffect(() => {
+    if (!isMemberPage) return;
+    const value = new URLSearchParams(window.location.search).get("type") || "staff";
+    setMemberType(memberLabels[value] ? value : "staff");
+  }, [isMemberPage]);
+
+  if (isMemberPage) {
+    const section = memberLabels[memberType] || memberLabels.staff;
+    return (
+      <div className="mx-auto max-w-7xl">
+        <header className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-6 shadow-sm md:p-8">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] theme-primary">{eyebrow}</p>
+          <h1 className="mt-2 text-3xl font-bold text-[var(--school-text)]">{section.title}</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--school-muted)]">{section.description}</p>
+        </header>
+        <section className="members-only mt-6">{children}</section>
+        <style jsx>{`
+          .members-only > div:first-child {
+            display: none;
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-7xl">
       <header className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-6 shadow-sm md:p-8">
