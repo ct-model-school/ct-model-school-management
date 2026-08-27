@@ -15,6 +15,23 @@ type ActivityItem = {
   createdAt: string;
 };
 
+type OwnerMetrics = {
+  students: number;
+  parents: number;
+  teachers: number;
+  staff: number;
+  inventoryItems: number;
+  lowStockItems: number;
+  pendingSr: number;
+  pendingPr: number;
+  pendingPo: number;
+  pendingBills: number;
+  pendingStudentAdmission: number;
+  pendingParentRegistration: number;
+  totalOutstandingBills: number;
+  totalFeeDue: number;
+};
+
 async function getRecentActivity(): Promise<ActivityItem[]> {
   const supabase = await createServerSupabaseClient();
 
@@ -42,13 +59,53 @@ async function getRecentActivity(): Promise<ActivityItem[]> {
   return items.filter((item) => item.createdAt).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 20);
 }
 
+async function getOwnerMetrics(): Promise<OwnerMetrics> {
+  const supabase = await createServerSupabaseClient();
+  const [students, parents, teachers, staff, inventoryItems, lowStockItems, pendingSr, pendingPr, pendingPo, pendingBills, pendingStudentAdmission, pendingParentRegistration, bills, feeAccounts] = await Promise.all([
+    supabase.from("students").select("id", { count: "exact", head: true }).eq("status", "active"),
+    supabase.from("parents").select("id", { count: "exact", head: true }).eq("is_active", true),
+    supabase.from("teacher_members").select("id", { count: "exact", head: true }).eq("is_active", true),
+    supabase.from("staff_members").select("id", { count: "exact", head: true }).eq("is_active", true),
+    supabase.from("inventory_items").select("id", { count: "exact", head: true }).eq("is_active", true),
+    supabase.from("inventory_items").select("id", { count: "exact", head: true }).eq("is_active", true).filter("current_stock", "lte", "reorder_level"),
+    supabase.from("store_service_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    supabase.from("procurement_requests").select("id", { count: "exact", head: true }).eq("status", "submitted"),
+    supabase.from("purchase_orders").select("id", { count: "exact", head: true }).in("status", ["submitted", "accounts_submitted"]),
+    supabase.from("accounts_bills").select("id", { count: "exact", head: true }).in("status", ["submitted", "approved", "partial", "due"]),
+    supabase.from("student_registration_requests").select("id", { count: "exact", head: true }).in("status", ["pending", "reviewing"]),
+    supabase.from("parent_registration_requests").select("id", { count: "exact", head: true }).in("status", ["pending", "reviewing"]),
+    supabase.from("accounts_bills").select("due_amount").in("status", ["approved", "partial", "due"]),
+    supabase.from("student_fee_accounts").select("balance_due").gt("balance_due", 0),
+  ]);
+
+  const sum = (rows: Array<{ due_amount?: number | string | null; balance_due?: number | string | null }> | null | undefined, key: "due_amount" | "balance_due") =>
+    (rows ?? []).reduce((total, row) => total + Number(row[key] ?? 0), 0);
+
+  return {
+    students: students.count ?? 0,
+    parents: parents.count ?? 0,
+    teachers: teachers.count ?? 0,
+    staff: staff.count ?? 0,
+    inventoryItems: inventoryItems.count ?? 0,
+    lowStockItems: lowStockItems.count ?? 0,
+    pendingSr: pendingSr.count ?? 0,
+    pendingPr: pendingPr.count ?? 0,
+    pendingPo: pendingPo.count ?? 0,
+    pendingBills: pendingBills.count ?? 0,
+    pendingStudentAdmission: pendingStudentAdmission.count ?? 0,
+    pendingParentRegistration: pendingParentRegistration.count ?? 0,
+    totalOutstandingBills: sum(bills.data, "due_amount"),
+    totalFeeDue: sum(feeAccounts.data, "balance_due"),
+  };
+}
+
 export default async function AdminPage() {
   const profile = await getCurrentProfile();
   if (!profile) return null;
 
   if (isSuperAdmin(profile.role.name)) {
-    const activityItems = await getRecentActivity();
-    return <OwnerCommandCenterRouter fullName={profile.full_name} email={profile.email} roleName={profile.role.name} activityItems={activityItems} />;
+    const [activityItems, metrics] = await Promise.all([getRecentActivity(), getOwnerMetrics()]);
+    return <OwnerCommandCenterRouter fullName={profile.full_name} email={profile.email} roleName={profile.role.name} activityItems={activityItems} metrics={metrics} />;
   }
 
   const modules = [
