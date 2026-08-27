@@ -3,8 +3,7 @@ export type OwnerGroup = { label: string; href?: string; actions?: OwnerAction[]
 export type OwnerModule = { code: string; title: string; description: string; groups: OwnerGroup[] };
 
 // Owner navigation is intentionally outcome/workspace based.
-// One destination appears once. Detailed actions belong inside the workspace,
-// not as duplicate navigation leaves.
+// Each destination is represented once. Detailed actions belong inside the workspace.
 export const ownerModules: OwnerModule[] = [
   {
     code: "01",
@@ -55,10 +54,7 @@ export const ownerModules: OwnerModule[] = [
           { label: "Reports", href: "/admin/inventory/reports" },
         ],
       },
-      {
-        label: "PR & PO Workspace",
-        href: "/admin/inventory/procurement",
-      },
+      { label: "PR & PO Workspace", href: "/admin/inventory/procurement" },
     ],
   },
   {
@@ -89,19 +85,17 @@ export const ownerModules: OwnerModule[] = [
   {
     code: "07",
     title: "Academic",
-    description: "Students, examinations, results and academic reporting.",
+    description: "Examinations, results and academic reporting.",
     groups: [
-      { label: "Students", href: "/admin/students" },
       { label: "Results Workspace", href: "/admin/results" },
       { label: "Result Entry", href: "/admin/results/entry" },
       { label: "Result Reports", href: "/admin/results/reports" },
-      { label: "Notices", href: "/admin/notices" },
     ],
   },
   {
     code: "08",
     title: "Access Control",
-    description: "Users, roles, permissions, portals and audit controls.",
+    description: "Users, roles, permissions, portals and security controls.",
     groups: [
       { label: "User Management", href: "/admin/members" },
       { label: "Role Management", href: "/admin/roles" },
