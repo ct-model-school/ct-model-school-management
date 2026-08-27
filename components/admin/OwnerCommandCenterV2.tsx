@@ -1,19 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { ownerModules, ownerLeafCount } from "./ownerAdminNavigation";
+import { useRouter } from "next/navigation";
+import { ownerModules } from "./ownerAdminNavigation";
 
 type ActivityItem = { id: string; module: string; action: string; reference?: string | null; detail?: string | null; status?: string | null; createdAt: string };
-type OwnerMetrics = { students: number; parents: number; teachers: number; staff: number; inventoryItems: number; lowStockItems: number; pendingSr: number; pendingPr: number; pendingPo: number; pendingBills: number; pendingStudentAdmission: number; pendingParentRegistration: number; totalOutstandingBills: number; totalFeeDue: number };
+type OwnerMetrics = { students: number; parents: number; teachers: number; staff: number; inventoryItems: number; lowStockItems: number; pendingSr: number; pendingPr: number; pendingPo: number; pendingBills: number; pendingStudentAdmission: number; pendingParentRegistration: number; pendingPayroll: number; totalOutstandingBills: number; totalFeeDue: number };
 
 const money = (value: number) => `৳${value.toLocaleString("en-BD", { maximumFractionDigits: 2 })}`;
 
 export default function OwnerCommandCenterV2({ fullName, email, roleName, activityItems, metrics }: { fullName: string | null; email: string | null; roleName: string; activityItems: ActivityItem[]; metrics: OwnerMetrics }) {
-  const pending = metrics.pendingSr + metrics.pendingPr + metrics.pendingPo + metrics.pendingBills + metrics.pendingStudentAdmission + metrics.pendingParentRegistration;
+  const router = useRouter();
+  const pending = metrics.pendingSr + metrics.pendingPr + metrics.pendingPo + metrics.pendingBills + metrics.pendingStudentAdmission + metrics.pendingParentRegistration + metrics.pendingPayroll;
   const people = metrics.students + metrics.parents + metrics.teachers + metrics.staff;
   return <div className="space-y-6">
     <section className="rounded-3xl border border-[var(--school-border)] bg-[var(--school-surface)] p-6 shadow-sm md:p-8">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-[9px] font-black uppercase tracking-[.2em] theme-primary">Super Admin / Owner Command Center</p><h1 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">Welcome, {fullName || "C.T. Model School Administrator"}</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--school-muted)]">Live management view connected to the school database. Counts, outstanding amounts and workflow queues below are read from current records.</p></div><div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-background)] px-5 py-4"><p className="text-[9px] font-black uppercase tracking-[.16em] text-[var(--school-muted)]">Role</p><p className="mt-1 text-sm font-black capitalize">{roleName.replace(/_/g, " ")}</p><p className="mt-1 text-[10px] text-[var(--school-muted)]">{email || ""}</p></div></div>
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-[9px] font-black uppercase tracking-[.2em] theme-primary">Super Admin / Owner Command Center</p><h1 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">Welcome, {fullName || "C.T. Model School Administrator"}</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--school-muted)]">Live management view connected to the school database. Counts, balances and workflow queues are read from current records.</p></div><div className="flex items-center gap-3"><button type="button" onClick={() => router.refresh()} className="rounded-xl border border-[var(--school-border)] bg-[var(--school-surface)] px-3 py-2 text-[10px] font-black hover:bg-[var(--school-primary-soft)]">Refresh data</button><div className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-background)] px-5 py-4"><p className="text-[9px] font-black uppercase tracking-[.16em] text-[var(--school-muted)]">Role</p><p className="mt-1 text-sm font-black capitalize">{roleName.replace(/_/g, " ")}</p><p className="mt-1 text-[10px] text-[var(--school-muted)]">{email || ""}</p></div></div></div>
     </section>
 
     <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -23,9 +25,10 @@ export default function OwnerCommandCenterV2({ fullName, email, roleName, activi
       <Link href="/admin?view=pending" className="rounded-2xl border border-[var(--school-primary-border)] bg-[var(--school-primary-soft)] p-5 transition hover:opacity-90"><p className="text-[9px] uppercase tracking-wider theme-primary">Needs Attention</p><p className="mt-1 text-2xl font-black">{pending}</p><p className="mt-1 text-[10px] text-[var(--school-muted)]">SR {metrics.pendingSr} · PR {metrics.pendingPr} · PO {metrics.pendingPo} · Bills {metrics.pendingBills}</p></Link>
     </section>
 
-    <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
       <Link href="/admin/students" className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 hover:bg-[var(--school-primary-soft)]"><p className="text-[9px] uppercase tracking-wider text-[var(--school-muted)]">Admission Queue</p><p className="mt-1 text-xl font-black">{metrics.pendingStudentAdmission}</p><p className="mt-1 text-[10px] text-[var(--school-muted)]">New student applications</p></Link>
       <Link href="/admin/parents" className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 hover:bg-[var(--school-primary-soft)]"><p className="text-[9px] uppercase tracking-wider text-[var(--school-muted)]">Parent Registration</p><p className="mt-1 text-xl font-black">{metrics.pendingParentRegistration}</p><p className="mt-1 text-[10px] text-[var(--school-muted)]">Pending/reviewing requests</p></Link>
+      <Link href="/admin/hr" className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 hover:bg-[var(--school-primary-soft)]"><p className="text-[9px] uppercase tracking-wider text-[var(--school-muted)]">Payroll Queue</p><p className="mt-1 text-xl font-black">{metrics.pendingPayroll}</p><p className="mt-1 text-[10px] text-[var(--school-muted)]">Draft/submitted payroll sheets</p></Link>
       <Link href="/admin/accounts/bill-payments" className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 hover:bg-[var(--school-primary-soft)]"><p className="text-[9px] uppercase tracking-wider text-[var(--school-muted)]">Outstanding Bills</p><p className="mt-1 text-xl font-black">{money(metrics.totalOutstandingBills)}</p><p className="mt-1 text-[10px] text-[var(--school-muted)]">Across approved/partial/due bills</p></Link>
       <Link href="/admin/accounts/fees" className="rounded-2xl border border-[var(--school-border)] bg-[var(--school-surface)] p-5 hover:bg-[var(--school-primary-soft)]"><p className="text-[9px] uppercase tracking-wider text-[var(--school-muted)]">Student Fee Due</p><p className="mt-1 text-xl font-black">{money(metrics.totalFeeDue)}</p><p className="mt-1 text-[10px] text-[var(--school-muted)]">Current positive balances</p></Link>
     </section>
