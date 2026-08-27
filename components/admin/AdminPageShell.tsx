@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useOwnerAdminContext } from "./OwnerAdminContext";
 
 type AdminPageShellProps = {
   eyebrow: string;
@@ -30,6 +31,7 @@ const memberLabels: Record<string, { title: string; description: string }> = {
 };
 
 export function AdminPageShell({ eyebrow, title, description, children, action }: AdminPageShellProps) {
+  const ownerContext = useOwnerAdminContext();
   const [memberType, setMemberType] = useState("staff");
   const [navOpen, setNavOpen] = useState(false);
   const isMemberPage = title === "Staff, Teachers, Accounts & Others";
@@ -40,6 +42,8 @@ export function AdminPageShell({ eyebrow, title, description, children, action }
     const value = new URLSearchParams(window.location.search).get("type") || "staff";
     setMemberType(memberLabels[value] ? value : "staff");
   }, [isMemberPage]);
+
+  if (ownerContext) return <>{children}</>;
 
   const navigation = (
     <nav aria-label="Administration navigation" className="space-y-1">
