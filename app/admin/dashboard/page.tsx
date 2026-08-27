@@ -1,4 +1,3 @@
-/** Route reserved for a future, separately scoped implementation. */
-export default function Page() {
-  return null;
-}
+import AdminPage from "../page";
+
+export default AdminPage;
