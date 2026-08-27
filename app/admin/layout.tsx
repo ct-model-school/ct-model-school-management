@@ -2,6 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getCurrentAdminPermissions } from "@/lib/adminPermissions";
+import OwnerAdminShell from "@/components/admin/OwnerAdminShell";
 
 const primaryNavigation = [
   { href: "/admin", label: "Dashboard", permission: "dashboard" },
@@ -18,11 +19,8 @@ const primaryNavigation = [
   { href: "/admin/roles/procurement", label: "PR & PO Permissions", adminOnly: true },
 ];
 
-const isAdminOnlyRole = (roleName: string) =>
-  ["admin", "administrator", "super_admin", "super admin"].includes(roleName.toLowerCase().replace(/_/g, " "));
-
-const isSuperAdminRole = (roleName: string) =>
-  ["super_admin", "super admin"].includes(roleName.toLowerCase().replace(/_/g, " "));
+const isAdminOnlyRole = (roleName: string) => ["admin", "administrator", "super_admin", "super admin"].includes(roleName.toLowerCase().replace(/_/g, " "));
+const isSuperAdminRole = (roleName: string) => ["super_admin", "super admin"].includes(roleName.toLowerCase().replace(/_/g, " "));
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const access = await getCurrentAdminPermissions();
@@ -48,39 +46,19 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (pathname === "/admin" || pathname === "/admin/") {
     if (!permissions.dashboard && !adminOnly) redirect("/admin/login");
   }
-
-  // Super Admin owns the complete admin tree. Individual branches are protected
-  // by their normal permission checks below, but Super Admin must never be sent
-  // back to the dashboard simply because a leaf route is opened.
-  if (pathname === "/admin/portals" || pathname.startsWith("/admin/portals/")) {
-    if (!adminOnly) redirect("/admin");
-  }
-  if (pathname === "/admin/settings" || pathname.startsWith("/admin/settings/")) {
-    if (!adminOnly) redirect("/admin");
-  }
-  if (pathname === "/admin/roles" || pathname.startsWith("/admin/roles/")) {
-    if (!adminOnly) redirect("/admin");
-  }
+  if (pathname === "/admin/portals" || pathname.startsWith("/admin/portals/")) if (!adminOnly) redirect("/admin");
+  if (pathname === "/admin/settings" || pathname.startsWith("/admin/settings/")) if (!adminOnly) redirect("/admin");
+  if (pathname === "/admin/roles" || pathname.startsWith("/admin/roles/")) if (!adminOnly) redirect("/admin");
   if (pathname === "/admin/inventory/procurement" || pathname.startsWith("/admin/inventory/procurement/")) {
     if (!hasProcurement) redirect("/admin");
   } else if (pathname === "/admin/inventory" || pathname.startsWith("/admin/inventory/")) {
     if (!hasInventory) redirect("/admin");
   }
-  if (pathname === "/admin/item-sr" || pathname.startsWith("/admin/item-sr/")) {
-    if (!hasItemSr) redirect("/admin");
-  }
-  if (pathname === "/admin/accounts" || pathname.startsWith("/admin/accounts/")) {
-    if (!hasAccounts) redirect("/admin");
-  }
-  if (pathname === "/admin/parents" || pathname.startsWith("/admin/parents/")) {
-    if (!adminOnly) redirect("/admin");
-  }
-  if (pathname === "/admin/hr" || pathname.startsWith("/admin/hr/")) {
-    if (!adminOnly) redirect("/admin");
-  }
-  if (pathname === "/admin/members" || pathname.startsWith("/admin/members/")) {
-    if (!adminOnly) redirect("/admin");
-  }
+  if (pathname === "/admin/item-sr" || pathname.startsWith("/admin/item-sr/")) if (!hasItemSr) redirect("/admin");
+  if (pathname === "/admin/accounts" || pathname.startsWith("/admin/accounts/")) if (!hasAccounts) redirect("/admin");
+  if (pathname === "/admin/parents" || pathname.startsWith("/admin/parents/")) if (!adminOnly) redirect("/admin");
+  if (pathname === "/admin/hr" || pathname.startsWith("/admin/hr/")) if (!adminOnly) redirect("/admin");
+  if (pathname === "/admin/members" || pathname.startsWith("/admin/members/")) if (!adminOnly) redirect("/admin");
 
   const roleLabel = roleName.replace(/_/g, " ");
   const visiblePrimary = primaryNavigation.filter(item => {
@@ -93,11 +71,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   });
 
   if (superAdmin) {
-    return (
-      <div className="min-h-screen bg-[var(--school-background)] text-[var(--school-text)]">
-        <main className="min-w-0 p-4 sm:p-6 lg:p-9">{children}</main>
-      </div>
-    );
+    return <OwnerAdminShell fullName={access.profile.full_name} email={access.profile.email} roleName={access.profile.role.name}>{children}</OwnerAdminShell>;
   }
 
   return (
