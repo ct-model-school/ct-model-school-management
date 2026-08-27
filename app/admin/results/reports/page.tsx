@@ -1,4 +1,2 @@
-/** Route reserved for a future, separately scoped implementation. */
-export default function Page() {
-  return null;
-}
+import ResultsPage from "../page";
+export default ResultsPage;
