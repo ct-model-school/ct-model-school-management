@@ -14,6 +14,11 @@ export type AdminPermissionKey =
   | "notices"
   | "results";
 
+const isOwnerRole = (roleName: string) =>
+  ["super_admin", "super admin", "admin", "administrator"].includes(
+    roleName.toLowerCase().replace(/_/g, " "),
+  );
+
 export async function getCurrentAdminPermissions() {
   const profile = await getCurrentProfile();
   if (!profile) return null;
@@ -24,18 +29,27 @@ export async function getCurrentAdminPermissions() {
   });
 
   if (error) {
-    return { profile, permissions: {} as Record<string, boolean> };
+    return {
+      profile,
+      isOwner: isOwnerRole(profile.role.name),
+      permissions: {} as Record<string, unknown>,
+    };
   }
 
   return {
     profile,
-    permissions: (data ?? {}) as Record<string, boolean>,
+    isOwner: isOwnerRole(profile.role.name),
+    permissions: (data ?? {}) as Record<string, unknown>,
   };
 }
 
 export async function requireAdminPermission(permission: AdminPermissionKey | AdminPermissionKey[]) {
   const access = await getCurrentAdminPermissions();
   if (!access) redirect("/admin/login");
+
+  // Owner/Admin is the highest trust level. Do not let stale or incomplete
+  // role-permission rows block an owner from an administrative workspace.
+  if (access.isOwner) return access;
 
   const required = Array.isArray(permission) ? permission : [permission];
   const allowed = required.some((key) => Boolean(access.permissions[key]));
