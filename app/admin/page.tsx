@@ -28,6 +28,7 @@ type OwnerMetrics = {
   pendingBills: number;
   pendingStudentAdmission: number;
   pendingParentRegistration: number;
+  pendingPayroll: number;
   totalOutstandingBills: number;
   totalFeeDue: number;
 };
@@ -61,7 +62,7 @@ async function getRecentActivity(): Promise<ActivityItem[]> {
 
 async function getOwnerMetrics(): Promise<OwnerMetrics> {
   const supabase = await createServerSupabaseClient();
-  const [students, parents, teachers, staff, inventoryItems, lowStockItems, pendingSr, pendingPr, pendingPo, pendingBills, pendingStudentAdmission, pendingParentRegistration, bills, feeAccounts] = await Promise.all([
+  const [students, parents, teachers, staff, inventoryItems, lowStockItems, pendingSr, pendingPr, pendingPo, pendingBills, pendingStudentAdmission, pendingParentRegistration, pendingPayroll, bills, feeAccounts] = await Promise.all([
     supabase.from("students").select("id", { count: "exact", head: true }).eq("status", "active"),
     supabase.from("parents").select("id", { count: "exact", head: true }).eq("is_active", true),
     supabase.from("teacher_members").select("id", { count: "exact", head: true }).eq("is_active", true),
@@ -74,6 +75,7 @@ async function getOwnerMetrics(): Promise<OwnerMetrics> {
     supabase.from("accounts_bills").select("id", { count: "exact", head: true }).in("status", ["submitted", "approved", "partial", "due"]),
     supabase.from("student_registration_requests").select("id", { count: "exact", head: true }).in("status", ["pending", "reviewing"]),
     supabase.from("parent_registration_requests").select("id", { count: "exact", head: true }).in("status", ["pending", "reviewing"]),
+    supabase.from("hr_payroll_sheets").select("id", { count: "exact", head: true }).in("status", ["draft", "submitted"]),
     supabase.from("accounts_bills").select("due_amount").in("status", ["approved", "partial", "due"]),
     supabase.from("student_fee_accounts").select("balance_due").gt("balance_due", 0),
   ]);
@@ -94,6 +96,7 @@ async function getOwnerMetrics(): Promise<OwnerMetrics> {
     pendingBills: pendingBills.count ?? 0,
     pendingStudentAdmission: pendingStudentAdmission.count ?? 0,
     pendingParentRegistration: pendingParentRegistration.count ?? 0,
+    pendingPayroll: pendingPayroll.count ?? 0,
     totalOutstandingBills: sum(bills.data, "due_amount"),
     totalFeeDue: sum(feeAccounts.data, "balance_due"),
   };
